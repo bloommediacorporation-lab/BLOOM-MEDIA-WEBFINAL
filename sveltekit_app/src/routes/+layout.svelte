@@ -2,7 +2,6 @@
     import '../../../src/index.css'; // Import global styles from parent
     import { onMount } from 'svelte';
     import { fade, fly } from 'svelte/transition';
-    import Lenis from '@studio-freight/lenis';
     import Navbar from '$lib/components/Navbar.svelte';
     import Cursor from '$lib/components/Cursor.svelte';
     import BackgroundOrbs from '$lib/components/BackgroundOrbs.svelte';
@@ -23,55 +22,54 @@
     let scrollY = 0;
 
     onMount(() => {
-        // Initialize Lenis for smooth scrolling
-        lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            smoothTouch: false,
-            touchMultiplier: 2,
-        });
+        let destroyed = false;
+        let rafId;
+        let handleScroll;
 
-        function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
+        (async () => {
+            const { default: Lenis } = await import('@studio-freight/lenis');
+            if (destroyed) return;
 
-        requestAnimationFrame(raf);
+            lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            });
 
-        // Smart Navbar Logic
-        const handleScroll = () => {
-            scrollY = window.scrollY;
-            
-            // Determine scroll direction
-            if (scrollY > lastScrollY && scrollY > 100) {
-                // Scrolling DOWN and past 100px
-                isNavVisible = false;
-            } else {
-                // Scrolling UP or at top
-                isNavVisible = true;
-            }
+            const raf = (time) => {
+                if (destroyed) return;
+                lenis.raf(time);
+                rafId = requestAnimationFrame(raf);
+            };
 
-            // Determine if scrolled from top (for style changes)
-            isScrolled = scrollY > 50;
-            
-            lastScrollY = scrollY;
-        };
+            rafId = requestAnimationFrame(raf);
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll = () => {
+                scrollY = window.scrollY;
+
+                if (scrollY > lastScrollY && scrollY > 100) {
+                    isNavVisible = false;
+                } else {
+                    isNavVisible = true;
+                }
+
+                isScrolled = scrollY > 50;
+                lastScrollY = scrollY;
+            };
+
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
 
         return () => {
-            lenis.destroy();
-            window.removeEventListener('scroll', handleScroll);
+            destroyed = true;
+            if (rafId) cancelAnimationFrame(rafId);
+            if (handleScroll) window.removeEventListener('scroll', handleScroll);
+            if (lenis) lenis.destroy();
         };
     });
 
     // Reset scroll on navigation
     $effect(() => {
-        if ($page.url.pathname && lenis) {
+        if (lenis && $page.url.pathname) {
             lenis.scrollTo(0, { immediate: true });
         }
     });

@@ -1,5 +1,6 @@
 <script>
   import { fade, fly } from 'svelte/transition';
+  import { setCursorLabel, clearCursor } from '$lib/cursorState.svelte.js';
   
   let { navigate } = $props();
   

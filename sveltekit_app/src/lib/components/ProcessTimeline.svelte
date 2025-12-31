@@ -1,9 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   // CONTENT (4 PHASES)
   const steps = [
@@ -38,48 +34,56 @@
   let isMobile = false;
 
   onMount(() => {
-    const mm = gsap.matchMedia();
+    let destroyed = false;
+    let mm;
     
-    // Desktop: Horizontal Scroll
-    mm.add("(min-width: 768px)", () => {
-        isMobile = false;
-        
-        // Calculate scroll distance based on panel count
-        const getScrollDistance = () => {
-          const panels = trackRef.querySelectorAll('.process-panel');
-          const panelCount = panels.length;
-          const viewportWidth = window.innerWidth;
-          const totalWidth = panelCount * viewportWidth;
-          const distance = totalWidth - viewportWidth;
-          
-          /* console.log removed for optimization */
-          
-          return distance;
-        };
+    (async () => {
+      const [{ gsap }, scrollTriggerModule] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger')
+      ]);
 
-        gsap.to(trackRef, {
-          x: () => -getScrollDistance(), // ✅ NEGATIVE = slides LEFT
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef,
-            pin: true,
-            scrub: 1,
-            start: "top top",
-            end: () => "+=" + (getScrollDistance() * 2.2), // Speed increased by ~36% (was 3x)
-            invalidateOnRefresh: true,
-            pinSpacing: true
-          }
-        });
-    });
+      const { ScrollTrigger } = scrollTriggerModule;
+      if (destroyed) return;
 
-    // Mobile: Vertical Stack
-    mm.add("(max-width: 767px)", () => {
-        isMobile = true;
-        // Native vertical scroll, no GSAP
-    });
+      gsap.registerPlugin(ScrollTrigger);
+      mm = gsap.matchMedia();
+
+      mm.add("(min-width: 768px)", () => {
+          isMobile = false;
+          
+          const getScrollDistance = () => {
+            const panels = trackRef.querySelectorAll('.process-panel');
+            const panelCount = panels.length;
+            const viewportWidth = window.innerWidth;
+            const totalWidth = panelCount * viewportWidth;
+            const distance = totalWidth - viewportWidth;
+            return distance;
+          };
+
+          gsap.to(trackRef, {
+            x: () => -getScrollDistance(),
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef,
+              pin: true,
+              scrub: 1,
+              start: "top top",
+              end: () => "+=" + (getScrollDistance() * 2.2),
+              invalidateOnRefresh: true,
+              pinSpacing: true
+            }
+          });
+      });
+
+      mm.add("(max-width: 767px)", () => {
+          isMobile = true;
+      });
+    })();
 
     return () => {
-      mm.revert();
+      destroyed = true;
+      if (mm) mm.revert();
     };
   });
 </script>

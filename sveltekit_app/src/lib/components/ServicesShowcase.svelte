@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import gsap from 'gsap';
-  import ScrollTrigger from 'gsap/ScrollTrigger';
+  let gsap;
+  let ScrollTrigger;
 
   // --- DATA ---
   const services = [
@@ -197,30 +197,47 @@
 
   // --- LIFECYCLE ---
   onMount(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    let destroyed = false;
 
-    // Entry Animation
-    const cards = document.querySelectorAll('.service-card');
-    
-    gsap.fromTo(cards, 
-      { opacity: 0, y: 60 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef,
-          start: "top 80%",
-          once: true
+    (async () => {
+      const [gsapModule, scrollTriggerModule] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger')
+      ]);
+
+      if (destroyed) return;
+
+      gsap = gsapModule.default;
+      ScrollTrigger = scrollTriggerModule.default;
+      gsap.registerPlugin(ScrollTrigger);
+
+      const cards = document.querySelectorAll('.service-card');
+
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef,
+            start: "top 80%",
+            once: true
+          }
         }
-      }
-    );
+      );
+    })();
+
+    return () => {
+      destroyed = true;
+    };
   });
 
   onDestroy(() => {
-    ScrollTrigger.getAll().forEach(t => t.kill());
+    if (ScrollTrigger) ScrollTrigger.getAll().forEach((t) => t.kill());
     cancelAnimationFrame(momentumID);
   });
 </script>

@@ -1,9 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   let { reveal = false } = $props();
   const currentYear = new Date().getFullYear();
@@ -13,29 +9,42 @@
   let bgEl;
 
   onMount(() => {
-    if (reveal && bgEl) {
-      // Parallax effect for footer background
-      gsap.fromTo(bgEl, 
-        { yPercent: -50 },
-        {
-          yPercent: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: document.body, // Trigger based on whole page scroll
-            start: "bottom bottom", // When bottom of page hits bottom of viewport? No.
-            // Actually, for a fixed footer revealed by scrolling up, the parallax is tricky.
-            // Let's just create a subtle movement based on scroll distance relative to footer.
-            trigger: footerEl, // But footer is fixed...
-            // Let's rely on the natural reveal.
-            // Maybe just animate the background slightly?
-             trigger: 'body',
-             start: 'top top',
-             end: 'bottom bottom',
-             scrub: true
+    let destroyed = false;
+    let tween;
+
+    (async () => {
+      const [{ gsap }, scrollTriggerModule] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger')
+      ]);
+
+      const { ScrollTrigger } = scrollTriggerModule;
+      if (destroyed) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      if (reveal && bgEl) {
+        tween = gsap.fromTo(
+          bgEl,
+          { yPercent: -50 },
+          {
+            yPercent: 0,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: 'body',
+              start: 'top top',
+              end: 'bottom bottom',
+              scrub: true
+            }
           }
-        }
-      );
-    }
+        );
+      }
+    })();
+
+    return () => {
+      destroyed = true;
+      if (tween) tween.kill();
+    };
   });
 </script>
 

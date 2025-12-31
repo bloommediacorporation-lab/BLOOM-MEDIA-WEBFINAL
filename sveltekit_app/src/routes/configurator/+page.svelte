@@ -4,10 +4,6 @@
   import { tweened, spring } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
   import { cursorState, setCursorLabel, clearCursor } from '$lib/cursorState.svelte.js';
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   // --- Constants & Data ---
   const BASE_STRATEGY_FEE = 249.99;

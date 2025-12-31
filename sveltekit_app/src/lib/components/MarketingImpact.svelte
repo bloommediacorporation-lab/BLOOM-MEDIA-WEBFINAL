@@ -1,9 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import gsap from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   const cards = [
     {
@@ -54,24 +50,41 @@
   let cardsRef = [];
 
   onMount(() => {
-    // Staggered reveal for cards
-    gsap.fromTo(cardsRef.filter(Boolean), 
-      { 
-        y: 50, 
-        opacity: 0,
-      },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: sectionRef,
-          start: 'top 80%'
+    let destroyed = false;
+    let tween;
+
+    (async () => {
+      const [{ default: gsap }, scrollTriggerModule] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger')
+      ]);
+
+      const { ScrollTrigger } = scrollTriggerModule;
+      if (destroyed) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      tween = gsap.fromTo(
+        cardsRef.filter(Boolean),
+        { y: 50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: sectionRef,
+            start: 'top 80%'
+          }
         }
-      }
-    );
+      );
+    })();
+
+    return () => {
+      destroyed = true;
+      if (tween) tween.kill();
+    };
   });
 </script>
 

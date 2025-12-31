@@ -1,10 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import gsap from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
   import RollingChar from './RollingChar.svelte';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   let container;
   let ctaBtn;
@@ -16,71 +12,78 @@
   const line3Part2 = "invizibile";
 
   onMount(() => {
-    const ctx = gsap.context(() => {
-      // 1. Text Reveal Animation (Rolling Chars)
-      const strips = container.querySelectorAll('.char-strip');
-      gsap.to(strips, {
-        y: '-50%', // Slide up to reveal Slot 2
-        duration: 1.4,
-        ease: 'expo.out',
-        stagger: 0.015,
-        delay: 0.2
-      });
+    let destroyed = false;
+    let cleanup = () => {};
 
-      // 2. Parallax Effect for the whole section
-      // Fade out and move down as user scrolls
-      gsap.to(sectionRef, {
-        scrollTrigger: {
-          trigger: sectionRef,
-          start: "top top",
-          end: "bottom top", // adjust as needed
-          scrub: true
-        },
-        y: 300, // Move down
-        opacity: 0, // Fade out
-        filter: "blur(20px)", // Add blur effect
-        ease: "none"
-      });
+    (async () => {
+      const [{ default: gsap }, scrollTriggerModule] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger')
+      ]);
 
-      // 3. CTA Button Entrance
-      gsap.fromTo(ctaBtn, 
-        { y: 100, opacity: 0 },
-        { 
-          y: 0, 
-          opacity: 1, 
-          duration: 1, 
-          ease: "power2.out", // [0.215, 0.610, 0.355, 1.000] approx
-          delay: 1.8 
-        }
-      );
-    }, sectionRef);
+      const { ScrollTrigger } = scrollTriggerModule;
+      if (destroyed) return;
 
-    // 4. Magnetic Button Logic
-    const mouseMoveHandler = (e) => {
-       if (!ctaBtn) return;
-       const btn = ctaBtn;
-       const btnRect = btn.getBoundingClientRect();
-       const btnCenterX = btnRect.left + btnRect.width / 2;
-       const btnCenterY = btnRect.top + btnRect.height / 2;
-       
-       const distanceX = e.clientX - btnCenterX;
-       const distanceY = e.clientY - btnCenterY;
-       const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-       const maxDistance = 150;
-       
-       if (distance < maxDistance) {
-         const strength = (maxDistance - distance) / maxDistance;
-         gsap.to(btn, {
-           x: distanceX * strength * 0.5,
-           y: distanceY * strength * 0.5,
-           duration: 0.3,
-           ease: 'power2.out',
-           overwrite: 'auto'
-         });
-       } else {
-         // We rely on 'mouseleave' or just checking distance > maxDistance to reset
-         // But since we track global mouse, we can reset if distance > maxDistance AND we were moved
-         // Simplification: just reset if > maxDistance
+      gsap.registerPlugin(ScrollTrigger);
+
+      const ctx = gsap.context(() => {
+        const strips = container.querySelectorAll('.char-strip');
+        gsap.to(strips, {
+          y: '-50%',
+          duration: 1.4,
+          ease: 'expo.out',
+          stagger: 0.015,
+          delay: 0.2
+        });
+
+        gsap.to(sectionRef, {
+          scrollTrigger: {
+            trigger: sectionRef,
+            start: "top top",
+            end: "bottom top",
+            scrub: true
+          },
+          y: 300,
+          opacity: 0,
+          filter: "blur(20px)",
+          ease: "none"
+        });
+
+        gsap.fromTo(
+          ctaBtn,
+          { y: 100, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out",
+            delay: 1.8
+          }
+        );
+      }, sectionRef);
+
+      const mouseMoveHandler = (e) => {
+        if (!ctaBtn) return;
+        const btn = ctaBtn;
+        const btnRect = btn.getBoundingClientRect();
+        const btnCenterX = btnRect.left + btnRect.width / 2;
+        const btnCenterY = btnRect.top + btnRect.height / 2;
+
+        const distanceX = e.clientX - btnCenterX;
+        const distanceY = e.clientY - btnCenterY;
+        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        const maxDistance = 150;
+
+        if (distance < maxDistance) {
+          const strength = (maxDistance - distance) / maxDistance;
+          gsap.to(btn, {
+            x: distanceX * strength * 0.5,
+            y: distanceY * strength * 0.5,
+            duration: 0.3,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
+        } else {
           gsap.to(btn, {
             x: 0,
             y: 0,
@@ -88,14 +91,20 @@
             ease: 'elastic.out(1, 0.3)',
             overwrite: 'auto'
           });
-       }
-    };
+        }
+      };
 
-    window.addEventListener('mousemove', mouseMoveHandler);
+      window.addEventListener('mousemove', mouseMoveHandler);
+
+      cleanup = () => {
+        ctx.revert();
+        window.removeEventListener('mousemove', mouseMoveHandler);
+      };
+    })();
 
     return () => {
-      ctx.revert();
-      window.removeEventListener('mousemove', mouseMoveHandler);
+      destroyed = true;
+      cleanup();
     };
   });
 </script>

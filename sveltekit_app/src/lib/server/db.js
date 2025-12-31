@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { env } from '$env/dynamic/private';
-import path from 'path';
+import path from 'node:path';
 
 const verbose = sqlite3.verbose();
 

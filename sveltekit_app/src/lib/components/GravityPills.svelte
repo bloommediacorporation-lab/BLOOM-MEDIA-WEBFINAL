@@ -20,6 +20,7 @@
   
   // Store references to sync Physics <-> DOM
   let pillElements = [];
+  let pillRefs = [];
 
   onMount(() => {
     // 1. Setup Matter.js Engine
@@ -62,15 +63,7 @@
     const obstacle = Bodies.rectangle(width / 2, height / 2, 300, 80, {
       isStatic: true,
       angle: Math.PI / 16, // Slight tilt
-      render: { 
-        fillStyle: 'rgba(255, 255, 255, 0.1)',
-        visible: true // Visible for debug/effect as requested? Prompt implies "unde ar fi", maybe invisible? 
-                      // Prompt says: "Adaugă un corp static rectangular... Rotește-l puțin... pentru ca pilulele să alunece"
-                      // Doesn't explicitly say invisible, but usually obstacles are. Let's make it invisible for now or subtle.
-                      // Actually prompt says "unde ar fi titlul", implies the title IS the obstacle. 
-                      // I will make it invisible, assuming a title would be there visually in a real layout.
-        visible: false 
-      }
+      render: { visible: false }
     });
 
     Composite.add(world, [ground, leftWall, rightWall, obstacle]);
@@ -124,19 +117,13 @@
 
     // 7. Sync Loop
     const update = () => {
-      pillElements.forEach(item => {
-        if (item.body && item.element) {
+      pillElements.forEach((item, index) => {
+        const el = pillRefs[index];
+        if (item.body && el) {
           const { x, y } = item.body.position;
           const angle = item.body.angle;
           
-          item.element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad) translate(-50%, -50%)`;
-          // Note: translate(-50%, -50%) is needed because Matter.js positions are center-based, 
-          // and usually absolute DOM elements are top-left based. 
-          // But here we are setting translate3d(x, y, 0). 
-          // If the element's top/left are 0, this moves top-left corner to x,y.
-          // We need to center it. CSS logic:
-          // left: 0; top: 0; transform: translate(x,y) -> top-left at x,y.
-          // We want center at x,y. So translate(x,y) translate(-50%, -50%).
+          el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad) translate(-50%, -50%)`;
         }
       });
       animationFrameId = requestAnimationFrame(update);
@@ -160,7 +147,7 @@
   });
 
   onDestroy(() => {
-    if (runner) Runner.stop(runner);
+    if (runner) Matter.Runner.stop(runner);
     if (engine) Matter.Engine.clear(engine);
     if (render) Matter.Render.stop(render);
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -176,9 +163,7 @@
   {#each tags as tag, i}
     <div 
       class="pill" 
-      bind:this={el => {
-        if (pillElements[i]) pillElements[i].element = el;
-      }}
+      bind:this={pillRefs[i]}
     >
       {tag}
     </div>
