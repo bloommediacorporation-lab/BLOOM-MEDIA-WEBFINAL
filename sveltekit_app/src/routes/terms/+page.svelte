@@ -1,6 +1,6 @@
 <script>
-    import Terms from '@legacy/components/Terms.svelte';
-    import Footer from '@legacy/components/Footer.svelte';
+    import Terms from '$lib/components/Terms.svelte';
+    import Footer from '$lib/components/Footer.svelte';
 </script>
 
 <Terms />

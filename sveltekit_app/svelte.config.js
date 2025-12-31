@@ -11,8 +11,8 @@ const config = {
         alias: {
             // This is crucial: Map the 'src' alias to the ROOT src folder, not the kit src folder
             // We'll use $lib for kit-specific things if needed
-            '@legacy': '../src',
-            '$lib': '../src/lib'
+            // '@legacy': '../src',
+            // '$lib': '../src/lib'
         }
 	},
     preprocess: vitePreprocess()

@@ -1,6 +1,6 @@
 <script>
-    import Privacy from '@legacy/components/Privacy.svelte';
-    import Footer from '@legacy/components/Footer.svelte';
+    import Privacy from '$lib/components/Privacy.svelte';
+    import Footer from '$lib/components/Footer.svelte';
 </script>
 
 <Privacy />

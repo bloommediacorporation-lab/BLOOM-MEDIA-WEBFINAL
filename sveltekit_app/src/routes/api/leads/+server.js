@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { run } from '../../../lib/server/db';
-import transporter from '../../../lib/server/email';
+import { run } from '$lib/server/db';
+import transporter from '$lib/server/email';
 import { env } from '$env/dynamic/private';
 
 function isValidEmail(email) {

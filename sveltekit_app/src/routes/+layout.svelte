@@ -3,10 +3,10 @@
     import { onMount } from 'svelte';
     import { fade, fly } from 'svelte/transition';
     import Lenis from '@studio-freight/lenis';
-    import Navbar from '@legacy/components/Navbar.svelte';
-    import Cursor from '@legacy/components/Cursor.svelte';
-    import BackgroundOrbs from '@legacy/components/BackgroundOrbs.svelte';
-    import FilmGrain from '@legacy/components/FilmGrain.svelte';
+    import Navbar from '$lib/components/Navbar.svelte';
+    import Cursor from '$lib/components/Cursor.svelte';
+    import BackgroundOrbs from '$lib/components/BackgroundOrbs.svelte';
+    import FilmGrain from '$lib/components/FilmGrain.svelte';
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
 

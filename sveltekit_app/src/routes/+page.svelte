@@ -1,12 +1,12 @@
 <script>
-  import Hero from '@legacy/components/Hero.svelte';
-  import MarketingImpact from '@legacy/components/MarketingImpact.svelte';
-  import ServicesShowcase from '@legacy/components/ServicesShowcase.svelte';
-  import ProcessTimeline from '@legacy/components/ProcessTimeline.svelte';
-  import Services from '@legacy/components/Services.svelte';
-  import FAQ from '@legacy/components/FAQ.svelte';
-  import Contact from '@legacy/components/Contact.svelte';
-  import Footer from '@legacy/components/Footer.svelte';
+  import Hero from '$lib/components/Hero.svelte';
+  import MarketingImpact from '$lib/components/MarketingImpact.svelte';
+  import ServicesShowcase from '$lib/components/ServicesShowcase.svelte';
+  import ProcessTimeline from '$lib/components/ProcessTimeline.svelte';
+  import Services from '$lib/components/Services.svelte';
+  import FAQ from '$lib/components/FAQ.svelte';
+  import Contact from '$lib/components/Contact.svelte';
+  import Footer from '$lib/components/Footer.svelte';
   import { goto } from '$app/navigation';
 
   function navigate(path) {

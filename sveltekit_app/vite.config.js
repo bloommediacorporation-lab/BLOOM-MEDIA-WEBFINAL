@@ -13,8 +13,8 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@legacy': path.resolve('../src'),
-            '$lib': path.resolve('../src/lib')
+            // '@legacy': path.resolve('../src'),
+            // '$lib': path.resolve('../src/lib')
         }
     },
     ssr: {
