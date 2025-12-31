@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ro" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.emailjs.com https://cdn.jsdelivr.net; 
+                   worker-src 'self' blob:;
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; 
+                   font-src 'self' https://fonts.gstatic.com; 
+                   img-src 'self' data: https: https://i.postimg.cc;
+                   connect-src 'self' https://api.emailjs.com http://localhost:5000">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Bloom Media - agenție de marketing digital și automatizare. Creștere accelerată, rezultate măsurabile, soluții premium." />
+    <meta name="theme-color" content="#080808" />
+    <meta property="og:title" content="Bloom Media - Marketing Digital & Automatizare" />
+    <meta property="og:description" content="Transformăm viziunea ta în realitate digitală. Marketing inteligent, automatizare avansată, rezultate măsurabile." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:locale" content="ro_RO" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Silktide Consent Manager -->
+    <link rel="stylesheet" id="silktide-consent-manager-css" href="https://cdn.jsdelivr.net/gh/silktide/consent-manager/dist/silktide-consent-manager.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/silktide/consent-manager/dist/silktide-consent-manager.min.js"></script>
+    <script>
+      silktideCookieBannerManager.updateCookieBannerConfig({
+        background: { showBackground: true },
+        cookieIcon: { position: "bottomLeft" },
+        cookieTypes: [
+          {
+            id: "necessary",
+            name: "Necessary",
+            description: "<p>These cookies are necessary for the website to function properly and cannot be switched off. They help with things like logging in and setting your privacy preferences.</p>",
+            required: true,
+            onAccept: function() { console.log('Add logic for the required Necessary here'); }
+          },
+          {
+            id: "analytics",
+            name: "Analytics",
+            description: "<p>These cookies help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>",
+            defaultValue: true,
+            onAccept: function() {
+              if(typeof gtag !== 'undefined') {
+                  gtag('consent', 'update', { analytics_storage: 'granted' });
+              }
+              if(typeof dataLayer !== 'undefined') {
+                  dataLayer.push({ 'event': 'consent_accepted_analytics' });
+              }
+            },
+            onReject: function() {
+              if(typeof gtag !== 'undefined') {
+                  gtag('consent', 'update', { analytics_storage: 'denied' });
+              }
+            }
+          },
+          {
+            id: "advertising",
+            name: "Advertising",
+            description: "<p>These cookies provide extra features and personalization to improve your experience. They may be set by us or by partners whose services we use.</p>",
+            onAccept: function() {
+               if(typeof gtag !== 'undefined') {
+                  gtag('consent', 'update', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' });
+               }
+               if(typeof dataLayer !== 'undefined') {
+                  dataLayer.push({ 'event': 'consent_accepted_advertising' });
+               }
+            },
+            onReject: function() {
+               if(typeof gtag !== 'undefined') {
+                  gtag('consent', 'update', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+               }
+            }
+          }
+        ],
+        text: {
+          banner: {
+            description: "<p>We use cookies on our site to enhance your user experience, provide personalized content, and analyze our traffic. <a href=\"/privacy\" target=\"_blank\">Cookie Policy.</a></p>",
+            acceptAllButtonText: "Accept all",
+            acceptAllButtonAccessibleLabel: "Accept all cookies",
+            rejectNonEssentialButtonText: "Reject non-essential",
+            rejectNonEssentialButtonAccessibleLabel: "Reject non-essential",
+            preferencesButtonText: "Preferences",
+            preferencesButtonAccessibleLabel: "Toggle preferences"
+          },
+          preferences: {
+            title: "Customize your cookie preferences",
+            description: "<p>We respect your right to privacy. You can choose not to allow some types of cookies. Your cookie preferences will apply across our website.</p>",
+            creditLinkText: "Get this banner for free",
+            creditLinkAccessibleLabel: "Get this banner for free"
+          }
+        },
+        position: { banner: "bottomLeft" }
+      });
+    </script>
+    %sveltekit.head%
+  </head>
+  <body class="antialiased" data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
