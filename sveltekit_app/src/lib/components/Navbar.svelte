@@ -3,6 +3,7 @@
 
   function handleScrollTo(e, id) {
     e.preventDefault();
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
     if (window.location.pathname !== '/') {
       navigate('/');
       setTimeout(() => {

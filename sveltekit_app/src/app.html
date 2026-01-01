@@ -23,78 +23,111 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     
-    <!-- Silktide Consent Manager -->
-    <link rel="stylesheet" id="silktide-consent-manager-css" href="https://cdn.jsdelivr.net/gh/silktide/consent-manager/dist/silktide-consent-manager.min.css">
-    <script src="https://cdn.jsdelivr.net/gh/silktide/consent-manager/dist/silktide-consent-manager.min.js"></script>
     <script>
-      silktideCookieBannerManager.updateCookieBannerConfig({
-        background: { showBackground: true },
-        cookieIcon: { position: "bottomLeft" },
-        cookieTypes: [
-          {
-            id: "necessary",
-            name: "Necessary",
-            description: "<p>These cookies are necessary for the website to function properly and cannot be switched off. They help with things like logging in and setting your privacy preferences.</p>",
-            required: true,
-            onAccept: function() { console.log('Add logic for the required Necessary here'); }
-          },
-          {
-            id: "analytics",
-            name: "Analytics",
-            description: "<p>These cookies help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>",
-            defaultValue: true,
-            onAccept: function() {
-              if(typeof gtag !== 'undefined') {
-                  gtag('consent', 'update', { analytics_storage: 'granted' });
+      (function () {
+        if (typeof window === 'undefined' || typeof document === 'undefined') return;
+        const host = window.location && window.location.hostname ? window.location.hostname : '';
+        const isLocal =
+          host === 'localhost' ||
+          host === '127.0.0.1' ||
+          host === '::1';
+        const isVercelSubdomain = host.endsWith('.vercel.app');
+
+        if (!host || isLocal || isVercelSubdomain) return;
+
+        const cssHref =
+          'https://cdn.jsdelivr.net/gh/silktide/consent-manager/dist/silktide-consent-manager.min.css';
+        const jsSrc =
+          'https://cdn.jsdelivr.net/gh/silktide/consent-manager/dist/silktide-consent-manager.min.js';
+
+        const existingCss = document.getElementById('silktide-consent-manager-css');
+        if (!existingCss) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.id = 'silktide-consent-manager-css';
+          link.href = cssHref;
+          document.head.appendChild(link);
+        }
+
+        const script = document.createElement('script');
+        script.src = jsSrc;
+        script.async = true;
+        script.onload = function () {
+          const mgr = window.silktideCookieBannerManager;
+          if (!mgr || typeof mgr.updateCookieBannerConfig !== 'function') return;
+
+          mgr.updateCookieBannerConfig({
+            background: { showBackground: true },
+            cookieIcon: { position: "bottomLeft" },
+            cookieTypes: [
+              {
+                id: "necessary",
+                name: "Necessary",
+                description: "<p>These cookies are necessary for the website to function properly and cannot be switched off. They help with things like logging in and setting your privacy preferences.</p>",
+                required: true,
+                onAccept: function () { console.log('Add logic for the required Necessary here'); }
+              },
+              {
+                id: "analytics",
+                name: "Analytics",
+                description: "<p>These cookies help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>",
+                defaultValue: true,
+                onAccept: function () {
+                  if (typeof gtag !== 'undefined') {
+                    gtag('consent', 'update', { analytics_storage: 'granted' });
+                  }
+                  if (typeof dataLayer !== 'undefined') {
+                    dataLayer.push({ 'event': 'consent_accepted_analytics' });
+                  }
+                },
+                onReject: function () {
+                  if (typeof gtag !== 'undefined') {
+                    gtag('consent', 'update', { analytics_storage: 'denied' });
+                  }
+                }
+              },
+              {
+                id: "advertising",
+                name: "Advertising",
+                description: "<p>These cookies provide extra features and personalization to improve your experience. They may be set by us or by partners whose services we use.</p>",
+                onAccept: function () {
+                  if (typeof gtag !== 'undefined') {
+                    gtag('consent', 'update', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' });
+                  }
+                  if (typeof dataLayer !== 'undefined') {
+                    dataLayer.push({ 'event': 'consent_accepted_advertising' });
+                  }
+                },
+                onReject: function () {
+                  if (typeof gtag !== 'undefined') {
+                    gtag('consent', 'update', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+                  }
+                }
               }
-              if(typeof dataLayer !== 'undefined') {
-                  dataLayer.push({ 'event': 'consent_accepted_analytics' });
+            ],
+            text: {
+              banner: {
+                description: "<p>We use cookies on our site to enhance your user experience, provide personalized content, and analyze our traffic. <a href=\"/privacy\" target=\"_blank\">Cookie Policy.</a></p>",
+                acceptAllButtonText: "Accept all",
+                acceptAllButtonAccessibleLabel: "Accept all cookies",
+                rejectNonEssentialButtonText: "Reject non-essential",
+                rejectNonEssentialButtonAccessibleLabel: "Reject non-essential",
+                preferencesButtonText: "Preferences",
+                preferencesButtonAccessibleLabel: "Toggle preferences"
+              },
+              preferences: {
+                title: "Customize your cookie preferences",
+                description: "<p>We respect your right to privacy. You can choose not to allow some types of cookies. Your cookie preferences will apply across our website.</p>",
+                creditLinkText: "Get this banner for free",
+                creditLinkAccessibleLabel: "Get this banner for free"
               }
             },
-            onReject: function() {
-              if(typeof gtag !== 'undefined') {
-                  gtag('consent', 'update', { analytics_storage: 'denied' });
-              }
-            }
-          },
-          {
-            id: "advertising",
-            name: "Advertising",
-            description: "<p>These cookies provide extra features and personalization to improve your experience. They may be set by us or by partners whose services we use.</p>",
-            onAccept: function() {
-               if(typeof gtag !== 'undefined') {
-                  gtag('consent', 'update', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' });
-               }
-               if(typeof dataLayer !== 'undefined') {
-                  dataLayer.push({ 'event': 'consent_accepted_advertising' });
-               }
-            },
-            onReject: function() {
-               if(typeof gtag !== 'undefined') {
-                  gtag('consent', 'update', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
-               }
-            }
-          }
-        ],
-        text: {
-          banner: {
-            description: "<p>We use cookies on our site to enhance your user experience, provide personalized content, and analyze our traffic. <a href=\"/privacy\" target=\"_blank\">Cookie Policy.</a></p>",
-            acceptAllButtonText: "Accept all",
-            acceptAllButtonAccessibleLabel: "Accept all cookies",
-            rejectNonEssentialButtonText: "Reject non-essential",
-            rejectNonEssentialButtonAccessibleLabel: "Reject non-essential",
-            preferencesButtonText: "Preferences",
-            preferencesButtonAccessibleLabel: "Toggle preferences"
-          },
-          preferences: {
-            title: "Customize your cookie preferences",
-            description: "<p>We respect your right to privacy. You can choose not to allow some types of cookies. Your cookie preferences will apply across our website.</p>",
-            creditLinkText: "Get this banner for free",
-            creditLinkAccessibleLabel: "Get this banner for free"
-          }
-        },
-        position: { banner: "bottomLeft" }
-      });
+            position: { banner: "bottomLeft" }
+          });
+        };
+
+        document.head.appendChild(script);
+      })();
     </script>
     %sveltekit.head%
   </head>

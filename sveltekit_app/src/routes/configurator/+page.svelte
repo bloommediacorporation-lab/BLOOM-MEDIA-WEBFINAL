@@ -90,6 +90,7 @@
   });
 
   $effect(() => {
+    if (typeof document === 'undefined') return;
     docHeight = document.documentElement.scrollHeight;
   });
 
@@ -244,6 +245,7 @@
     submitSuccess = false;
     selectedServices = new Set();
     formData = { businessName: '', name: '', email: '', phone: '', details: '' };
+    if (typeof window === 'undefined') return;
     window.location.reload();
   }
 </script>
@@ -412,6 +414,7 @@
                 <button 
                     class="finalize-button" 
                     onclick={() => {
+                        if (typeof document === 'undefined') return;
                         const form = document.querySelector('form');
                         if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                     }}
@@ -439,6 +442,7 @@
             <button 
                 class="footer-button" 
                 onclick={() => {
+                    if (typeof document === 'undefined') return;
                     // Scroll to form or submit if ready
                     const formSection = document.getElementById('contact-form-section');
                     if (selectedServices.size > 0 && formSection) {
