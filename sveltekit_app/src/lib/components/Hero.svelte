@@ -23,6 +23,7 @@
 
       const { ScrollTrigger } = scrollTriggerModule;
       if (destroyed) return;
+      if (typeof window === 'undefined' || !container || !sectionRef) return;
 
       gsap.registerPlugin(ScrollTrigger);
 

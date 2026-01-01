@@ -206,6 +206,7 @@
       ]);
 
       if (destroyed) return;
+      if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
       gsap = gsapModule.default;
       ScrollTrigger = scrollTriggerModule.default;

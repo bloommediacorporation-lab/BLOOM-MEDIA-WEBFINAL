@@ -93,6 +93,7 @@
   });
 
   onMount(() => {
+    if (typeof window === 'undefined') return;
     let animationFrame;
 
     const handleMouseMove = (e) => {

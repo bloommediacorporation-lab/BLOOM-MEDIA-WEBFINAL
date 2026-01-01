@@ -22,6 +22,7 @@
     let scrollY = 0;
 
     onMount(() => {
+        if (typeof window === 'undefined') return;
         let destroyed = false;
         let rafId;
         let handleScroll;

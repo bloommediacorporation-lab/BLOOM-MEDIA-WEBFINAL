@@ -53,7 +53,9 @@
         script.src = jsSrc;
         script.async = true;
         script.onload = function () {
-          const mgr = window.silktideCookieBannerManager;
+          if (typeof silktideCookieBannerManager === 'undefined' && typeof window.silktideCookieBannerManager === 'undefined') return;
+
+          const mgr = window.silktideCookieBannerManager || silktideCookieBannerManager;
           if (!mgr || typeof mgr.updateCookieBannerConfig !== 'function') return;
 
           mgr.updateCookieBannerConfig({

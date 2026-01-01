@@ -45,6 +45,7 @@
 
       const { ScrollTrigger } = scrollTriggerModule;
       if (destroyed) return;
+      if (typeof window === 'undefined') return;
 
       gsap.registerPlugin(ScrollTrigger);
       mm = gsap.matchMedia();
@@ -55,7 +56,7 @@
           const getScrollDistance = () => {
             const panels = trackRef.querySelectorAll('.process-panel');
             const panelCount = panels.length;
-            const viewportWidth = window.innerWidth;
+            const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
             const totalWidth = panelCount * viewportWidth;
             const distance = totalWidth - viewportWidth;
             return distance;

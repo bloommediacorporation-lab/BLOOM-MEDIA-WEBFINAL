@@ -97,6 +97,7 @@
   }
 
   onMount(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
     // Initialize mouse position to center of viewport
     mouseX = window.innerWidth / 2;
     mouseY = window.innerHeight / 2;

@@ -1,0 +1,5 @@
+import{f as i,a as o}from"../chunks/DRfq4Ggn.js";import"../chunks/B3X8McM1.js";import{ae as s,a9 as n}from"../chunks/CTC7hIcE.js";import{F as c}from"../chunks/CIbyJlcC.js";var p=i(`<section class="about-section svelte-7hpc9t"><div class="about-container svelte-7hpc9t"><div class="about-grid svelte-7hpc9t"><div class="about-left svelte-7hpc9t"><span class="about-subtitle svelte-7hpc9t">01 / DESPRE NOI</span></div> <div class="about-right"><p class="about-text svelte-7hpc9t">Bloom Media redefinește standardele în marketingul digital printr-o abordare 
+          bazată pe date, creativitate și performanță. Nu suntem doar o agenție — 
+          suntem partenerul tău strategic în construirea unui brand care rezistă 
+          în timp. Fiecare campanie este o poveste, fiecare rezultat este o promisiune 
+          îndeplinită.</p></div></div></div></section>`);function l(e){var t=p();o(e,t)}var d=i("<!> <!>",1);function f(e){var t=d(),a=s(t);l(a);var r=n(a,2);c(r,{}),o(e,t)}export{f as component};
