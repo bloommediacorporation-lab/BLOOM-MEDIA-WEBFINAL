@@ -23,6 +23,7 @@
 
     onMount(() => {
         if (typeof window === 'undefined') return;
+        window['clearCursor'] = window['clearCursor'] || (() => {});
         let destroyed = false;
         let rafId;
         let handleScroll;
