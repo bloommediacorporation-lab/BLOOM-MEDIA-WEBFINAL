@@ -1,5 +1,5 @@
 <script>
-    import "../../../src/index.css"; // Import global styles from parent
+    import "../index.css"; // Import global styles from parent
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
     import Navbar from "$lib/components/Navbar.svelte";
