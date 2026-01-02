@@ -49,7 +49,7 @@
     </a>
 
     <!-- Desktop Links -->
-    <div class="links desktop-only">
+    <div class="links nav-links desktop-only">
       <a
         href="/"
         onclick={(e) => {
@@ -394,6 +394,10 @@
 
   /* --- RESPONSIVE --- */
   @media (max-width: 768px) {
+    .nav-links {
+      display: none !important;
+    }
+
     .links.desktop-only {
       display: none !important;
     }

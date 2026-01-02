@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "npm run vercel-build",
-    "vercel-build": "npm --prefix sveltekit_app install --no-audit --no-fund && npm --prefix sveltekit_app run build && node -e \"const fs=require('fs'); const path=require('path'); const src=path.join(process.cwd(),'sveltekit_app','.vercel','output'); const dst=path.join(process.cwd(),'.vercel','output'); fs.rmSync(dst,{recursive:true,force:true}); fs.mkdirSync(path.dirname(dst),{recursive:true}); fs.cpSync(src,dst,{recursive:true,force:true,dereference:true});\""
+    "vercel-build": "node -e \"const cp=require('child_process'); const fs=require('fs'); const path=require('path'); const isVercel=!!process.env.VERCEL; const install=isVercel?'ci':'install'; cp.execSync('npm --prefix sveltekit_app ' + install + ' --no-audit --no-fund',{stdio:'inherit'}); cp.execSync('npm --prefix sveltekit_app run build',{stdio:'inherit'}); const src=path.join(process.cwd(),'sveltekit_app','.vercel','output'); const dst=path.join(process.cwd(),'.vercel','output'); fs.rmSync(dst,{recursive:true,force:true}); fs.mkdirSync(path.dirname(dst),{recursive:true}); fs.cpSync(src,dst,{recursive:true,force:true,dereference:true});\""
   },
   "engines": {
     "node": "20.x"

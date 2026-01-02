@@ -10,7 +10,3 @@ dist/
 .svelte-kit/
 .vercel/
 build/
-package-lock.json
-
-.vercel
-.env*.local
