@@ -1,8 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  export let char = "";
-  export let isHighlight = false;
-  export let isThemeColor = false;
+  let { char = "", isHighlight = false, isThemeColor = false } = $props();
 
   let isMobile = $state(false);
 
