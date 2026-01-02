@@ -148,6 +148,7 @@
       }
     };
 
+    // Verify if we are on a touch device to disable the custom cursor ribbon/dot
     const isTouch = window.matchMedia(
       "(hover: none), (pointer: coarse)",
     ).matches;
