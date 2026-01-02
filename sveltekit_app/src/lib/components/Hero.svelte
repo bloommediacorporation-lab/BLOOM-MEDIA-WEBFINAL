@@ -113,7 +113,7 @@
 <section
   id="acasa"
   bind:this={sectionRef}
-  class="relative min-h-screen flex items-center justify-center overflow-hidden perspective-1000"
+  class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden perspective-1000"
 >
   <!-- BACKGROUND -->
   <div 
@@ -128,16 +128,16 @@
   <!-- CONTENT -->
   <div 
     bind:this={container}
-    class="relative z-10 px-6 text-left max-w-7xl mx-auto flex flex-col items-start pt-24 pb-24 -mt-24 w-full"
+    class="hero-container relative z-10 px-6 text-left max-w-7xl mx-auto flex flex-col items-start pt-24 pb-24 -mt-24 w-full"
     aria-label="Atinge potențialul business-ului tău cu Bloom Media. Pentru branduri care refuză să fie invizibile."
   >
     <!-- SECTION LABEL (Integrated) -->
-    <div class="mb-4 text-xs md:text-sm font-bold tracking-[0.15em] text-white/40 uppercase font-['Inter']">
+    <div class="hero-label mb-4 text-xs md:text-sm font-bold tracking-[0.15em] text-white/40 uppercase font-['Inter']">
       01 / HERO
     </div>
 
     <!-- Line 1: "Atinge..." -->
-    <div class="mb-2 text-[clamp(1.5rem,3vw,3rem)] font-bold font-['Montserrat'] leading-tight tracking-tight flex flex-wrap justify-start gap-x-[0.2em] opacity-80">
+    <div class="hero-subtitle mb-2 text-[clamp(1.5rem,3vw,3rem)] font-bold font-['Montserrat'] leading-tight tracking-tight flex flex-wrap justify-start gap-x-[0.2em] opacity-80">
       {#each line1.split(" ") as word, wIndex}
         <span class="inline-flex whitespace-nowrap">
           {#each word.split("") as char, cIndex}
@@ -148,7 +148,7 @@
     </div>
 
     <!-- Line 2: "BLOOM MEDIA" (Massive Block Style) -->
-    <div class="mb-8 -mt-2 md:-mt-4 text-[clamp(3.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[0.9] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase">
+    <div class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(3.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[0.9] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase">
       {#each line2.split(" ") as word, wIndex}
         <span class="inline-flex whitespace-nowrap">
           {#each word.split("") as char, cIndex}
@@ -159,7 +159,7 @@
     </div>
 
     <!-- Line 3: "Pentru..." + "invizibile" (Highlight) -->
-    <div class="mb-12 text-[clamp(1rem,1.5vw,1.5rem)] font-light font-['Montserrat'] max-w-2xl flex flex-wrap justify-start gap-x-[0.3em] leading-relaxed">
+    <div class="hero-description mb-12 text-[clamp(1rem,1.5vw,1.5rem)] font-light font-['Montserrat'] max-w-2xl flex flex-wrap justify-start gap-x-[0.3em] leading-relaxed">
       <!-- Part 1: Normal text -->
       {#each line3Part1.split(" ") as word, wIndex}
         {#if word}
@@ -184,7 +184,7 @@
       <a 
         bind:this={ctaBtn}
         href="#contact" 
-        class="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full text-lg font-bold text-black bg-[#fca311] relative group opacity-0"
+        class="cta-button inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full text-lg font-bold text-black bg-[#fca311] relative group opacity-0"
       >
         <span class="relative z-10">DISCUTĂ CU NOI</span>
         <svg 
