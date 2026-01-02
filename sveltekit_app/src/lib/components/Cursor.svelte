@@ -152,9 +152,7 @@
       "(hover: none), (pointer: coarse)",
     ).matches;
     if (isTouch) {
-      const container = document.querySelector(
-        ".cursor-container",
-      ) as HTMLElement;
+      const container = document.querySelector(".cursor-container");
       if (container) container.style.display = "none";
       return;
     }
