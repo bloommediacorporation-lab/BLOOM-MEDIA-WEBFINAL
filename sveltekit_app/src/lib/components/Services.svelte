@@ -25,22 +25,22 @@
         <h2 class="title">Servicii</h2>
       </div>
       
-      <div class="card" in:fly={{ y: 40, duration: 700, delay: 200 }}>
+      <div class="pricing-card card" in:fly={{ y: 40, duration: 700, delay: 200 }}>
         <!-- LEFT: Price & Info -->
         <div class="left">
           <div class="price-block">
             <div class="prefix">De la</div>
-            <span class="value">249,99</span>
+            <span class="price-amount value">249,99</span>
             <span class="currency">€</span>
             <span class="period">/lună</span>
           </div>
           
           <div class="meta">
-            <h3 class="package-name">PACHET START</h3>
+            <h3 class="package-title package-name">PACHET START</h3>
             <p class="package-desc">Soluția completă pentru branduri care vor să domine digitalul.</p>
           </div>
 
-          <button class="cta-btn" onclick={() => navigate && navigate('/configurator')}>
+          <button class="configure-button cta-btn" onclick={() => navigate && navigate('/configurator')}>
             Configurează Pachet
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
