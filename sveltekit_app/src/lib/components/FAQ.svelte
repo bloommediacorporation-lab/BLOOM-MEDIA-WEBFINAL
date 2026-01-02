@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { setCursorLabel, clearCursor } from '$lib/cursorState.svelte.js';
+  import { setCursorLabel, clearCursor } from '$lib/utils/cursorState.js';
 
   let openIndex = $state(null);
   

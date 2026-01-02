@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { setCursorLabel, clearCursor } from '$lib/cursorState.svelte.js';
+  import { setCursorLabel, clearCursor } from '$lib/utils/cursorState.js';
   
   let sectionRef;
   let titleRef;

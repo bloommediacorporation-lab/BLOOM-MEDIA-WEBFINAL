@@ -20,5 +20,5 @@ export function clearCursor() {
 }
 
 if (typeof window !== 'undefined') {
-  window['clearCursor'] = clearCursor;
+  window.clearCursor = clearCursor;
 }
