@@ -330,3 +330,113 @@ html {
     transition: none;
   }
 }
+
+/* MOBILE-ONLY FIXES (<768px) - CRITICAL ISSUES */
+
+@media (max-width: 768px) { 
+   /* FIX 1: HERO TEXT OVERFLOW "BLOOM MEDIA" */
+   .hero-title, h1.hero-title { 
+     font-size: clamp(3rem, 15vw, 4.5rem) !important; 
+     line-height: 0.9 !important; 
+     letter-spacing: -0.03em !important; 
+     word-break: break-word; 
+     max-width: 100%; 
+     padding: 0 1rem; 
+   } 
+   
+   .hero-container, .hero-section { 
+     padding: 0 1rem !important; 
+     overflow: hidden; 
+   } 
+
+   /* FIX 2: CTA BUTTON TEXT "DISCUTĂCU" OVERFLOW */
+   .cta-button, button.cta-button, a.cta-button { 
+     font-size: 0.875rem !important; 
+     padding: 1rem 1.5rem !important; 
+     white-space: nowrap; 
+     width: auto; 
+     max-width: 100%; 
+   } 
+
+   /* FIX 3: HERO SECTION COMPLETE */
+   .hero-section { 
+     min-height: 100vh; 
+     padding: 6rem 1rem 4rem !important; 
+   } 
+   
+   .hero-label, .section-label { 
+     font-size: 0.65rem !important; 
+     margin-bottom: 1.5rem !important; 
+   } 
+   
+   .hero-subtitle { 
+     font-size: 1.25rem !important; 
+     margin-bottom: 2rem !important; 
+   } 
+   
+   .hero-title { 
+     font-size: clamp(3rem, 15vw, 4.5rem) !important; 
+     line-height: 0.9 !important; 
+     margin-bottom: 2rem !important; 
+   } 
+   
+   .hero-description { 
+     font-size: 1rem !important; 
+     margin-bottom: 2.5rem !important; 
+   } 
+   
+   .hero-cta, .cta-button { 
+     width: 100% !important; 
+     padding: 1.25rem 2rem !important; 
+     font-size: 0.875rem !important; 
+   } 
+
+   /* FIX 4: PACHET START PRICING CARD */
+   .pricing-card, .pachet-card { 
+     padding: 2rem 1.5rem !important; 
+     margin: 2rem 1rem !important; 
+   } 
+   
+   .price-amount { 
+     font-size: 4rem !important; 
+     line-height: 1 !important; 
+   } 
+   
+   .package-title { 
+     font-size: 1.5rem !important; 
+     margin: 1.5rem 0 1rem !important; 
+   } 
+   
+   .configure-button { 
+     width: 100% !important; 
+     padding: 1.25rem !important; 
+     font-size: 0.875rem !important; 
+   } 
+
+   /* FIX 5: GLOBAL MOBILE SAFETY */
+   /* Prevent horizontal scroll */ 
+   html, body { 
+     overflow-x: hidden !important; 
+     max-width: 100vw; 
+   } 
+   
+   * { 
+     max-width: 100%; 
+   } 
+   
+   /* Typography */ 
+   h1 { font-size: clamp(2.5rem, 10vw, 4rem) !important; } 
+   h2 { font-size: clamp(2rem, 8vw, 3rem) !important; } 
+   h3 { font-size: clamp(1.5rem, 6vw, 2rem) !important; } 
+   
+   /* Buttons */ 
+   button, .btn, .button { 
+     font-size: 0.875rem !important; 
+     padding: 1rem 1.5rem !important; 
+   } 
+   
+   /* Sections */ 
+   section { 
+     padding: 4rem 1rem !important; 
+   } 
+ }

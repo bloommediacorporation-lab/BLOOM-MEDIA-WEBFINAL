@@ -393,6 +393,20 @@
   }
 
   /* --- RESPONSIVE --- */
+  @media (max-width: 768px) {
+    .links.desktop-only {
+      display: none !important;
+    }
+
+    .desktop-only {
+      display: none !important;
+    }
+
+    .mobile-only {
+      display: flex !important;
+    }
+  }
+
   @media (max-width: 1024px) {
     .desktop-only {
       display: none;

@@ -11,3 +11,6 @@ dist/
 .vercel/
 build/
 package-lock.json
+
+.vercel
+.env*.local
