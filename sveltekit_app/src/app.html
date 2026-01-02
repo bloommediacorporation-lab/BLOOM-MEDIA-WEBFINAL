@@ -21,6 +21,28 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+      (function () {
+        if (typeof window === 'undefined') return;
+
+        window.silktideCookieBannerManager = window.silktideCookieBannerManager || {};
+        window.silktideCookieBannerManager.init =
+          window.silktideCookieBannerManager.init || function () {};
+        window.silktideCookieBannerManager.initCookieBanner =
+          window.silktideCookieBannerManager.initCookieBanner || function () {};
+        window.silktideCookieBannerManager.updateCookieBannerConfig =
+          window.silktideCookieBannerManager.updateCookieBannerConfig || function () {};
+        window.silktideCookieBannerManager.injectScript =
+          window.silktideCookieBannerManager.injectScript || function () {};
+
+        window.clearCursor = window.clearCursor || function () {};
+
+        var silktideCookieBannerManager = window.silktideCookieBannerManager;
+        var clearCursor = window.clearCursor;
+        void silktideCookieBannerManager;
+        void clearCursor;
+      })();
+    </script>
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
     %sveltekit.head%
   </head>
