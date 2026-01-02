@@ -47,6 +47,10 @@
 			"dest": "/echipa"
 		},
 		{
+			"src": "^/favicon\\.ico/?(?:/__data.json)?$",
+			"dest": "/favicon.ico"
+		},
+		{
 			"src": "^/privacy/?(?:/__data.json)?$",
 			"dest": "/privacy"
 		},

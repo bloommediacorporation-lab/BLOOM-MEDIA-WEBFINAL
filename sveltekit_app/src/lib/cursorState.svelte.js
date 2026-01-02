@@ -18,3 +18,7 @@ export function clearCursor() {
   cursorState.active = false;
   // We don't reset isHovering here because that's handled by the mouseover/out listeners
 }
+
+if (typeof window !== 'undefined') {
+  window['clearCursor'] = clearCursor;
+}

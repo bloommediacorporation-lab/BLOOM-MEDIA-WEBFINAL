@@ -54,9 +54,9 @@
         script.async = true;
         script.onload = function () {
           try {
-            if (typeof silktideCookieBannerManager === 'undefined' && typeof window.silktideCookieBannerManager === 'undefined') return;
+            if (!window.silktideCookieBannerManager) return;
 
-            const mgr = window.silktideCookieBannerManager || silktideCookieBannerManager;
+            const mgr = window.silktideCookieBannerManager;
             if (!mgr || typeof mgr.updateCookieBannerConfig !== 'function') return;
 
             mgr.updateCookieBannerConfig({

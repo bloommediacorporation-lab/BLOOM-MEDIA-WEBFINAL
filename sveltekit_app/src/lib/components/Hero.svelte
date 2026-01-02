@@ -208,18 +208,4 @@
   </div>
 </section>
 
-<style>
-  .fixed-section-label {
-    position: absolute;
-    top: 6rem;
-    left: 4vw;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    z-index: 20;
-    pointer-events: none;
-  }
-</style>
+<style></style>

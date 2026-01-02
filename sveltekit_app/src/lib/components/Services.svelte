@@ -100,16 +100,6 @@
     margin-bottom: 4rem;
   }
 
-  .section-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #fca311;
-    opacity: 0.8;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
   .title {
     font-family: Montserrat, sans-serif; 
     font-weight: 900; 
@@ -321,11 +311,6 @@
 
     .right {
       padding: 3rem 2rem;
-    }
-    
-    .watermark {
-      font-size: 6rem;
-      top: -2rem;
     }
   }
 </style>
