@@ -155,7 +155,7 @@
   .member-role {
     font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.7); /* Increased from 0.5 */
     letter-spacing: 0.05em;
     text-transform: uppercase;
     text-align: right;

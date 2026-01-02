@@ -120,6 +120,12 @@
     margin-bottom: 2rem;
   }
 
+  @media (max-width: 768px) {
+    .section-label {
+      margin-bottom: 3.5rem;
+    }
+  }
+
   .section-title {
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;

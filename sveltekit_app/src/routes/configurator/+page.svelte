@@ -579,7 +579,7 @@
     .category-title {
         font-family: 'Montserrat', sans-serif;
         font-weight: 800;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 5vw, 2rem);
         color: #FFFFFF;
         text-transform: uppercase;
         margin: 0;

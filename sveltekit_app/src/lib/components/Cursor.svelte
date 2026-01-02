@@ -148,6 +148,17 @@
       }
     };
 
+    const isTouch = window.matchMedia(
+      "(hover: none), (pointer: coarse)",
+    ).matches;
+    if (isTouch) {
+      const container = document.querySelector(
+        ".cursor-container",
+      ) as HTMLElement;
+      if (container) container.style.display = "none";
+      return;
+    }
+
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseover", handleMouseOver);
     window.addEventListener("mouseout", handleMouseOut);
@@ -200,9 +211,11 @@
 </div>
 
 <style>
-  :global(body),
-  :global(*) {
-    cursor: none !important;
+  @media (hover: hover) and (pointer: fine) {
+    :global(body),
+    :global(*) {
+      cursor: none !important;
+    }
   }
 
   .cursor-container {
@@ -254,13 +267,15 @@
     filter: drop-shadow(0 0 8px #fca311);
   }
 
-  @media (hover: none) and (pointer: coarse) {
+  @media (hover: none), (pointer: coarse) {
     :global(body),
     :global(*) {
       cursor: auto !important;
     }
     .cursor-container {
       display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
     }
   }
 </style>

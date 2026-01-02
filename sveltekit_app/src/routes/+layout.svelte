@@ -91,17 +91,17 @@
 
 <div class="app-wrapper">
     <!-- Smart Navbar Container -->
-    {#if isNavVisible}
-        <header
-            class="fixed top-0 left-0 w-full z-50 transition-all duration-500"
-            class:scrolled={isScrolled || isMenuOpen}
-            transition:fly={{ y: -100, duration: 500 }}
-        >
-            <div class="navbar-inner">
-                <Navbar {navigate} bind:isMenuOpen />
-            </div>
-        </header>
-    {/if}
+    <header
+        class="fixed top-0 left-0 w-full z-50 transform transition-all duration-500 ease-in-out"
+        class:scrolled={isScrolled || isMenuOpen}
+        style:opacity={isNavVisible ? 1 : 0}
+        style:pointer-events={isNavVisible ? "auto" : "none"}
+        style:transform={isNavVisible ? "translateY(0)" : "translateY(-100%)"}
+    >
+        <div class="navbar-inner">
+            <Navbar {navigate} bind:isMenuOpen />
+        </div>
+    </header>
 
     <main class="relative z-10 min-h-screen">
         {#key $page.url.pathname}
@@ -152,6 +152,7 @@
         /* Default state (at top): transparent, no shadow */
         background: transparent;
         box-shadow: none;
+        will-change: transform, opacity;
     }
 
     /* Scrolled State: Blur + Gold Glow */

@@ -152,7 +152,7 @@
   .brand {
     font-family: Montserrat;
     font-weight: 800;
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
     color: white;
     margin-bottom: 0.5rem;
     display: flex;

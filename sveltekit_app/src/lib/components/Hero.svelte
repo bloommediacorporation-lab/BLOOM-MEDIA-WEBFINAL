@@ -148,7 +148,7 @@
     </div>
 
     <!-- Line 2: "BLOOM MEDIA" (Massive Block Style) -->
-    <div class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(3.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[0.9] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase">
+    <div class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(2.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[0.9] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase">
       {#each line2.split(" ") as word, wIndex}
         <span class="inline-flex whitespace-nowrap">
           {#each word.split("") as char, cIndex}

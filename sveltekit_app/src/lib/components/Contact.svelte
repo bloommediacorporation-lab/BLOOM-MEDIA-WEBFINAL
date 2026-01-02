@@ -168,9 +168,10 @@
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;
     font-size: clamp(4rem, 15vw, 15rem);
-    line-height: 0.8;
+    line-height: 1.0; /* Increased from 0.8 */
     color: #ffffff;
     margin: 0;
+    padding: 0.5rem 0; /* Added padding to prevent clipping */
     transform: translateY(100%);
     transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
