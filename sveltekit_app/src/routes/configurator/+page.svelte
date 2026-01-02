@@ -3,7 +3,11 @@
   import { fade, slide, scale } from 'svelte/transition';
   import { tweened, spring } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
-  import { cursorState, setCursorLabel, clearCursor } from '$lib/cursorState.svelte.js';
+  import { cursorState, setCursorLabel, clearCursor } from '../../lib/cursorState.svelte.js';
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
 
   // --- Constants & Data ---
   const BASE_STRATEGY_FEE = 249.99;
@@ -37,13 +41,13 @@
   const PROXY_URL = '/api/make-webhook';
 
   // --- State ---
-  let selectedServices = $state(new Set());
-  let isSubmitting = $state(false);
-  let submitSuccess = $state(false);
-  let scrollY = $state(0);
-  let innerHeight = $state(0);
-  let innerWidth = $state(0);
-  let docHeight = $state(0);
+  let selectedServices = new Set();
+  let isSubmitting = false;
+  let submitSuccess = false;
+  let scrollY = 0;
+  let innerHeight = 0;
+  let innerWidth = 0;
+  let docHeight = 0;
   
   // Smooth Sticky State
   let containerRef;
@@ -51,33 +55,19 @@
   const sidebarY = spring(0, { stiffness: 0.08, damping: 0.7 });
 
   // Form State
-  let formData = $state({
+  let formData = {
     businessName: '',
     name: '',
     email: '',
     phone: '',
     details: ''
-  });
+  };
 
   // --- Derived State ---
-  let totalPrice = $derived(
-    BASE_STRATEGY_FEE + 
-    Array.from(selectedServices).reduce((sum, id) => {
-      const service = SERVICES.find(s => s.id === id);
-      return sum + (service ? service.price : 0);
-    }, 0)
-  );
-  
-  let selectedServicesList = $derived(
-    Array.from(selectedServices).map(id => SERVICES.find(s => s.id === id)).filter(Boolean)
-  );
-
-  let scrollProgress = $derived.by(() => {
-    if (docHeight - innerHeight <= 0) return 0;
-    return (scrollY / (docHeight - innerHeight)) * 100;
-  });
-
-  let isMobile = $derived(innerWidth < 1024);
+  let totalPrice = BASE_STRATEGY_FEE;
+  let selectedServicesList = [];
+  let scrollProgress = 0;
+  let isMobile = false;
 
   // --- Animations ---
   const animatedPrice = tweened(BASE_STRATEGY_FEE, {
@@ -85,43 +75,57 @@
     easing: cubicOut
   });
 
-  $effect(() => {
-    animatedPrice.set(totalPrice);
-  });
+  $: totalPrice =
+    BASE_STRATEGY_FEE +
+    Array.from(selectedServices).reduce((sum, id) => {
+      const service = SERVICES.find((s) => s.id === id);
+      return sum + (service ? service.price : 0);
+    }, 0);
 
-  $effect(() => {
-    if (typeof document === 'undefined') return;
-    docHeight = document.documentElement.scrollHeight;
-  });
+  $: selectedServicesList = Array.from(selectedServices)
+    .map((id) => SERVICES.find((s) => s.id === id))
+    .filter(Boolean);
 
-  $effect(() => {
+  $: scrollProgress = docHeight - innerHeight <= 0 ? 0 : (scrollY / (docHeight - innerHeight)) * 100;
+
+  $: isMobile = innerWidth < 1024;
+
+  $: animatedPrice.set(totalPrice);
+
+  $: {
     if (containerRef && sidebarRef && innerWidth >= 1024) {
-        const containerRect = containerRef.getBoundingClientRect();
-        const sidebarHeight = sidebarRef.offsetHeight;
-        const containerHeight = containerRect.height;
-        
-        // Calculate absolute top of container relative to document
-        const containerTop = scrollY + containerRect.top;
-        
-        // Target Y is current scroll + padding (32px)
-        const targetY = scrollY + 32;
-        
-        // Bounds
-        const minY = containerTop;
-        const maxY = containerTop + containerHeight - sidebarHeight;
-        
-        // Clamp
-        const clampedY = Math.max(minY, Math.min(targetY, maxY));
-        
-        // Relative transform
-        sidebarY.set(clampedY - containerTop);
+      const containerRect = containerRef.getBoundingClientRect();
+      const sidebarHeight = sidebarRef.offsetHeight;
+      const containerHeight = containerRect.height;
+
+      const containerTop = scrollY + containerRect.top;
+      const targetY = scrollY + 32;
+
+      const minY = containerTop;
+      const maxY = containerTop + containerHeight - sidebarHeight;
+      const clampedY = Math.max(minY, Math.min(targetY, maxY));
+
+      sidebarY.set(clampedY - containerTop);
     } else {
-        sidebarY.set(0);
+      sidebarY.set(0);
     }
-  });
+  }
 
   // --- Persistence & Init ---
   onMount(() => {
+    if (typeof document !== 'undefined') {
+      const updateDocHeight = () => {
+        docHeight = document.documentElement.scrollHeight;
+      };
+
+      updateDocHeight();
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('resize', updateDocHeight);
+        return () => window.removeEventListener('resize', updateDocHeight);
+      }
+    }
+
     // We intentionally do not load from localStorage to ensure a fresh start
     // const saved = localStorage.getItem('bloom_config');
     // if (saved) {
@@ -135,16 +139,14 @@
     // }
   });
 
-  $effect(() => {
-    // Only save if there is something to save, but maybe we should stop saving too if we don't load?
-    // Let's keep saving for now in case we want to re-enable it later, or just disable it entirely.
-    // Given the user request "se selecteaza automat... fixeaza", disabling persistence is the key.
-    // So I will also comment out the saving part to be consistent.
-    
-    // if (selectedServices.size > 0) {
-    //   localStorage.setItem('bloom_config', JSON.stringify(Array.from(selectedServices)));
-    // }
-  });
+  // Only save if there is something to save, but maybe we should stop saving too if we don't load?
+  // Let's keep saving for now in case we want to re-enable it later, or just disable it entirely.
+  // Given the user request "se selecteaza automat... fixeaza", disabling persistence is the key.
+  // So I will also comment out the saving part to be consistent.
+
+  // if (selectedServices.size > 0) {
+  //   localStorage.setItem('bloom_config', JSON.stringify(Array.from(selectedServices)));
+  // }
 
   // --- Actions ---
   function toggleService(id) {
@@ -180,7 +182,7 @@
     return '';
   }
 
-  let formErrors = $state({ name: '', email: '', businessName: '' });
+  let formErrors = { name: '', email: '', businessName: '' };
 
   async function handleSubmit(e) {
     if (e) e.preventDefault();
@@ -247,8 +249,9 @@
     submitSuccess = false;
     selectedServices = new Set();
     formData = { businessName: '', name: '', email: '', phone: '', details: '' };
-    if (typeof window === 'undefined') return;
-    window.location.reload();
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   }
 </script>
 
@@ -280,8 +283,8 @@
                     
                     <div class="services-list">
                         {#each SERVICES.filter(s => s.category === category.id) as service}
-                            <!-- svelte-ignore a11y_click_events_have_key_events -->
-                            <!-- svelte-ignore a11y_no_static_element_interactions -->
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <!-- svelte-ignore a11y-no-static-element-interactions -->
                             <div 
                                 class="service-item {selectedServices.has(service.id) ? 'selected' : ''}"
                                 onclick={() => toggleService(service.id)}
@@ -416,7 +419,6 @@
                 <button 
                     class="finalize-button" 
                     onclick={() => {
-                        if (typeof document === 'undefined') return;
                         const form = document.querySelector('form');
                         if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                     }}
@@ -444,7 +446,6 @@
             <button 
                 class="footer-button" 
                 onclick={() => {
-                    if (typeof document === 'undefined') return;
                     // Scroll to form or submit if ready
                     const formSection = document.getElementById('contact-form-section');
                     if (selectedServices.size > 0 && formSection) {

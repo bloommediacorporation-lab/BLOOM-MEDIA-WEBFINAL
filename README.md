@@ -1,4 +1,5 @@
-# Bloom Media - Landing Page
+# Bloom Media Monorepo
+> Last Deploy: Fri Jan 2 19:35:00 EET 2026 Mobile Optimization Fix Trigger
 
 Landing page ultra-modern și premium pentru agenția de marketing digital și automatizare **Bloom Media**.
 
