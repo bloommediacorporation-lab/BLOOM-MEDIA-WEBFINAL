@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { get } from "svelte/store";
   import { spring } from "svelte/motion";
+  let isMobile = $state(false);
   import { cursorState, setHovering } from "$lib/cursorState.svelte.js";
 
   // --- Physics with Svelte Spring ---
@@ -148,15 +149,8 @@
       }
     };
 
-    // Verify if we are on a touch device to disable the custom cursor ribbon/dot
-    const isTouch = window.matchMedia(
-      "(hover: none), (pointer: coarse)",
-    ).matches;
-    if (isTouch) {
-      const container = document.querySelector(".cursor-container");
-      if (container) container.style.display = "none";
-      return;
-    }
+    isMobile = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    if (isMobile) return;
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseover", handleMouseOver);
@@ -174,45 +168,46 @@
   });
 </script>
 
-<div class="cursor-container">
-  <svg class="cursor-svg">
-    <defs>
-      <!-- Heavy Motion Blur -->
-      <filter id="motion-blur" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="12" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
-      </filter>
+{#if !isMobile}
+  <div class="cursor-container">
+    <svg class="cursor-svg">
+      <defs>
+        <!-- Heavy Motion Blur -->
+        <filter id="motion-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="12" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
 
-      <!-- Bloom Glow for Main Cursor -->
-      <filter id="head-glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
-      </filter>
-    </defs>
+        <!-- Bloom Glow for Main Cursor -->
+        <filter id="head-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
 
-    <!-- Motion Trail (Ribbon Mesh) -->
-    <!-- We generate a single smooth path that tapers from head to tail -->
-    {#if trailPath}
-      <g filter="url(#motion-blur)" class="trail-group">
-        <path d={trailPath} class="trail-path" class:hovering={isHovering} />
-      </g>
-    {/if}
+      <!-- Motion Trail (Ribbon Mesh) -->
+      <!-- We generate a single smooth path that tapers from head to tail -->
+      {#if trailPath}
+        <g filter="url(#motion-blur)" class="trail-group">
+          <path d={trailPath} class="trail-path" class:hovering={isHovering} />
+        </g>
+      {/if}
 
-    <!-- Main Cursor Head -->
-    <circle
-      cx={$mouseX}
-      cy={$mouseY}
-      r={isHovering ? 20 : 6}
-      class="head-circle"
-      class:hovering={isHovering}
-    />
-  </svg>
-</div>
+      <!-- Main Cursor Head -->
+      <circle
+        cx={$mouseX}
+        cy={$mouseY}
+        r={isHovering ? 20 : 6}
+        class="head-circle"
+        class:hovering={isHovering}
+      />
+    </svg>
+  </div>
+{/if}
 
 <style>
   @media (hover: hover) and (pointer: fine) {
-    :global(body),
-    :global(*) {
+    :global(html, body, *, *::before, *::after) {
       cursor: none !important;
     }
   }
@@ -267,14 +262,9 @@
   }
 
   @media (hover: none), (pointer: coarse) {
-    :global(body),
-    :global(*) {
-      cursor: auto !important;
-    }
     .cursor-container {
       display: none !important;
       visibility: hidden !important;
-      opacity: 0 !important;
     }
   }
 </style>
