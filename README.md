@@ -1,4 +1,5 @@
-# Bloom Media - Landing Page
+# Bloom Media Monorepo
+> Last Deploy: Mobile Fix Sync- Landing Page
 
 Landing page ultra-modern și premium pentru agenția de marketing digital și automatizare **Bloom Media**.
 
