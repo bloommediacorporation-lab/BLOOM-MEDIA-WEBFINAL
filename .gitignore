@@ -8,6 +8,6 @@ dist/
 .history/
 .vscode/
 .svelte-kit/
+.vercel/
 build/
 package-lock.json
-
