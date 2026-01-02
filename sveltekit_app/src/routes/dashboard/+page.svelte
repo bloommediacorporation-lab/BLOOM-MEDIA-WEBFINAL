@@ -1,9 +1,17 @@
 <script>
-  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
+  
+  // Simple navigate function if passed as prop, or use window.history
+  let { navigate } = $props();
 
   function goHome(e) {
       e.preventDefault();
-      goto('/');
+      if (navigate) {
+          navigate('/');
+      } else {
+          window.history.pushState(null, '', '/');
+          window.dispatchEvent(new PopStateEvent('popstate'));
+      }
   }
 </script>
 
