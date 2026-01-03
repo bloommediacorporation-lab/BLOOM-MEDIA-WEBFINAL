@@ -12,7 +12,7 @@
 </script>
 
 <div
-  class="char-mask relative block overflow-hidden h-[1.1em] align-baseline {isThemeColor
+  class="char-mask relative inline-flex overflow-hidden h-[1.1em] align-baseline {isThemeColor
     ? 'px-[0.1em] -mx-[0.08em]'
     : 'px-[0.06em]'}"
 >

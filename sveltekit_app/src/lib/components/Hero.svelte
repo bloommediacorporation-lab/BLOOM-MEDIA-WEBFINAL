@@ -1,10 +1,12 @@
 <script>
-  import { onMount } from 'svelte';
-  import RollingChar from './RollingChar.svelte';
+  import { onMount } from "svelte";
+  import RollingChar from "./RollingChar.svelte";
 
   let container;
   let ctaBtn;
   let sectionRef;
+
+  let isMobile = $state(false);
 
   const line1 = "Atinge potențialul business-ului tău\u00A0cu";
   const line2 = "BLOOM MEDIA";
@@ -12,42 +14,47 @@
   const line3Part2 = "invizibile";
 
   onMount(() => {
+    isMobile = window.matchMedia(
+      "(hover: none), (pointer: coarse), (max-width: 768px)",
+    ).matches;
     let destroyed = false;
     let cleanup = () => {};
 
     (async () => {
       const [{ default: gsap }, scrollTriggerModule] = await Promise.all([
-        import('gsap'),
-        import('gsap/ScrollTrigger')
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
       ]);
 
       const { ScrollTrigger } = scrollTriggerModule;
       if (destroyed) return;
-      if (typeof window === 'undefined' || !container || !sectionRef) return;
+      if (typeof window === "undefined" || !container || !sectionRef) return;
 
       gsap.registerPlugin(ScrollTrigger);
 
       const ctx = gsap.context(() => {
-        const strips = container.querySelectorAll('.char-strip');
-        gsap.to(strips, {
-          y: '-50%',
-          duration: 1.4,
-          ease: 'expo.out',
-          stagger: 0.015,
-          delay: 0.2
-        });
+        if (!isMobile) {
+          const strips = container.querySelectorAll(".char-strip");
+          gsap.to(strips, {
+            y: "-50%",
+            duration: 1.4,
+            ease: "expo.out",
+            stagger: 0.015,
+            delay: 0.2,
+          });
+        }
 
         gsap.to(sectionRef, {
           scrollTrigger: {
             trigger: sectionRef,
             start: "top top",
             end: "bottom top",
-            scrub: true
+            scrub: true,
           },
           y: 300,
           opacity: 0,
           filter: "blur(20px)",
-          ease: "none"
+          ease: "none",
         });
 
         gsap.fromTo(
@@ -58,8 +65,8 @@
             opacity: 1,
             duration: 1,
             ease: "power2.out",
-            delay: 1.8
-          }
+            delay: 1.8,
+          },
         );
       }, sectionRef);
 
@@ -72,7 +79,9 @@
 
         const distanceX = e.clientX - btnCenterX;
         const distanceY = e.clientY - btnCenterY;
-        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        const distance = Math.sqrt(
+          distanceX * distanceX + distanceY * distanceY,
+        );
         const maxDistance = 150;
 
         if (distance < maxDistance) {
@@ -81,25 +90,25 @@
             x: distanceX * strength * 0.5,
             y: distanceY * strength * 0.5,
             duration: 0.3,
-            ease: 'power2.out',
-            overwrite: 'auto'
+            ease: "power2.out",
+            overwrite: "auto",
           });
         } else {
           gsap.to(btn, {
             x: 0,
             y: 0,
             duration: 0.5,
-            ease: 'elastic.out(1, 0.3)',
-            overwrite: 'auto'
+            ease: "elastic.out(1, 0.3)",
+            overwrite: "auto",
           });
         }
       };
 
-      window.addEventListener('mousemove', mouseMoveHandler);
+      window.addEventListener("mousemove", mouseMoveHandler);
 
       cleanup = () => {
         ctx.revert();
-        window.removeEventListener('mousemove', mouseMoveHandler);
+        window.removeEventListener("mousemove", mouseMoveHandler);
       };
     })();
 
@@ -116,7 +125,7 @@
   class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden perspective-1000"
 >
   <!-- BACKGROUND -->
-  <div 
+  <div
     class="absolute inset-0 z-0"
     style="background: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(20, 33, 61, 0.4) 0%, #0a0a0a 70%);"
   ></div>
@@ -126,18 +135,22 @@
   ></div>
 
   <!-- CONTENT -->
-  <div 
+  <div
     bind:this={container}
     class="hero-container relative z-10 px-6 text-left max-w-7xl mx-auto flex flex-col items-start pt-24 pb-24 -mt-24 w-full"
     aria-label="Atinge potențialul business-ului tău cu Bloom Media. Pentru branduri care refuză să fie invizibile."
   >
     <!-- SECTION LABEL (Integrated) -->
-    <div class="hero-label mb-4 text-xs md:text-sm font-bold tracking-[0.15em] text-white/40 uppercase font-['Inter']">
+    <div
+      class="hero-label mb-4 text-xs md:text-sm font-bold tracking-[0.15em] text-white/40 uppercase font-['Inter']"
+    >
       01 / HERO
     </div>
 
     <!-- Line 1: "Atinge..." -->
-    <div class="hero-subtitle mb-2 text-[clamp(1.5rem,3vw,3rem)] font-bold font-['Montserrat'] leading-tight tracking-tight flex flex-wrap justify-start gap-x-[0.2em] opacity-80">
+    <div
+      class="hero-subtitle mb-2 text-[clamp(1.5rem,3vw,3rem)] font-bold font-['Montserrat'] leading-tight tracking-tight flex flex-wrap justify-start gap-x-[0.2em] opacity-80"
+    >
       {#each line1.split(" ") as word, wIndex}
         <span class="inline-flex whitespace-nowrap">
           {#each word.split("") as char, cIndex}
@@ -148,7 +161,9 @@
     </div>
 
     <!-- Line 2: "BLOOM MEDIA" (Massive Block Style) -->
-    <div class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(2.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[0.9] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase">
+    <div
+      class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(2.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[0.9] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase"
+    >
       {#each line2.split(" ") as word, wIndex}
         <span class="inline-flex whitespace-nowrap">
           {#each word.split("") as char, cIndex}
@@ -159,7 +174,9 @@
     </div>
 
     <!-- Line 3: "Pentru..." + "invizibile" (Highlight) -->
-    <div class="hero-description mb-12 text-[clamp(1rem,1.5vw,1.5rem)] font-light font-['Montserrat'] max-w-2xl flex flex-wrap justify-start gap-x-[0.3em] leading-relaxed">
+    <div
+      class="hero-description mb-12 text-[clamp(1rem,1.5vw,1.5rem)] font-light font-['Montserrat'] max-w-2xl flex flex-wrap justify-start gap-x-[0.3em] leading-relaxed"
+    >
       <!-- Part 1: Normal text -->
       {#each line3Part1.split(" ") as word, wIndex}
         {#if word}
@@ -170,7 +187,7 @@
           </span>
         {/if}
       {/each}
-      
+
       <!-- Part 2: "invizibile" (Highlight) -->
       <span class="inline-flex whitespace-nowrap">
         {#each line3Part2.split("") as char, cIndex}
@@ -178,25 +195,25 @@
         {/each}
       </span>
     </div>
-    
+
     <!-- CTA BUTTON -->
-    <div class="overflow-hidden p-2"> 
-      <a 
+    <div class="overflow-hidden p-2">
+      <a
         bind:this={ctaBtn}
-        href="#contact" 
+        href="#contact"
         class="cta-button inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full text-lg font-bold text-black bg-[#fca311] relative group opacity-0"
       >
         <span class="relative z-10">DISCUTĂ CU NOI</span>
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round" 
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           class="relative z-10 transition-transform group-hover:translate-x-1"
         >
           <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -204,7 +221,6 @@
         </svg>
       </a>
     </div>
-
   </div>
 </section>
 
