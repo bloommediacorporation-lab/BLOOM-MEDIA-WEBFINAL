@@ -12,32 +12,67 @@
 </script>
 
 <div
-  class="char-mask relative inline-flex overflow-hidden !overflow-hidden h-[1em] max-h-[1em] leading-[1em] align-baseline {isThemeColor
-    ? 'px-[0.1em] -mx-[0.08em]'
-    : 'px-[0.06em]'}"
+  class="char-mask {isThemeColor ? 'px-[0.1em] -mx-[0.08em]' : 'px-[0.06em]'}"
 >
-  <div class="char-strip flex flex-col will-change-transform h-full">
+  <div class="char-strip">
     <!-- SLOT 1: Initial State -->
+    <span class="char-slot text-white">
+      {char === " " ? "\u00A0" : char}
+    </span>
+    <!-- SLOT 2: Transform State -->
     <span
-      class="char-slot h-full min-h-[1em] flex items-center justify-center text-white"
+      class="char-slot {isHighlight
+        ? 'font-serif italic text-[#fca311] pr-[0.05em]'
+        : isThemeColor
+          ? 'text-[#fca311]'
+          : 'text-white'}"
     >
       {char === " " ? "\u00A0" : char}
     </span>
-    {#if !isMobile}
-      <!-- SLOT 2: Transform State (The Griflan Look) - Only rendered on desktop to prevent doubling artifacts -->
-      <span
-        class="char-slot h-full min-h-[1em] flex items-center justify-center {isHighlight
-          ? 'font-serif italic text-[#fca311] pr-[0.05em]'
-          : isThemeColor
-            ? 'text-[#fca311]'
-            : 'text-white'}"
-      >
-        {char === " " ? "\u00A0" : char}
-      </span>
-    {/if}
   </div>
 </div>
 
 <style>
-  /* Styles are handled by Tailwind classes in the markup */
+  .char-mask {
+    display: inline-block; /* Changed from inline-flex to prevent child height collapse */
+    position: relative;
+    overflow: hidden !important;
+    height: 1.2em !important;
+    max-height: 1.2em !important;
+    line-height: 1.2em !important;
+    vertical-align: bottom;
+    box-sizing: content-box;
+  }
+
+  .char-strip {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+    transform: translateY(0);
+    width: 100%;
+  }
+
+  .char-slot {
+    height: 1.2em !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1 !important; /* Reset line-height inside slot to prevent expansion */
+  }
+
+  /* Keyframes referenced by user - can be used as fallback or for manual control */
+  @keyframes slot-machine-roll {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-50%);
+    }
+  }
+
+  /* This class can be applied for CSS-only animation if desired */
+  :global(.animate-slot) {
+    animation: slot-machine-roll 1.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  }
 </style>

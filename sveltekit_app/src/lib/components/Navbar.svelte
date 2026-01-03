@@ -206,7 +206,6 @@
   }
 
   .links {
-    display: flex;
     gap: 2.5rem;
     align-items: center;
   }
@@ -294,7 +293,6 @@
 
   /* --- HAMBURGER MENU --- */
   .hamburger {
-    display: none;
     flex-direction: column;
     gap: 6px;
     background: none;
@@ -392,5 +390,29 @@
     font-family: "Inter", sans-serif;
   }
 
-  /* --- RESPONSIVE REMOVED IN FAVOR OF TAILWIND CLASSES --- */
+  @media (max-width: 1024px) {
+    .container {
+      padding: 1rem 1.25rem !important;
+    }
+
+    .logo {
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: nowrap;
+      font-size: 1.25rem;
+    }
+
+    .hamburger {
+      flex: 0 0 auto;
+    }
+
+    .nav-links {
+      display: none !important;
+    }
+    
+    /* Ensure desktop CTA is also hidden if tailwind fails or breakpoint mismatch */
+    .container > div:nth-child(3) {
+       display: none !important;
+    }
+  }
 </style>

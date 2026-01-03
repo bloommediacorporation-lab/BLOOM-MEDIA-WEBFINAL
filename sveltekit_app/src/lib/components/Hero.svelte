@@ -17,6 +17,9 @@
     isMobile =
       window.matchMedia("(hover: none), (pointer: coarse), (max-width: 1024px)")
         .matches || window.innerWidth <= 1024;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     let destroyed = false;
     let cleanup = () => {};
 
@@ -33,10 +36,11 @@
       gsap.registerPlugin(ScrollTrigger);
 
       const ctx = gsap.context(() => {
-        if (!isMobile) {
-          const strips = container.querySelectorAll(".char-strip");
+        const strips = container.querySelectorAll(".char-strip");
+        
+        if (!prefersReducedMotion) {
           gsap.to(strips, {
-            y: "-50%",
+            y: "-1.2em", // Exact height of one slot (calculated from 1.2em line-height)
             duration: 1.4,
             ease: "expo.out",
             stagger: 0.015,
@@ -44,71 +48,82 @@
           });
         }
 
-        gsap.to(sectionRef, {
-          scrollTrigger: {
-            trigger: sectionRef,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-          y: 300,
-          opacity: 0,
-          filter: "blur(20px)",
-          ease: "none",
-        });
+        if (!prefersReducedMotion) {
+          gsap.to(sectionRef, {
+            scrollTrigger: {
+              trigger: sectionRef,
+              start: "top top",
+              end: "bottom top",
+              scrub: true,
+            },
+            y: 300,
+            opacity: 0,
+            filter: "blur(20px)",
+            ease: "none",
+          });
+        }
 
         gsap.fromTo(
           ctaBtn,
-          { y: 100, opacity: 0 },
+          { y: isMobile ? 30 : 100, opacity: 0 },
           {
             y: 0,
             opacity: 1,
             duration: 1,
             ease: "power2.out",
-            delay: 1.8,
+            delay: isMobile ? 0.6 : 1.8,
           },
         );
       }, sectionRef);
 
-      const mouseMoveHandler = (e) => {
-        if (!ctaBtn) return;
-        const btn = ctaBtn;
-        const btnRect = btn.getBoundingClientRect();
-        const btnCenterX = btnRect.left + btnRect.width / 2;
-        const btnCenterY = btnRect.top + btnRect.height / 2;
+      let mouseMoveHandler;
+      if (
+        !isMobile &&
+        !prefersReducedMotion &&
+        window.matchMedia("(hover: hover) and (pointer: fine)").matches
+      ) {
+        mouseMoveHandler = (e) => {
+          if (!ctaBtn) return;
+          const btn = ctaBtn;
+          const btnRect = btn.getBoundingClientRect();
+          const btnCenterX = btnRect.left + btnRect.width / 2;
+          const btnCenterY = btnRect.top + btnRect.height / 2;
 
-        const distanceX = e.clientX - btnCenterX;
-        const distanceY = e.clientY - btnCenterY;
-        const distance = Math.sqrt(
-          distanceX * distanceX + distanceY * distanceY,
-        );
-        const maxDistance = 150;
+          const distanceX = e.clientX - btnCenterX;
+          const distanceY = e.clientY - btnCenterY;
+          const distance = Math.sqrt(
+            distanceX * distanceX + distanceY * distanceY,
+          );
+          const maxDistance = 150;
 
-        if (distance < maxDistance) {
-          const strength = (maxDistance - distance) / maxDistance;
-          gsap.to(btn, {
-            x: distanceX * strength * 0.5,
-            y: distanceY * strength * 0.5,
-            duration: 0.3,
-            ease: "power2.out",
-            overwrite: "auto",
-          });
-        } else {
-          gsap.to(btn, {
-            x: 0,
-            y: 0,
-            duration: 0.5,
-            ease: "elastic.out(1, 0.3)",
-            overwrite: "auto",
-          });
-        }
-      };
+          if (distance < maxDistance) {
+            const strength = (maxDistance - distance) / maxDistance;
+            gsap.to(btn, {
+              x: distanceX * strength * 0.5,
+              y: distanceY * strength * 0.5,
+              duration: 0.3,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          } else {
+            gsap.to(btn, {
+              x: 0,
+              y: 0,
+              duration: 0.5,
+              ease: "elastic.out(1, 0.3)",
+              overwrite: "auto",
+            });
+          }
+        };
 
-      window.addEventListener("mousemove", mouseMoveHandler);
+        window.addEventListener("mousemove", mouseMoveHandler);
+      }
 
       cleanup = () => {
         ctx.revert();
-        window.removeEventListener("mousemove", mouseMoveHandler);
+        if (mouseMoveHandler) {
+          window.removeEventListener("mousemove", mouseMoveHandler);
+        }
       };
     })();
 
@@ -149,7 +164,7 @@
 
     <!-- Line 1: "Atinge..." -->
     <div
-      class="hero-subtitle mb-2 text-[clamp(1.5rem,3vw,3rem)] font-bold font-['Montserrat'] leading-tight tracking-tight flex flex-wrap justify-start gap-x-[0.2em] opacity-80"
+      class="hero-subtitle mb-2 text-[clamp(1.5rem,3vw,3rem)] font-bold font-['Montserrat'] leading-[1.2] tracking-tight flex flex-wrap justify-start gap-x-[0.2em] opacity-80"
     >
       {#each line1.split(" ") as word, wIndex}
         <span class="inline-flex whitespace-nowrap">
@@ -162,7 +177,7 @@
 
     <!-- Line 2: "BLOOM MEDIA" (Massive Block Style) -->
     <div
-      class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(2.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[0.9] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase"
+      class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(2.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[1.2] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase"
     >
       {#each line2.split(" ") as word, wIndex}
         <span class="inline-flex whitespace-nowrap">
@@ -175,7 +190,7 @@
 
     <!-- Line 3: "Pentru..." + "invizibile" (Highlight) -->
     <div
-      class="hero-description mb-12 text-[clamp(1rem,1.5vw,1.5rem)] font-light font-['Montserrat'] max-w-2xl flex flex-wrap justify-start gap-x-[0.3em] leading-relaxed"
+      class="hero-description mb-12 text-[clamp(1rem,1.5vw,1.5rem)] font-light font-['Montserrat'] max-w-2xl flex flex-wrap justify-start gap-x-[0.3em] leading-[1.2]"
     >
       <!-- Part 1: Normal text -->
       {#each line3Part1.split(" ") as word, wIndex}
@@ -224,4 +239,16 @@
   </div>
 </section>
 
-<style></style>
+<style>
+  .hero-container {
+    will-change: transform;
+  }
+
+  .cta-button {
+    will-change: transform;
+  }
+
+  :global(.char-strip) {
+    will-change: transform;
+  }
+</style>
