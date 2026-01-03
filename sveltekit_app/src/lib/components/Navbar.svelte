@@ -49,7 +49,7 @@
     </a>
 
     <!-- Desktop Links -->
-    <div class="links nav-links hidden lg:flex">
+    <div class="links nav-links desktop-only hidden lg:flex">
       <a
         href="/"
         onclick={(e) => {
@@ -96,7 +96,7 @@
       >
     </div>
 
-    <div class="hidden lg:block">
+    <div class="desktop-only hidden lg:block">
       <button class="cta" onclick={() => handleNavigate("/")}
         >Începe Proiectul</button
       >
@@ -406,8 +406,15 @@
       flex: 0 0 auto;
     }
 
-    .nav-links {
+    .nav-links,
+    .desktop-only {
       display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
     }
     
     /* Ensure desktop CTA is also hidden if tailwind fails or breakpoint mismatch */
