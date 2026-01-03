@@ -162,7 +162,12 @@
     /* Mobile optimization: Ensure header is properly handled */
     @media (max-width: 768px) {
         header {
-             /* Ensure header doesn't block clicks when hidden/transparent if needed */
+            /* Optimized blur for mobile */
+            background: rgba(5, 5, 5, 0.85) !important; /* Slightly more opaque to help with contrast */
+            backdrop-filter: blur(8px) !important; /* Reduced blur radius for performance */
+            -webkit-backdrop-filter: blur(8px) !important;
+            will-change: transform, backdrop-filter;
+            transform: translateZ(0); /* Force GPU acceleration */
         }
     }
 

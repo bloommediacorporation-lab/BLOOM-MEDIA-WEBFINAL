@@ -58,7 +58,10 @@
             },
             y: 300,
             opacity: 0,
-            filter: "blur(20px)",
+            // Optimized blur: lighter on mobile (10px) vs desktop (20px)
+            filter: isMobile ? "blur(10px)" : "blur(20px)", 
+            willChange: "transform, opacity, filter",
+            force3D: true, // Force GPU layer
             ease: "none",
           });
         }
