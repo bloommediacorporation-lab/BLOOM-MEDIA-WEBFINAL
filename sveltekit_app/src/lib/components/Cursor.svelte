@@ -149,9 +149,9 @@
       }
     };
 
-    isMobile = window.matchMedia(
-      "(hover: none), (pointer: coarse), (max-width: 768px)",
-    ).matches;
+    isMobile =
+      window.matchMedia("(hover: none), (pointer: coarse), (max-width: 1024px)")
+        .matches || window.innerWidth <= 1024;
     if (isMobile) return;
 
     window.addEventListener("mousemove", handleMouseMove);

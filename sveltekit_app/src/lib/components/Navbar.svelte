@@ -49,7 +49,7 @@
     </a>
 
     <!-- Desktop Links -->
-    <div class="links nav-links desktop-only">
+    <div class="links nav-links hidden lg:flex">
       <a
         href="/"
         onclick={(e) => {
@@ -96,7 +96,7 @@
       >
     </div>
 
-    <div class="desktop-only">
+    <div class="hidden lg:block">
       <button class="cta" onclick={() => handleNavigate("/")}
         >Începe Proiectul</button
       >
@@ -104,7 +104,7 @@
 
     <!-- Mobile Hamburger Button -->
     <button
-      class="hamburger mobile-only"
+      class="hamburger lg:hidden flex"
       onclick={toggleMenu}
       aria-label="Menu"
     >
@@ -392,42 +392,5 @@
     font-family: "Inter", sans-serif;
   }
 
-  /* --- RESPONSIVE --- */
-  @media (max-width: 768px) {
-    .nav-links {
-      display: none !important;
-    }
-
-    .links.desktop-only {
-      display: none !important;
-    }
-
-    .desktop-only {
-      display: none !important;
-    }
-
-    .mobile-only {
-      display: flex !important;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    .desktop-only {
-      display: none;
-    }
-
-    .mobile-only {
-      display: flex;
-    }
-
-    .container {
-      padding: 1rem 1.5rem;
-    }
-  }
-
-  @media (min-width: 1025px) {
-    .mobile-only {
-      display: none;
-    }
-  }
+  /* --- RESPONSIVE REMOVED IN FAVOR OF TAILWIND CLASSES --- */
 </style>

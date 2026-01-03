@@ -14,9 +14,9 @@
   const line3Part2 = "invizibile";
 
   onMount(() => {
-    isMobile = window.matchMedia(
-      "(hover: none), (pointer: coarse), (max-width: 768px)",
-    ).matches;
+    isMobile =
+      window.matchMedia("(hover: none), (pointer: coarse), (max-width: 1024px)")
+        .matches || window.innerWidth <= 1024;
     let destroyed = false;
     let cleanup = () => {};
 

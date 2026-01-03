@@ -5,28 +5,28 @@
   let isMobile = $state(false);
 
   onMount(() => {
-    isMobile = window.matchMedia(
-      "(hover: none), (pointer: coarse), (max-width: 768px)",
-    ).matches;
+    isMobile =
+      window.matchMedia("(hover: none), (pointer: coarse), (max-width: 1024px)")
+        .matches || window.innerWidth <= 1024;
   });
 </script>
 
 <div
-  class="char-mask relative inline-flex overflow-hidden h-[1.1em] align-baseline {isThemeColor
+  class="char-mask relative inline-flex overflow-hidden !overflow-hidden h-[1em] max-h-[1em] leading-[1em] align-baseline {isThemeColor
     ? 'px-[0.1em] -mx-[0.08em]'
     : 'px-[0.06em]'}"
 >
-  <div class="char-strip flex flex-col will-change-transform">
+  <div class="char-strip flex flex-col will-change-transform h-full">
     <!-- SLOT 1: Initial State -->
     <span
-      class="char-slot h-[1.1em] flex items-center justify-center text-white"
+      class="char-slot h-full min-h-[1em] flex items-center justify-center text-white"
     >
       {char === " " ? "\u00A0" : char}
     </span>
     {#if !isMobile}
       <!-- SLOT 2: Transform State (The Griflan Look) - Only rendered on desktop to prevent doubling artifacts -->
       <span
-        class="char-slot h-[1.1em] flex items-center justify-center {isHighlight
+        class="char-slot h-full min-h-[1em] flex items-center justify-center {isHighlight
           ? 'font-serif italic text-[#fca311] pr-[0.05em]'
           : isThemeColor
             ? 'text-[#fca311]'
