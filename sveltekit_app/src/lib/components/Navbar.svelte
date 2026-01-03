@@ -49,7 +49,7 @@
     </a>
 
     <!-- Desktop Links -->
-    <div id="desktop-nav" class="links nav-links desktop-only hidden lg:flex">
+    <div id="desktop-nav" class="links nav-links hidden lg:flex">
       <a
         href="/"
         onclick={(e) => {
@@ -96,7 +96,7 @@
       >
     </div>
 
-    <div id="desktop-cta" class="desktop-only hidden lg:block">
+    <div id="desktop-cta" class="hidden lg:block">
       <button class="cta" onclick={() => handleNavigate("/")}
         >Începe Proiectul</button
       >
@@ -193,6 +193,7 @@
     gap: 0.5rem;
     transition: transform 0.2s;
     letter-spacing: -0.05em;
+    flex-shrink: 0;
   }
   .logo:hover {
     transform: scale(1.05);
@@ -392,43 +393,11 @@
 
   @media (max-width: 1024px) {
     .container {
-      padding: 1rem 1.25rem !important;
+      padding: 1rem 1.25rem;
     }
 
     .logo {
-      flex: 1 1 auto;
-      min-width: 0;
-      white-space: nowrap;
       font-size: 1.25rem;
-    }
-
-    .hamburger {
-      flex: 0 0 auto;
-    }
-
-    #desktop-nav,
-    #desktop-cta,
-    .nav-links,
-    .desktop-only {
-      display: none !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-      width: 0 !important;
-      height: 0 !important;
-      overflow: hidden !important;
-      pointer-events: none !important;
-      position: absolute !important;
-      z-index: -9999 !important;
-      max-width: 0 !important;
-      max-height: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      border: none !important;
-    }
-    
-    /* Ensure desktop CTA is also hidden if tailwind fails or breakpoint mismatch */
-    .container > div:nth-child(3) {
-       display: none !important;
     }
   }
 </style>

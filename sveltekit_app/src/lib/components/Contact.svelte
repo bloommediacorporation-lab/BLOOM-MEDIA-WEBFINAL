@@ -102,10 +102,10 @@
   .contact-section {
     background-color: #050505;
     color: #ffffff;
-    min-height: 100vh;
+    min-height: 70vh; /* Further reduced from 80vh */
     display: flex;
     align-items: center;
-    padding: 6rem 0;
+    padding: 3rem 0 1rem; /* Further reduced padding */
     position: relative;
     overflow: hidden;
   }
@@ -283,6 +283,11 @@
 
   /* --- Responsive --- */
   @media (max-width: 1024px) {
+    .contact-section {
+      min-height: auto !important; /* Remove forced height on mobile */
+      padding: 3rem 0 2rem !important;
+    }
+
     .content-grid {
       grid-template-columns: 1fr;
       gap: 4rem;

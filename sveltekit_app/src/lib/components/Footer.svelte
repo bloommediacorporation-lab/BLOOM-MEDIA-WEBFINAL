@@ -50,7 +50,7 @@
 
 <!-- Spacer for Reveal Effect -->
 {#if reveal}
-  <div style="height: {footerHeight}px; width: 100%;"></div>
+  <div class="footer-spacer" style="height: {footerHeight}px; width: 100%;"></div>
 {/if}
 
 <footer 
@@ -113,7 +113,7 @@
   .footer {
     background: #080808;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 4rem 2rem 2rem;
+    padding: 2rem 2rem 1rem; /* Reduced padding */
     position: relative;
     overflow: hidden;
   }
@@ -124,6 +124,28 @@
     left: 0;
     width: 100%;
     z-index: -10; /* Behind main content */
+    top: auto; /* Prevent negative top positioning */
+    clip-path: inset(0 0 0 0); /* Create stacking context to contain content */
+  }
+
+  /* On mobile, disable reveal effect but keep footer visible */
+  @media (max-width: 768px) {
+    .is-reveal {
+      position: relative !important; /* Change from fixed to relative */
+      display: block !important;
+      visibility: visible !important;
+      z-index: 10 !important; /* Ensure it's above content */
+    }
+    
+    /* Hide the spacer on mobile since footer is relative */
+    :global(.footer-spacer) {
+      display: none !important;
+      height: 0 !important;
+    }
+
+    .container {
+      padding-top: 2rem !important; /* Reduce padding on mobile */
+    }
   }
 
   .footer-bg {
@@ -135,11 +157,13 @@
     background: radial-gradient(circle at 50% 100%, #1a1a1a 0%, #000000 70%);
     z-index: 0;
     opacity: 0.5;
+    will-change: transform; /* Optimize for animation */
   }
   
   .container {
     max-width: 1200px;
     margin: 0 auto;
+    padding-top: 4rem; /* Ensure content starts below any potential overlap */
   }
   
   .grid {

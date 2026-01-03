@@ -115,12 +115,14 @@
 
 <style>
     :global(html, body, *, *::before, *::after) {
-        /* cursor: none !important; REMOVED to restore system cursor */
+        cursor: none !important; /* Restore custom cursor hiding */
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     :global(a, button, input, select, textarea, [role="button"]) {
-        /* cursor: none !important; REMOVED to restore system cursor */
-        cursor: pointer;
+        cursor: none !important; /* Restore custom cursor hiding for interactive elements */
     }
 
     :global(html) {
@@ -150,8 +152,9 @@
 
     /* Smart Navbar Styles */
     header {
-        /* Default state (at top): transparent, no shadow */
-        background: transparent;
+        /* Default state (at top): semi-transparent with backdrop blur to block footer content */
+        background: rgba(5, 5, 5, 0.8);
+        backdrop-filter: blur(10px);
         box-shadow: none;
         will-change: transform, opacity;
     }
@@ -164,9 +167,8 @@
     }
 
     /* Scrolled State: Blur + Gold Glow */
-    header.scrolled .navbar-inner {
-        background: rgba(5, 5, 5, 0.7); /* Matte Black with opacity */
-        backdrop-filter: blur(10px); /* Blur effect */
+    header.scrolled {
+        background: #050505; /* Fully opaque to prevent any text bleed-through */
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         box-shadow: 0 4px 30px rgba(252, 163, 17, 0.15); /* Gold Glow */
     }
