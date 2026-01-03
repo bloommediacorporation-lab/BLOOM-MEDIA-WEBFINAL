@@ -115,11 +115,12 @@
 
 <style>
     :global(html, body, *, *::before, *::after) {
-        cursor: none !important;
+        /* cursor: none !important; REMOVED to restore system cursor */
     }
 
     :global(a, button, input, select, textarea, [role="button"]) {
-        cursor: none !important;
+        /* cursor: none !important; REMOVED to restore system cursor */
+        cursor: pointer;
     }
 
     :global(html) {
@@ -153,6 +154,13 @@
         background: transparent;
         box-shadow: none;
         will-change: transform, opacity;
+    }
+
+    /* Mobile optimization: Ensure header is properly handled */
+    @media (max-width: 768px) {
+        header {
+             /* Ensure header doesn't block clicks when hidden/transparent if needed */
+        }
     }
 
     /* Scrolled State: Blur + Gold Glow */
