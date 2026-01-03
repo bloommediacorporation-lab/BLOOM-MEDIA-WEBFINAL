@@ -149,7 +149,9 @@
       }
     };
 
-    isMobile = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    isMobile = window.matchMedia(
+      "(hover: none), (pointer: coarse), (max-width: 768px)",
+    ).matches;
     if (isMobile) return;
 
     window.addEventListener("mousemove", handleMouseMove);
