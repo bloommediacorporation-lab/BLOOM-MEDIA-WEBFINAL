@@ -1,6 +1,6 @@
 <script>
   import Hero from '$lib/components/Hero.svelte';
-  import MarketingImpact from '$lib/components/MarketingImpact.svelte';
+  import ComparisonSection from '$lib/components/ComparisonSection.svelte';
   import ServicesShowcase from '$lib/components/ServicesShowcase.svelte';
   import ProcessTimeline from '$lib/components/ProcessTimeline.svelte';
   import Services from '$lib/components/Services.svelte';
@@ -19,7 +19,8 @@
 <!-- Background color is crucial to hide footer until reveal -->
 <div class="relative z-10 bg-[#050505] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
   <Hero />
-  <MarketingImpact />
+
+  <ComparisonSection />
   <ServicesShowcase />
   <ProcessTimeline />
   <Services {navigate} />

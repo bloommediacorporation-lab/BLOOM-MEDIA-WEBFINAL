@@ -1,272 +1,196 @@
 <script>
-  import { onMount } from "svelte";
-  import { get } from "svelte/store";
-  import { spring } from "svelte/motion";
-  let isMobile = $state(false);
-  import { cursorState, setHovering } from "$lib/cursorState.svelte.js";
+  import { onMount } from 'svelte';
+  import { gsap } from 'gsap';
+  import { browser } from '$app/environment';
 
-  // --- Physics with Svelte Spring ---
-  // Main cursor is very tight to feel responsive
-  let mouseX = spring(0, { stiffness: 0.2, damping: 0.8 });
-  let mouseY = spring(0, { stiffness: 0.2, damping: 0.8 });
+  let dot;
+  let ring;
+  let isHovering = false;
+  let isVisible = true;
 
-  // --- Motion Blur History ---
-  // We store the last N positions to draw the trail
-  const HISTORY_SIZE = 35;
-  let history = $state([]);
-  let currentPos = { x: 0, y: 0 };
-
-  // Derived UI State
-  let isHovering = $state(false);
-  let trailPath = $state("");
-
-  // Generate the "Ribbon" path for the organic trail
-  const getRibbonPath = (points) => {
-    if (points.length < 2) return "";
-
-    const maxWid = 22; // Matches cursor diameter + bloom
-    const lefts = [];
-    const rights = [];
-
-    for (let i = 0; i < points.length - 1; i++) {
-      const p1 = points[i];
-      const p2 = points[i + 1];
-
-      // Direction vector
-      const dx = p2.x - p1.x;
-      const dy = p2.y - p1.y;
-      const len = Math.sqrt(dx * dx + dy * dy);
-
-      // Skip tiny segments to avoid jittery normals
-      if (len < 1 && i > 0) continue;
-
-      // Normal vector (normalized)
-      let nx = -dy / (len || 1);
-      let ny = dx / (len || 1);
-
-      // Tapering width: Head is max, Tail is 0
-      const progress = i / points.length;
-      const widthFactor = 1 - progress;
-      const width = maxWid * widthFactor;
-
-      // Offset points
-      lefts.push({ x: p1.x + nx * width * 0.5, y: p1.y + ny * width * 0.5 });
-      rights.push({ x: p1.x - nx * width * 0.5, y: p1.y - ny * width * 0.5 });
-    }
-
-    // Tail point
-    const last = points[points.length - 1];
-    lefts.push(last);
-    rights.push(last);
-
-    if (lefts.length < 2) return "";
-
-    // Construct Smooth Path (Quadratic Bezier)
-    let d = `M ${lefts[0].x} ${lefts[0].y}`;
-
-    // Smooth forward
-    for (let i = 1; i < lefts.length - 1; i++) {
-      const xc = (lefts[i].x + lefts[i + 1].x) / 2;
-      const yc = (lefts[i].y + lefts[i + 1].y) / 2;
-      d += ` Q ${lefts[i].x} ${lefts[i].y} ${xc} ${yc}`;
-    }
-    d += ` L ${lefts[lefts.length - 1].x} ${lefts[lefts.length - 1].y}`;
-
-    // Connect to right tail
-    d += ` L ${rights[rights.length - 1].x} ${rights[rights.length - 1].y}`;
-
-    // Smooth backward
-    for (let i = rights.length - 2; i > 0; i--) {
-      const xc = (rights[i].x + rights[i - 1].x) / 2;
-      const yc = (rights[i].y + rights[i - 1].y) / 2;
-      d += ` Q ${rights[i].x} ${rights[i].y} ${xc} ${yc}`;
-    }
-    d += ` L ${rights[0].x} ${rights[0].y}`;
-
-    d += " Z";
-    return d;
-  };
-
-  // Sync with global cursor state
-  $effect(() => {
-    // Hover state sync
-    isHovering = cursorState.isHovering || cursorState.active;
-  });
+  const brandColor = '#fca311';
+  const brandColorLight = 'rgba(252, 163, 17, 0.5)';
 
   onMount(() => {
-    if (typeof window === "undefined") return;
-    let animationFrame;
+    if (!browser) return;
 
-    const handleMouseMove = (e) => {
-      // Update main cursor spring
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+    let mouseX = -100;
+    let mouseY = -100;
 
-      // Update raw position for history
-      currentPos = { x: e.clientX, y: e.clientY };
+    const moveCursor = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      gsap.to(dot, {
+        x: mouseX,
+        y: mouseY,
+        duration: 0.1,
+        ease: 'power2.out'
+      });
+
+      gsap.to(ring, {
+        x: mouseX,
+        y: mouseY,
+        duration: 0.25,
+        ease: 'power2.out'
+      });
     };
 
-    // Game loop for smooth trail updates
-    const loop = () => {
-      // Add current SPRING position to history
-      // This ensures trail is attached to the visible cursor, not the raw mouse
-      const sprX = get(mouseX);
-      const sprY = get(mouseY);
-
-      history.unshift({ x: sprX, y: sprY });
-
-      // Trim history
-      if (history.length > HISTORY_SIZE) {
-        history.pop();
-      }
-
-      // Generate Path
-      trailPath = getRibbonPath(history);
-
-      // Force svelte update (reactive array)
-      history = history;
-
-      animationFrame = requestAnimationFrame(loop);
-    };
-
-    const handleMouseOver = (e) => {
-      const target = e.target;
-      const link = target.closest(
-        'a, button, [role="button"], .interactive, input, select, textarea',
-      );
-      if (link || cursorState.active) {
-        setHovering(true);
+    const handleMouseEnter = (e) => {
+      const target = e.target.closest('a, button, [data-cursor], input[type="submit"], .clickable');
+      if (target) {
+        isHovering = true;
+        gsap.to(ring, {
+          scale: 1.8,
+          borderWidth: '1px',
+          borderColor: brandColorLight,
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+        gsap.to(dot, {
+          scale: 0.5,
+          duration: 0.3
+        });
       }
     };
 
-    const handleMouseOut = (e) => {
-      const target = e.target;
-      const link = target.closest(
-        'a, button, [role="button"], .interactive, input, select, textarea',
-      );
-      if (link) {
-        setHovering(false);
+    const handleMouseLeave = (e) => {
+      const target = e.target.closest('a, button, [data-cursor], input[type="submit"], .clickable');
+      if (target) {
+        isHovering = false;
+        gsap.to(ring, {
+          scale: 1,
+          borderWidth: '2px',
+          borderColor: brandColor,
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+        gsap.to(dot, {
+          scale: 1,
+          duration: 0.3
+        });
       }
     };
 
-    isMobile =
-      window.matchMedia("(hover: none), (pointer: coarse), (max-width: 1024px)")
-        .matches || window.innerWidth <= 1024;
-    if (isMobile) return;
+    const handleMouseDown = () => {
+      gsap.to(ring, {
+        scale: isHovering ? 1.5 : 0.8,
+        duration: 0.15
+      });
+      gsap.to(dot, {
+        scale: 0.8,
+        duration: 0.15
+      });
+    };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseover", handleMouseOver);
-    window.addEventListener("mouseout", handleMouseOut);
+    const handleMouseUp = () => {
+      gsap.to(ring, {
+        scale: isHovering ? 1.8 : 1,
+        duration: 0.15
+      });
+      gsap.to(dot, {
+        scale: isHovering ? 0.5 : 1,
+        duration: 0.15
+      });
+    };
 
-    // Start loop
-    loop();
+    const handleVisibility = (e) => {
+      isVisible = e.type === 'mouseenter';
+      gsap.to([dot, ring], {
+        opacity: isVisible ? 1 : 0,
+        duration: 0.2
+      });
+    };
+
+    document.addEventListener('mousemove', moveCursor);
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.documentElement.addEventListener('mouseenter', handleVisibility);
+    document.documentElement.addEventListener('mouseleave', handleVisibility);
+    document.addEventListener('mouseenter', handleMouseEnter, true);
+    document.addEventListener('mouseleave', handleMouseLeave, true);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseover", handleMouseOver);
-      window.removeEventListener("mouseout", handleMouseOut);
-      cancelAnimationFrame(animationFrame);
+      document.removeEventListener('mousemove', moveCursor);
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.documentElement.removeEventListener('mouseenter', handleVisibility);
+      document.documentElement.removeEventListener('mouseleave', handleVisibility);
+      document.removeEventListener('mouseenter', handleMouseEnter, true);
+      document.removeEventListener('mouseleave', handleMouseLeave, true);
     };
   });
 </script>
 
-{#if !isMobile}
-  <div class="cursor-container">
-    <svg class="cursor-svg">
-      <defs>
-        <!-- Heavy Motion Blur -->
-        <filter id="motion-blur" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="12" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-
-        <!-- Bloom Glow for Main Cursor -->
-        <filter id="head-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-      </defs>
-
-      <!-- Motion Trail (Ribbon Mesh) -->
-      <!-- We generate a single smooth path that tapers from head to tail -->
-      {#if trailPath}
-        <g filter="url(#motion-blur)" class="trail-group">
-          <path d={trailPath} class="trail-path" class:hovering={isHovering} />
-        </g>
-      {/if}
-
-      <!-- Main Cursor Head -->
-      <circle
-        cx={$mouseX}
-        cy={$mouseY}
-        r={isHovering ? 20 : 6}
-        class="head-circle"
-        class:hovering={isHovering}
-      />
-    </svg>
-  </div>
-{/if}
+<div class="bloom-cursor" class:hidden={!isVisible}>
+  <div bind:this={dot} class="cursor-dot"></div>
+  <div bind:this={ring} class="cursor-ring"></div>
+</div>
 
 <style>
-  @media (hover: hover) and (pointer: fine) {
-    :global(html, body, *, *::before, *::after) {
-      cursor: none !important;
-    }
-  }
-
-  .cursor-container {
+  .bloom-cursor {
+    pointer-events: none;
+    z-index: 99999;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: difference;
-  }
-
-  .cursor-svg {
     width: 100%;
     height: 100%;
-    overflow: visible;
   }
 
-  .trail-group {
-    will-change: transform;
-    /* Ensure it doesn't clip */
-    overflow: visible;
+  .bloom-cursor.hidden {
+    opacity: 0;
   }
 
-  .trail-path {
-    fill: #ffffff;
-    fill-opacity: 0.25;
-    transition:
-      fill 0.3s ease,
-      fill-opacity 0.3s ease;
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background: #fca311;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99999;
+    pointer-events: none;
   }
 
-  .trail-path.hovering {
-    fill: #fca311;
-    fill-opacity: 0.35;
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #fca311;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99998;
+    pointer-events: none;
   }
 
-  .head-circle {
-    fill: #ffffff;
-    filter: url(#head-glow);
-    transition:
-      r 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-      fill 0.3s ease;
-  }
-
-  .head-circle.hovering {
-    fill: #fca311;
-    filter: drop-shadow(0 0 8px #fca311);
-  }
-
-  @media (hover: none), (pointer: coarse) {
-    .cursor-container {
+  @media (hover: none) and (pointer: coarse) {
+    .bloom-cursor {
       display: none !important;
-      visibility: hidden !important;
+    }
+  }
+
+  :global(body),
+  :global(a),
+  :global(button),
+  :global(input[type="submit"]),
+  :global([data-cursor]),
+  :global(.clickable) {
+    cursor: none !important;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    :global(body),
+    :global(a),
+    :global(button),
+    :global(input[type="submit"]),
+    :global([data-cursor]),
+    :global(.clickable) {
+      cursor: auto !important;
     }
   }
 </style>

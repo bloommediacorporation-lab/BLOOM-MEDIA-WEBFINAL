@@ -1,7 +1,8 @@
 <script>
     import "../index.css"; // Import global styles from parent
     import { onMount } from "svelte";
-    import { fade, fly } from "svelte/transition";
+    import { browser } from '$app/environment';
+    import { fade } from "svelte/transition";
     import Navbar from "$lib/components/Navbar.svelte";
     import Cursor from "$lib/components/Cursor.svelte";
     import BackgroundOrbs from "$lib/components/BackgroundOrbs.svelte";
@@ -9,11 +10,14 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
 
+    let { children } = $props();
+
     function navigate(path) {
         goto(path);
     }
 
     let lenis;
+    let rafId;
 
     // Navbar State
     let isNavVisible = $state(true);
@@ -24,52 +28,89 @@
 
     onMount(() => {
         if (typeof window === "undefined") return;
-        window["clearCursor"] = window["clearCursor"] || (() => {});
-        let destroyed = false;
-        let rafId;
-        let handleScroll;
 
-        (async () => {
-            const { default: Lenis } = await import("@studio-freight/lenis");
+        let destroyed = false;
+
+        async function initScrolling() {
+            const [{ default: Lenis }, { default: gsap }, { ScrollTrigger }] =
+                await Promise.all([
+                    import("@studio-freight/lenis"),
+                    import("gsap"),
+                    import("gsap/ScrollTrigger"),
+                ]);
+
             if (destroyed) return;
+
+            gsap.registerPlugin(ScrollTrigger);
 
             lenis = new Lenis({
                 duration: 1.2,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: "vertical",
+                gestureOrientation: "vertical",
+                smoothWheel: true,
+                wheelMultiplier: 1,
+                touchMultiplier: 2,
+                infinite: false,
             });
 
-            const raf = (time) => {
-                if (destroyed) return;
-                lenis.raf(time);
-                rafId = requestAnimationFrame(raf);
+            // Expose lenis for debugging and other components
+            window["lenis"] = lenis;
+
+            lenis.on("scroll", ScrollTrigger.update);
+
+            const update = (time) => {
+                if (lenis) lenis.raf(time);
+                rafId = requestAnimationFrame(update);
             };
+            rafId = requestAnimationFrame(update);
 
-            rafId = requestAnimationFrame(raf);
+            // Handle Navbar scroll logic with debouncing
+            let scrollTimeout;
+            lenis.on("scroll", ({ scroll, velocity = 0, direction = 0 }) => {
+                scrollY = scroll;
 
-            handleScroll = () => {
-                scrollY = window.scrollY;
-
-                if (isMenuOpen) {
+                if (isMenuOpen || scrollY < 10) {
                     isNavVisible = true;
-                } else if (scrollY > lastScrollY && scrollY > 100) {
+                } else if (direction === 1 && velocity > 0.2 && scrollY > 80) {
                     isNavVisible = false;
-                } else {
+                } else if (direction === -1 && velocity < -0.15) {
                     isNavVisible = true;
                 }
 
                 isScrolled = scrollY > 50;
                 lastScrollY = scrollY;
-            };
 
-            window.addEventListener("scroll", handleScroll, { passive: true });
-        })();
+                // Debounce scroll updates
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    // Trigger any scroll-dependent updates here
+                }, 100);
+            });
+
+            // Normal ScrollTrigger refresh is enough for window scrolling
+            ScrollTrigger.refresh();
+        }
+
+        initScrolling();
+
+        // Initialize html2canvas for LiquidGlassMaterial background capture
+        async function initHtml2canvas() {
+            if (typeof window !== "undefined") {
+                const html2canvas = await import("html2canvas");
+                window["html2canvas"] = html2canvas.default;
+            }
+        }
+        initHtml2canvas();
 
         return () => {
             destroyed = true;
             if (rafId) cancelAnimationFrame(rafId);
-            if (handleScroll)
-                window.removeEventListener("scroll", handleScroll);
-            if (lenis) lenis.destroy();
+            if (lenis) {
+                lenis.destroy();
+                lenis = null;
+                window["lenis"] = null;
+            }
         };
     });
 
@@ -85,29 +126,20 @@
     <title>Bloom Media — Marketing Digital & Automatizare</title>
 </svelte:head>
 
-<Cursor />
+{#if browser}
+  <Cursor />
+{/if}
+
 <FilmGrain />
 <BackgroundOrbs />
 
 <div class="app-wrapper">
-    <!-- Smart Navbar Container -->
-    <header
-        class="fixed top-0 left-0 w-full z-50 transform transition-all duration-500 ease-in-out"
-        class:scrolled={isScrolled || isMenuOpen}
-        style:opacity={isNavVisible ? 1 : 0}
-        style:pointer-events={isNavVisible ? "auto" : "none"}
-        style:transform={isNavVisible ? "translateY(0)" : "translateY(-100%)"}
-    >
-        <div class="navbar-inner">
-            <Navbar {navigate} bind:isMenuOpen />
-        </div>
-    </header>
+    <Navbar {navigate} bind:isMenuOpen />
 
-    <main class="relative z-10 min-h-screen">
+    <main class="relative z-10 min-h-screen pt-24">
         {#key $page.url.pathname}
-            <!-- Added pt-20 to prevent content from jumping under fixed navbar -->
-            <div class="pt-20" in:fade={{ duration: 300 }}>
-                <slot />
+            <div in:fade={{ duration: 300 }}>
+                {@render children()}
             </div>
         {/key}
     </main>
@@ -115,14 +147,13 @@
 
 <style>
     :global(html, body, *, *::before, *::after) {
-        cursor: none !important; /* Restore custom cursor hiding */
         margin: 0;
         padding: 0;
         box-sizing: border-box;
     }
 
     :global(a, button, input, select, textarea, [role="button"]) {
-        cursor: none !important; /* Restore custom cursor hiding for interactive elements */
+        cursor: pointer;
     }
 
     :global(html) {
@@ -150,43 +181,5 @@
         position: relative;
     }
 
-    /* Smart Navbar Styles */
-    header {
-        /* Default state (at top): semi-transparent with backdrop blur to block footer content */
-        background: rgba(5, 5, 5, 0.8);
-        backdrop-filter: blur(10px);
-        box-shadow: none;
-        will-change: transform, opacity;
-    }
-
-    /* Mobile optimization: Ensure header is properly handled */
-    @media (max-width: 768px) {
-        header {
-            /* Optimized blur for mobile */
-            background: rgba(5, 5, 5, 0.85) !important; /* Slightly more opaque to help with contrast */
-            backdrop-filter: blur(8px) !important; /* Reduced blur radius for performance */
-            -webkit-backdrop-filter: blur(8px) !important;
-            will-change: transform, backdrop-filter;
-            transform: translateZ(0); /* Force GPU acceleration */
-        }
-    }
-
-    /* Scrolled State: Blur + Gold Glow */
-    header.scrolled {
-        background: #050505; /* Fully opaque to prevent any text bleed-through */
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 4px 30px rgba(252, 163, 17, 0.15); /* Gold Glow */
-    }
-
-    /* Ensure the inner container handles the background/blur so padding is respected if needed, 
-     but usually Navbar component has its own container. 
-     Actually, looking at Navbar.svelte, it has a .container with padding. 
-     So we apply the background to the header or a wrapper inside. 
-     Since Navbar.svelte has no background now (we removed fixed nav styles), 
-     we should apply styles to this wrapper. */
-
-    .navbar-inner {
-        width: 100%;
-        transition: all 0.4s ease;
-    }
+    /* Smart Navbar Styles removed - unused in layout, handled in Navbar component */
 </style>

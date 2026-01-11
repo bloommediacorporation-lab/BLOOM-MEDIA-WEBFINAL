@@ -2,13 +2,18 @@
   import { onMount } from 'svelte';
   
   let visible = $state(false);
+  let isMobile = $state(false);
   
   onMount(() => {
-    visible = true;
+    // Only show orbs on desktop
+    isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) {
+      visible = true;
+    }
   });
 </script>
 
-{#if visible}
+{#if visible && !isMobile}
   <div class="orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -23,6 +28,8 @@
     pointer-events: none;
     z-index: 0;
     overflow: hidden;
+    will-change: transform;
+    contain: layout style paint;
   }
   
   .orb {
@@ -30,6 +37,9 @@
     border-radius: 50%;
     filter: blur(80px);
     opacity: 0.3;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
   
   .orb-1 {
@@ -60,23 +70,17 @@
   }
   
   @keyframes float1 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(50px, -30px); }
+    0%, 100% { transform: translate(0, 0) translateZ(0); }
+    50% { transform: translate(50px, -30px) translateZ(0); }
   }
   
   @keyframes float2 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-40px, 40px); }
+    0%, 100% { transform: translate(0, 0) translateZ(0); }
+    50% { transform: translate(-40px, 40px) translateZ(0); }
   }
   
   @keyframes float3 {
-    0%, 100% { transform: translate(-50%, -50%); }
-    50% { transform: translate(calc(-50% + 30px), calc(-50% - 30px)); }
-  }
-  
-  @media (max-width: 768px) {
-    .orbs {
-      display: none;
-    }
+    0%, 100% { transform: translate(-50%, -50%) translateZ(0); }
+    50% { transform: translate(calc(-50% + 30px), calc(-50% - 30px)) translateZ(0); }
   }
 </style>

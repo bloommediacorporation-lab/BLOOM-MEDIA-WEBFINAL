@@ -32,9 +32,11 @@
   }
 </script>
 
-<section 
+<div 
   class="team-section" 
   bind:this={sectionRef} 
+  role="region"
+  aria-label="Echipă"
   onmousemove={handleMouseMove}
   onmouseleave={() => hoveredIndex = -1}
 >
@@ -74,11 +76,11 @@
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <style>
   .team-section {
-    background: #050505;
+    background: #000100;
     padding: 12rem 0;
     position: relative;
     overflow: hidden;

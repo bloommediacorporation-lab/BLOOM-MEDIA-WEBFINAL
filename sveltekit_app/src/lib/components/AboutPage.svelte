@@ -38,7 +38,7 @@
 
 <style>
   .about-page {
-    background: #050505;
+    background: #000100;
     min-height: 100vh;
     padding: 8rem 0;
     position: relative;

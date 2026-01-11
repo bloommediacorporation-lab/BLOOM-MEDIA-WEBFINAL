@@ -19,7 +19,7 @@
 
 <style>
   .about-section {
-    background: #050505;
+    background: #000100;
     padding: 10rem 2rem;
     position: relative;
     overflow: hidden;

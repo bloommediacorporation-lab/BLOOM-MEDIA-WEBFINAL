@@ -3,39 +3,40 @@
   import { fade, slide, scale } from 'svelte/transition';
   import { tweened, spring } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
-  import { cursorState, setCursorLabel, clearCursor } from '../../lib/cursorState.svelte.js';
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { enhance } from '$app/forms';
 
   gsap.registerPlugin(ScrollTrigger);
+
+  export let form;
 
   // --- Constants & Data ---
   const BASE_STRATEGY_FEE = 249.99;
   
   const SERVICES = [
-    // SOCIAL MEDIA
-    { id: 'content_mgmt', name: 'Management Conținut', price: 150, category: 'SOCIAL MEDIA', description: 'Strategic planning, posting schedule & platform management.' },
-    { id: 'scripting_reels', name: 'Scripting & Video Reels', price: 200, category: 'SOCIAL MEDIA', description: 'Short-form video content creation & viral scripting.' },
-    { id: 'graphic_design', name: 'Design Grafic', price: 50, category: 'SOCIAL MEDIA', description: 'Professional visuals for posts, stories & banners.' },
-    { id: 'community_mgmt', name: 'Community Management', price: 50, category: 'SOCIAL MEDIA', description: 'Engagement, comment moderation & audience growth.' },
+    // CAPTURARE
+    { id: 'content_mgmt', name: 'Management Conținut', price: 150, category: 'CAPTURARE', description: 'Sistem consistent de creație conținut care capturează atenție și generează interacțiuni măsurabile pe canale sociale.' },
+    { id: 'scripting_reels', name: 'Pachet 4x Video Reels (Short-Form)', price: 250, category: 'CAPTURARE', description: '4 clipuri/lună (1 pe săptămână). Scripting, editare dinamică și optimizare pentru Ads. Stop-scroll garantat.' },
+    { id: 'graphic_design', name: 'Pachet Creatives Static (Ads)', price: 50, category: 'CAPTURARE', description: 'Set de bannere performante pentru campanii. Focus pe CTR (Click-Through-Rate).' },
+    { id: 'community_mgmt', name: 'Community Management', price: 50, category: 'CAPTURARE', description: 'Moderare comentarii și mesaje cu focus pe direcționare către conversie. Engagement = mijloc, nu scop.' },
 
-    // PERFORMANCE ADS
-    { id: 'meta_ads', name: 'Meta Ads', price: 200, category: 'PERFORMANCE ADS', description: 'High-converting Facebook & Instagram campaigns.' },
-    { id: 'google_ads', name: 'Google Ads', price: 150, category: 'PERFORMANCE ADS', description: 'Search & Display network targeting for maximum ROI.' },
-    { id: 'tiktok_ads', name: 'TikTok Ads', price: 150, category: 'PERFORMANCE ADS', description: 'Viral creative strategies for younger demographics.' },
-    { id: 'retargeting', name: 'Retargeting Strategic', price: 50, category: 'PERFORMANCE ADS', description: 'Re-engaging visitors to close the conversion loop.' },
+    // CONVERSIE
+    { id: 'meta_ads', name: 'Meta Ads', price: 250, category: 'CONVERSIE', description: 'Include strategie completă de Retargeting și optimizare cost/lead. Campanii de achiziție pe Facebook & Instagram.' },
+    { id: 'google_ads', name: 'Google Ads (Search Intent & Youtube)', price: 150, category: 'CONVERSIE', description: 'Targetare intenție de căutare pentru capturare lead direct din nevoie exprimată.' },
+    { id: 'tiktok_ads', name: 'TikTok Ads', price: 150, category: 'CONVERSIE', description: 'Scalare achiziție prin platforme video unde audiența ta consumă conținut.' },
 
-    // INFRASTRUCTURĂ & AI
-    { id: 'landing_page', name: 'Landing Page Conversie', price: 300, category: 'INFRASTRUCTURĂ & AI', description: 'High-speed, conversion-focused landing pages.' },
-    { id: 'ecommerce_dev', name: 'E-commerce Development', price: 300, category: 'INFRASTRUCTURĂ & AI', description: 'Scalable online stores with seamless checkout.' },
-    { id: 'technical_seo', name: 'SEO Tehnic', price: 100, category: 'INFRASTRUCTURĂ & AI', description: 'Site speed, indexing & technical optimization.' },
-    { id: 'ai_automation', name: 'Automatizări AI & Chatboți', price: 150, category: 'INFRASTRUCTURĂ & AI', description: 'Smart chatbots & workflow automation integration.' }
+    // INFRASTRUCTURĂ (ONE-TIME FEE)
+    { id: 'landing_page', name: 'Landing Page Conversie', price: 300, category: 'INFRASTRUCTURĂ', description: 'Landing page de viteză maximă, construită exclusiv pentru conversie. Zero distracții.', isOneTime: true },
+    { id: 'ecommerce_dev', name: 'E-commerce Development', price: 300, category: 'INFRASTRUCTURĂ', description: 'Platform e-commerce scalabil cu checkout optimizat pentru finalizare tranzacție.', isOneTime: true },
+    { id: 'technical_seo', name: 'SEO Tehnic', price: 100, category: 'INFRASTRUCTURĂ', description: 'Viteză site, indexare, tehnică pură pentru reducere fricțiune conversie.' },
+    { id: 'ai_automation', name: 'Automatizări AI & Chatboți', price: 150, category: 'INFRASTRUCTURĂ', description: 'Chatboți și automatizări workflow pentru calificare lead și reducere timp răspuns.', isOneTime: true }
   ];
 
   const CATEGORIES = [
-    { id: 'SOCIAL MEDIA', number: '01', description: 'Dominate the social landscape.' },
-    { id: 'PERFORMANCE ADS', number: '02', description: 'Precision targeting and data-driven campaigns.' },
-    { id: 'INFRASTRUCTURĂ & AI', number: '03', description: 'Future-proof foundation with cutting-edge tech.' }
+    { id: 'CAPTURARE', number: '01', description: 'Sisteme care transformă atenția în date de contact.' },
+    { id: 'CONVERSIE', number: '02', description: 'Trafic plătit care generează lead-uri calificate.' },
+    { id: 'INFRASTRUCTURĂ', number: '03', description: 'Fundație tehnică pentru tracking și scalare.' }
   ];
 
   const PROXY_URL = '/api/make-webhook';
@@ -160,11 +161,7 @@
   }
 
   function handleServiceHover(id, isEnter) {
-    if (isEnter) {
-      setCursorLabel(selectedServices.has(id) ? 'REMOVE' : 'SELECT');
-    } else {
-      clearCursor();
-    }
+    // Cursor logic removed
   }
 
   function getCategoryCount(catId) {
@@ -184,65 +181,44 @@
 
   let formErrors = { name: '', email: '', businessName: '' };
 
-  async function handleSubmit(e) {
-    if (e) e.preventDefault();
-    if (isSubmitting) return;
-    
-    // Validation
-    const nameErr = validateField('name', formData.name);
-    const emailErr = validateField('email', formData.email);
-    const businessErr = validateField('businessName', formData.businessName);
+  function handleEnhance({ formData, cancel }) {
+    // Client-side validation
+    const nameVal = formData.get('name');
+    const emailVal = formData.get('email');
+    const businessVal = formData.get('businessName');
+
+    const nameErr = validateField('name', nameVal);
+    const emailErr = validateField('email', emailVal);
+    const businessErr = validateField('businessName', businessVal);
 
     formErrors = { name: nameErr, email: emailErr, businessName: businessErr };
 
     if (nameErr || emailErr || businessErr) {
+      cancel();
       return;
     }
 
     if (selectedServices.size === 0) {
       alert('Please select at least one service.');
+      cancel();
       return;
     }
 
     isSubmitting = true;
 
-    try {
-      const selectedList = Array.from(selectedServices).map(id => {
-        const s = SERVICES.find(serv => serv.id === id);
-        return { name: s.name, price: s.price };
-      });
-
-      const payload = {
-        businessName: formData.businessName,
-        contactName: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.details || 'Solicitare din configurator (Monolith V2)',
-        selectedServices: selectedList,
-        totalPrice: parseFloat(totalPrice.toFixed(2)),
-        source: 'service-configurator-monolith'
-      };
-
-      const resp = await fetch(PROXY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!resp.ok) throw new Error('Submission failed');
-
-      submitSuccess = true;
-      setCursorLabel('SUCCESS');
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem('bloom_config');
-      }
-      
-    } catch (error) {
-      console.error(error);
-      alert('Failed to send. Please try again.');
-    } finally {
+    return async ({ result }) => {
       isSubmitting = false;
-    }
+      if (result.type === 'success') {
+        submitSuccess = true;
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('bloom_config');
+        }
+      } else if (result.type === 'failure') {
+        alert(result.data?.message || 'Submission failed');
+      } else if (result.type === 'error') {
+        alert('A server error occurred.');
+      }
+    };
   }
 
   function resetConfig() {
@@ -261,10 +237,10 @@
     
     <!-- HEADER -->
     <div class="configurator-header">
-        <span class="section-label">STEP 01 / CONFIGURATOR</span>
-        <h1 class="section-title">CONSTRUIEȘTE<br/>STRATEGIA</h1>
+        <span class="section-label">CONFIGURATOR / CALIFICARE</span>
+        <h1 class="section-title">DEFINEȘTE<br/>PARAMETRII</h1>
         <p class="section-description">
-            Selectează serviciile pentru strategia ta personalizată.
+            Acest configurator este un mecanism de disciplină. Dacă nu poți defini clar ce ai nevoie, nu ești gata să lucrezi cu noi. Selectează doar ceea ce ai nevoie pentru conversii măsurabile.
         </p>
     </div>
 
@@ -286,7 +262,7 @@
                             <!-- svelte-ignore a11y-click-events-have-key-events -->
                             <!-- svelte-ignore a11y-no-static-element-interactions -->
                             <div 
-                                class="service-item {selectedServices.has(service.id) ? 'selected' : ''}"
+                                class="service-item {selectedServices.has(service.id) ? 'selected' : ''} {service.id === 'landing_page' && (selectedServices.has('meta_ads') || selectedServices.has('tiktok_ads')) ? 'recommended' : ''}"
                                 onclick={() => toggleService(service.id)}
                                 onmouseenter={() => handleServiceHover(service.id, true)}
                                 onmouseleave={() => handleServiceHover(service.id, false)}
@@ -296,7 +272,12 @@
                                     <p class="service-desc">{service.description}</p>
                                 </div>
                                 <div class="service-meta">
-                                    <span class="service-price">€{service.price}</span>
+                                    <div class="price-container">
+                                        <span class="service-price">€{service.price}</span>
+                                        {#if service.isOneTime}
+                                            <span class="one-time-badge">ONE-TIME</span>
+                                        {/if}
+                                    </div>
                                     <div class="indicator-dot">
                                         {#if selectedServices.has(service.id)}
                                             <div class="dot-inner" transition:scale={{ duration: 300, easing: cubicOut }}></div>
@@ -311,11 +292,14 @@
 
             <!-- LEAD FORM -->
             <div class="lead-form-section">
-                <h2 class="form-title">DETALII PROIECT</h2>
-                <form onsubmit={handleSubmit} class="lead-form">
+                <h2 class="form-title">DATE CALIFICARE</h2>
+                <form method="POST" use:enhance={handleEnhance} class="lead-form">
+                    <input type="hidden" name="servicii_json" value={JSON.stringify(selectedServicesList)} />
+                    <input type="hidden" name="pret" value={totalPrice} />
                     <div class="form-field">
                         <input 
                             type="text" 
+                            name="businessName"
                             id="businessName" 
                             class="form-input" 
                             placeholder=" " 
@@ -331,6 +315,7 @@
                     <div class="form-field">
                         <input 
                             type="text" 
+                            name="name"
                             id="name" 
                             class="form-input" 
                             placeholder=" " 
@@ -346,6 +331,7 @@
                     <div class="form-field">
                         <input 
                             type="email" 
+                            name="email"
                             id="email" 
                             class="form-input" 
                             placeholder=" " 
@@ -361,6 +347,7 @@
                     <div class="form-field">
                         <input 
                             type="tel" 
+                            name="phone"
                             id="phone" 
                             class="form-input" 
                             placeholder=" " 
@@ -378,7 +365,7 @@
                             bind:value={formData.details}
                             rows="4"
                         ></textarea>
-                        <label for="details" class="form-label">Empire Goals / Additional Details</label>
+                        <label for="details" class="form-label">Obiective Revenue / Detalii Sistem Actual (Opțional)</label>
                         <div class="form-border"></div>
                     </div>
                 </form>
@@ -392,7 +379,7 @@
                 bind:this={sidebarRef}
                 style="transform: translateY({$sidebarY}px)"
             >
-                <span class="summary-label">SUMMARY</span>
+                <span class="summary-label">INVESTIȚIE</span>
                 
                 <div class="summary-total">
                     €{$animatedPrice.toFixed(2)}
@@ -400,7 +387,7 @@
                 
                 <div class="summary-items">
                     <div class="summary-item">
-                        <span class="item-label">Base Strategy Fee</span>
+                        <span class="item-label">Fee Consultanță & Management</span>
                         <span class="item-value">€{BASE_STRATEGY_FEE}</span>
                     </div>
                     
@@ -412,7 +399,7 @@
                     {/each}
                     
                     {#if selectedServices.size === 0}
-                        <span class="empty-state">Selectează servicii pentru a continua.</span>
+                        <span class="empty-state">Definește parametrii pentru a continua.</span>
                     {/if}
                 </div>
                 
@@ -425,11 +412,11 @@
                     disabled={selectedServices.size === 0 || isSubmitting}
                 >
                     {#if isSubmitting}
-                        SE TRIMITE...
+                        SE PROCESEAZĂ...
                     {:else if submitSuccess}
-                        TRIMIS ✓
+                        PRIMIT ✓
                     {:else}
-                        FINALIZEAZĂ STRATEGIA
+                        TRANSMITE CERERE
                     {/if}
                 </button>
             </div>
@@ -467,9 +454,9 @@
     {#if submitSuccess}
         <div class="success-overlay" transition:fade>
             <div class="success-content">
-                <h2 class="success-title">CERERE TRIMISĂ</h2>
-                <p class="success-text">Te vom contacta în scurt timp pentru a stabili detaliile strategiei.</p>
-                <button class="finalize-button" onclick={resetConfig}>ÎNAPOI LA SITE</button>
+                <h2 class="success-title">CERERE PRIMITĂ</h2>
+                <p class="success-text">Verificăm compatibilitatea. Dacă parametrii tăi au sens, programăm consultanță în 48h.</p>
+                <button class="finalize-button" onclick={resetConfig}>ÎNAPOI</button>
             </div>
         </div>
     {/if}
@@ -617,9 +604,15 @@
         border-color: rgba(252,163,17,0.3);
     }
 
+    .service-item.recommended {
+        border-color: #fca311;
+        background: rgba(252, 163, 17, 0.05);
+        box-shadow: 0 0 20px rgba(252, 163, 17, 0.1);
+    }
+
     .service-info {
         flex: 1;
-        padding-right: 2rem;
+        margin-right: 1.5rem;
     }
 
     .service-name {
@@ -648,14 +641,34 @@
     .service-meta {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: 1.5rem;
+    }
+
+    .price-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .one-time-badge {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: #fca311;
+        background: rgba(252, 163, 17, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
     .service-price {
         font-family: 'Inter', sans-serif;
         font-weight: 500;
         font-size: 1.125rem;
-        color: rgba(255,255,255,0.7);
+        color: #FFFFFF;
+        white-space: nowrap;
     }
 
     .indicator-dot {

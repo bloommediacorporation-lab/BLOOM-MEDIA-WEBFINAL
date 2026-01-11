@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Playfair+Display:wght@700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,11 +16,12 @@ body {
   padding: 0;
   background-color: var(--bg-dark);
   color: var(--text-light);
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Inter', sans-serif;
   overflow-x: hidden !important;
   overflow-y: auto !important;
   width: 100%;
   max-width: 100vw;
+  scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -95,54 +95,10 @@ html {
 }
 
 /* GPU Optimization Hints */
-.gradient-text-animated, .cursor, .cursor-follower {
+.gradient-text-animated {
   will-change: transform, opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
-}
-
-.cursor-dot {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: var(--primary);
-  pointer-events: none;
-  z-index: 10000;
-  will-change: transform, opacity;
-  transform: translateZ(0);
-}
-
-.cursor-ring {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 9999px;
-  border: 1px solid rgba(252, 163, 17, 0.55);
-  background: transparent;
-  pointer-events: none;
-  z-index: 9999;
-  will-change: transform, opacity;
-  transform: translateZ(0);
-}
-
-.cursor-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 800;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #080808;
-  user-select: none;
 }
 
 /* Glass Card Effect */

@@ -89,7 +89,7 @@
   });
 </script>
 
-<section bind:this={sectionRef} class="process-section relative bg-[#050505] text-white overflow-hidden">
+<section bind:this={sectionRef} class="process-section relative bg-[#000100] text-white overflow-hidden">
   
   <!-- Fixed Background Title (Desktop Only) -->
   <!-- "HOW WE WIN" 8rem Montserrat 900, rgba(255,255,255,0.03), fixed left center, z-below -->
@@ -161,20 +161,6 @@
     pointer-events: none;
     z-index: 0; /* Behind content */
     line-height: 1;
-  }
-
-  .fixed-section-label {
-    position: absolute;
-    top: 6rem;
-    left: 4vw;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    z-index: 20;
-    pointer-events: none;
   }
 
   /* Desktop: Horizontal Track */

@@ -1,5 +1,5 @@
 <script>
-  import { fade, fly } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import { setCursorLabel, clearCursor } from '$lib/utils/cursorState.js';
   
   let { navigate } = $props();
@@ -8,11 +8,11 @@
   $effect(() => { visible = true; });
   
   const services = [
-    'Strategie de Conținut & Branding',
-    'Content Creation (Short-form Video)',
-    'Automatizari Inteligente (AI)',
-    'Gestionare Ads Pe Toate Platformele',
-    'SEO avansat și tehnic'
+    'Sistem de Capturare Lead-uri',
+    'Conținut Orientat Pe Conversie',
+    'Automatizare Flux Clienți',
+    'Sisteme de Achiziție Plătită',
+    'Optimizare Tehnică Conversie'
   ];
 </script>
 
@@ -22,26 +22,26 @@
     {#if visible}
       <div class="section-header" in:fly={{ y: 20, duration: 700 }}>
         <span class="section-num">05</span>
-        <h2 class="title">Servicii</h2>
+        <h2 class="title">Sistem De Achiziție</h2>
       </div>
       
       <div class="pricing-card card" in:fly={{ y: 40, duration: 700, delay: 200 }}>
         <!-- LEFT: Price & Info -->
         <div class="left">
           <div class="price-block">
-            <div class="prefix">De la</div>
+            <div class="prefix">Sistem de bază</div>
             <span class="price-amount value">249,99</span>
             <span class="currency">€</span>
             <span class="period">/lună</span>
           </div>
           
           <div class="meta">
-            <h3 class="package-title package-name">PACHET START</h3>
-            <p class="package-desc">Soluția completă pentru branduri care vor să domine digitalul.</p>
+            <h3 class="package-title package-name">SISTEM START</h3>
+            <p class="package-desc">Infrastructură completă pentru achiziție predictibilă de clienți. Lead-uri care se transformă în venit, nu metrici de vanitate.</p>
           </div>
 
           <button class="configure-button cta-btn" onclick={() => navigate && navigate('/configurator')}>
-            Configurează Pachet
+            Configurează Sistem
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
@@ -58,7 +58,7 @@
           {/each}
           <div class="item more">
              <span class="number">06</span>
-             <span class="text">And much more...</span>
+             <span class="text">Tot ce trebuie pentru predictibilitate</span>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@
           onmouseenter={() => setCursorLabel('GO')}
           onmouseleave={clearCursor}
         >
-          PERSONALIZARE COMPLETĂ - Mergi la Configurator
+          CALIFICARE COMPLETĂ - Configurator Avansat
         </button>
       </div>
     {/if}
@@ -82,7 +82,7 @@
   .services { 
     padding: 8rem 2rem; 
     position: relative; 
-    background: #050505;
+    background: #000100;
   }
   
   .container { 

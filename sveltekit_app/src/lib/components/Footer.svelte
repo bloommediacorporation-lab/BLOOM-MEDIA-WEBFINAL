@@ -13,12 +13,11 @@
     let tween;
 
     (async () => {
-      const [{ gsap }, scrollTriggerModule] = await Promise.all([
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
         import('gsap'),
         import('gsap/ScrollTrigger')
       ]);
 
-      const { ScrollTrigger } = scrollTriggerModule;
       if (destroyed) return;
 
       gsap.registerPlugin(ScrollTrigger);
@@ -118,12 +117,16 @@
     overflow: hidden;
   }
 
+  .footer-spacer {
+    pointer-events: none;
+  }
+
   .is-reveal {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: -10; /* Behind main content */
+    z-index: 0; /* Behind main content (which sits at z-10) */
     top: auto; /* Prevent negative top positioning */
     clip-path: inset(0 0 0 0); /* Create stacking context to contain content */
   }
@@ -158,6 +161,7 @@
     z-index: 0;
     opacity: 0.5;
     will-change: transform; /* Optimize for animation */
+    pointer-events: none;
   }
   
   .container {

@@ -17,7 +17,7 @@
       <p>Acest site poate utiliza cookie-uri pentru a îmbunătăți experiența de navigare. Puteți controla setările cookie-urilor din browserul dumneavoastră.</p>
 
       <h2>5. Contact</h2>
-      <p>Pentru orice întrebări legate de politica noastră de confidențialitate, ne puteți contacta la contact@bloommedia.ro.</p>
+      <p>Pentru orice întrebări legate de politica noastră de confidențialitate, ne puteți contacta la <a href="mailto:bloommediacorporation@gmail.com">bloommediacorporation@gmail.com</a>.</p>
     </div>
   </div>
 </section>
@@ -26,7 +26,7 @@
   .legal-page {
     min-height: 100vh;
     padding: 12rem 2rem 6rem;
-    background: #050505;
+    background: #000100;
     color: white;
   }
 

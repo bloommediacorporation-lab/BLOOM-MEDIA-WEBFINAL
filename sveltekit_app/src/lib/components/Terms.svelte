@@ -26,7 +26,7 @@
   .legal-page {
     min-height: 100vh;
     padding: 12rem 2rem 6rem;
-    background: #050505;
+    background: #000100;
     color: white;
   }
 

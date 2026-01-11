@@ -1,0 +1,11 @@
+
+html, body {
+	background: #0B0B0B;
+	color: #E5E5E5;
+	font-family: 'Inter', 'Montserrat', sans-serif;
+}
+h1, h2 {
+	color: #FFF;
+	font-family: 'Inter', 'Montserrat', sans-serif;
+}
+/* Legacy placeholder: stilurile sunt în src/styles.css (Tailwind) */

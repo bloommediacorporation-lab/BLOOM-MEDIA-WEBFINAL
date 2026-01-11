@@ -1,17 +1,16 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { setCursorLabel, clearCursor } from '$lib/utils/cursorState.js';
 
   let openIndex = $state(null);
   
   const faqs = [
     {
-      question: 'CÂT COSTĂ SERVICIILE?',
-      answer: 'Fee strategic €249.99/lună + servicii selectate (social, ads, website etc). Configuratorul arată prețuri transparente. Majoritatea clienților: €400-800/lună pentru rezultate consistente.'
+      question: 'CÂT COSTĂ SISTEMUL?',
+      answer: 'Fee consultanță €249.99/lună + componente sistem selectate în configurator. Majoritatea clienților: €400-800/lună pentru infrastructură completă lead-to-revenue. Rapoarte transparente, zero costuri ascunse.'
     },
     {
       question: 'CÂT TIMP PÂNĂ VĂD REZULTATE?',
-      answer: 'Social organic: 4-6 săptămâni. Ads: conversii în 1-2 săptămâni, optimizare 2-3 luni. SEO: 3-6 luni. Website: impact imediat. Construim fundație sustenabilă, nu quick wins. Rapoarte lunare transparente.'
+      answer: 'Capturare organic: 4-6 săptămâni. Achiziție plătită: lead-uri în 1-2 săptămâni, optimizare cost/lead 2-3 luni. SEO: 3-6 luni. Sisteme website: impact imediat. Nu promitem quick wins—construim fundație predictibilă. Tracking transparent de la zi 1.'
     },
     {
       question: 'ECHIPĂ SAU FREELANCERI?',
@@ -23,7 +22,7 @@
     },
     {
       question: 'AVEȚI EXPERIENȚĂ ÎN INDUSTRIA MEA?',
-      answer: 'Probabil da: e-commerce, servicii, HoReCa, real estate, tech, wellness, educație. Important: principiile universale + adaptare specifică. Metodologie solidă > experiență narrow. Cere studii de caz la consultanță.'
+      answer: 'Probabil da: e-commerce, servicii, HoReCa, real estate, SaaS, wellness, educație. Dar experiența narrow contează mai puțin decât principii universale de conversie. Metodologie solidă > povești din nișă. La consultanță vedem compatibilitate.'
     },
     {
       question: 'TREBUIE PREZENȚĂ ONLINE EXISTENTĂ?',
@@ -31,27 +30,27 @@
     },
     {
       question: 'CUM MĂSURAȚI SUCCESUL?',
-      answer: 'Date concrete: conversii, cost/achiziție, ROI, engagement calitativ, trafic relevant, poziții SEO. Dashboard real-time + rapoarte lunare. KPI-uri clare de la start. Ajustăm rapid dacă numerele stagnează.'
+      answer: 'Metrici concrete: lead-uri generate, cost/lead, rate conversie, revenue atribuit. Zero focus pe followers, likes, brand awareness fără conversie. Dashboard real-time + rapoarte lunare. KPI-uri stabilite la start. Dacă numerele stagnează, ajustăm rapid sau ne despărțim.'
     },
     {
-      question: 'POT ALEGE DOAR ANUMITE SERVICII?',
-      answer: 'Absolut. Configurator flexibil: selectezi ce ai nevoie. Fee bază (€249.99) include strategie, consultanță, rapoarte, management. Recomandam pachete integrate dar decizia e a ta.'
+      question: 'POT ALEGE DOAR ANUMITE COMPONENTE?',
+      answer: 'Absolut. Configurator flexibil—iei ce ai nevoie. Fee bază (€249.99) include consultanță, rapoarte, coordonare. Recomandam sisteme integrate pentru predictibilitate maximă, dar decizia e a ta.'
     },
     {
       question: 'CREAȚI VOI CONȚINUTUL?',
-      answer: 'Da, tot: design, copywriting, video editing, photography. Tu oferi informații + feedback. Poți fi implicat sau hands-off complet. Conținut optimizat pentru conversie.'
+      answer: 'Da, tot: copywriting, design, video editing, photography. Tu oferi brief + acces + feedback. Poți fi implicat sau hands-off. Conținut optimizat pentru conversie, nu pentru premii creative.'
     },
     {
-      question: 'CE PLATFORME SOCIAL RECOMANDAȚI?',
-      answer: 'Depinde de audiență. B2C tineri: Instagram/TikTok. B2C matur: Facebook/Instagram. B2B: LinkedIn. Local: Facebook/Google. Focusare 2-3 canale strategice, nu spam peste tot. Calitate > cantitate.'
+      question: 'CE CANALE RECOMANDAȚI?',
+      answer: 'Depinde unde e audiența ta și ce conversie urmărim. Poate fi social, search, video, email. Focusare 2-3 canale strategice unde ai cel mai bun cost/lead. Nu spam pe toate platformele. Calitate conversie > prezență universală.'
     },
     {
       question: 'CUM FUNCȚIONEAZĂ PROCESUL?',
-      answer: '1) Consultanță gratis 30 min - cunoaștem business-ul. 2) Propunere personalizată. 3) Onboarding 1-2 săpt - brief + access. 4) Execuție - implementare + rapoarte lunare. 5) Optimizare continuă. PM dedicat coordonează.'
+      answer: '1) Consultanță 30 min - verificăm compatibilitate. 2) Propunere sistem personalizat. 3) Onboarding 1-2 săpt - acces + brief + trackere. 4) Execuție - implementare + rapoarte. 5) Optimizare continuă bazată pe date. Manager dedicat coordonează tot.'
     },
     {
       question: 'GARANȚIE REZULTATE?',
-      answer: 'Garantăm efort maxim, transparență, best practices. Nu spam-uri "5000 followers în 30 zile". Strategie pe date, implementare profesională, rapoarte oneste. ROI pozitiv în 3-6 luni la majoritatea. Dacă după 3 luni zero progres: analiză gratuită + ajustări radicale sau despărțire.'
+      answer: 'Nu garantăm "X lead-uri în Y zile". Garantăm: efort maxim, transparență brutală, best practices dovedite, rapoarte oneste. Strategie pe date + implementare profesională. Majoritatea: ROI pozitiv în 3-6 luni. Dacă după 3 luni zero progres măsurabil: analiză gratuită + ajustări radicale sau încheiem colaborarea fără dramă.'
     }
   ];
   
@@ -73,8 +72,6 @@
           <button 
             class="question" 
             onclick={() => toggle(i)}
-            onmouseenter={() => setCursorLabel('VIEW')}
-            onmouseleave={clearCursor}
           >
             <span>{faq.question}</span>
             <span class="icon">{openIndex === i ? '−' : '+'}</span>
@@ -94,7 +91,7 @@
 <style>
   .faq {
     min-height: 100vh;
-    background: var(--bg-dark);
+    background: #000100;
     padding: 12rem 2rem;
   }
   

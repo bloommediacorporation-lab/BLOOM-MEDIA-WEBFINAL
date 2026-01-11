@@ -43,12 +43,12 @@ const config = {
 			mode: 'auto',
 			directives: {
 				'default-src': ['self'],
-				'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'blob:', 'https://cdn.emailjs.com', 'https://cdn.jsdelivr.net'],
-				'worker-src': ['self', 'blob:'],
+				'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'blob:', 'https://cdn.emailjs.com', 'https://cdn.jsdelivr.net', 'https://unpkg.com', 'https://www.gstatic.com'],
+				'worker-src': ['self', 'blob:', 'https://unpkg.com'],
 				'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com', 'https://cdn.jsdelivr.net'],
 				'font-src': ['self', 'https://fonts.gstatic.com'],
-				'img-src': ['self', 'data:', 'https:', 'https://i.postimg.cc'],
-				'connect-src': ['self', 'https://api.emailjs.com', 'http://localhost:5000']
+				'img-src': ['self', 'data:', 'blob:', 'https:', 'https://i.postimg.cc'],
+				'connect-src': ['self', 'https://api.emailjs.com', 'http://localhost:5000', 'https://unpkg.com', 'https://prod.spline.design', 'https://www.gstatic.com']
 			}
 		}
 	},

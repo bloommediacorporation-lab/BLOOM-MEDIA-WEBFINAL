@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { setCursorLabel, clearCursor } from '$lib/utils/cursorState.js';
   
   let sectionRef;
   let titleRef;
@@ -15,10 +14,15 @@
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     if (sectionRef) observer.observe(sectionRef);
+
+    // Fallback safety to ensure title appears
+    setTimeout(() => {
+      isVisible = true;
+    }, 500);
 
     return () => observer.disconnect();
   });
@@ -28,8 +32,8 @@
   <!-- Background Marquee -->
   <div class="bg-marquee">
     <div class="marquee-content">
-      <span>LET'S BUILD SOMETHING GREAT • LET'S BUILD SOMETHING GREAT • LET'S BUILD SOMETHING GREAT • </span>
-      <span>LET'S BUILD SOMETHING GREAT • LET'S BUILD SOMETHING GREAT • LET'S BUILD SOMETHING GREAT • </span>
+      <span>REVENUE SYSTEMS • NOT AD CAMPAIGNS • REVENUE SYSTEMS • NOT AD CAMPAIGNS • REVENUE SYSTEMS • NOT AD CAMPAIGNS • </span>
+      <span>REVENUE SYSTEMS • NOT AD CAMPAIGNS • REVENUE SYSTEMS • NOT AD CAMPAIGNS • REVENUE SYSTEMS • NOT AD CAMPAIGNS • </span>
     </div>
   </div>
 
@@ -48,9 +52,7 @@
       <div class="info-column">
         <div class="links-wrapper">
           <!-- Email -->
-          <a href="mailto:bloommediacorporation@gmail.com" class="contact-link"
-             onmouseenter={() => setCursorLabel('SAY HI')}
-             onmouseleave={clearCursor}>
+          <a href="mailto:bloommediacorporation@gmail.com" class="contact-link">
             <span class="link-label">EMAIL</span>
             <span class="link-text">bloommediacorporation@gmail.com</span>
             <div class="link-line"></div>
@@ -59,9 +61,7 @@
           <!-- Phone (Darius) -->
           <div class="contact-link">
             <span class="link-label">PHONE (DARIUS)</span>
-            <a href="tel:+40750269259" class="link-text"
-               onmouseenter={() => setCursorLabel('HI')}
-               onmouseleave={clearCursor}>
+            <a href="tel:+40750269259" class="link-text">
               +40 750 269 259
             </a>
             <div class="link-line"></div>
@@ -70,18 +70,14 @@
           <!-- Phone (Vlad) -->
           <div class="contact-link">
             <span class="link-label">PHONE (VLAD)</span>
-            <a href="tel:+40734270188" class="link-text"
-               onmouseenter={() => setCursorLabel('HI')}
-               onmouseleave={clearCursor}>
+            <a href="tel:+40734270188" class="link-text">
               +40 734 270 188
             </a>
             <div class="link-line"></div>
           </div>
 
           <!-- WhatsApp -->
-          <a href="https://wa.me/40734270188" target="_blank" rel="noopener noreferrer" class="contact-link"
-             onmouseenter={() => setCursorLabel('SAY HI')}
-             onmouseleave={clearCursor}>
+          <a href="https://wa.me/40734270188" target="_blank" rel="noopener noreferrer" class="contact-link">
             <span class="link-label">WHATSAPP</span>
             <span class="link-text">Chat on WhatsApp</span>
             <div class="link-line"></div>
@@ -100,14 +96,14 @@
 
 <style>
   .contact-section {
-    background-color: #050505;
+    background-color: #000100;
     color: #ffffff;
     min-height: 70vh; /* Further reduced from 80vh */
     display: flex;
-    align-items: center;
-    padding: 3rem 0 1rem; /* Further reduced padding */
+    align-items: flex-start;
+    padding: 6rem 0 4rem;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
   }
 
   /* --- Background Marquee --- */
@@ -156,7 +152,7 @@
     display: grid;
     grid-template-columns: 1fr 1.5fr;
     gap: 4rem;
-    align-items: flex-end; /* Align bottom baseline */
+    align-items: flex-end;
   }
 
   /* --- Left Column: Giant Title --- */
@@ -185,9 +181,9 @@
   .info-column {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; /* Align content to bottom */
-    gap: 4rem;
-    padding-bottom: 0.5rem; /* Optical alignment with title baseline */
+    justify-content: flex-start;
+    gap: 3rem;
+    padding-bottom: 0;
   }
 
   .links-wrapper {
@@ -226,7 +222,8 @@
     font-size: 1.2rem; /* Requested size */
     color: rgba(255, 255, 255, 0.8); /* Slightly dimmed initially */
     transition: color 0.3s ease;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
     text-decoration: none;
     cursor: pointer; /* For inner anchor tags */
   }
@@ -264,6 +261,7 @@
     display: flex;
     gap: 2rem;
     margin-top: 1rem;
+    flex-wrap: wrap;
   }
 
   .socials a {

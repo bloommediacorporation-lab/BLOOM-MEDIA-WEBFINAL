@@ -1,231 +1,190 @@
 <script>
   import { onMount } from "svelte";
-  import RollingChar from "./RollingChar.svelte";
+  import LoadingScreen from "./LoadingScreen.svelte";
 
-  let container;
-  let ctaBtn;
   let sectionRef;
+  let canvas;
+  let isLoaded = $state(false);
 
-  let isMobile = $state(false);
+  const smallTitle = "Soluția ta pentru a deveni un magnet pentru clienți";
 
-  const line1 = "Atinge potențialul business-ului tău\u00A0cu";
-  const line2 = "BLOOM MEDIA";
-  const line3Part1 = "Pentru branduri care refuză să fie ";
-  const line3Part2 = "invizibile";
+  // GLOBAL MOUSE PROXY:
+  // Listen to mouse moves on the entire window and forward them to the canvas
+  // This ensures Spline reacts even when hovering over the Navbar or CTA buttons
+  function handleGlobalEvent(e) {
+    if (!canvas) return;
+    if (e.target === canvas) return; // Canvas already receives these events
+
+    // Forward events to ensure continuous tracking
+    // We need to clone the event properties to create a valid synthetic event
+    const eventProps = {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      detail: e.detail,
+      screenX: e.screenX,
+      screenY: e.screenY,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      ctrlKey: e.ctrlKey,
+      altKey: e.altKey,
+      shiftKey: e.shiftKey,
+      metaKey: e.metaKey,
+      button: e.button,
+      buttons: e.buttons,
+      relatedTarget: canvas, // Pretend the relation is the canvas
+      pointerId: e.pointerId,
+      width: e.width,
+      height: e.height,
+      pressure: e.pressure,
+      tangentialPressure: e.tangentialPressure,
+      tiltX: e.tiltX,
+      tiltY: e.tiltY,
+      twist: e.twist,
+      pointerType: e.pointerType || "mouse",
+      isPrimary: e.isPrimary ?? true,
+    };
+
+    // Dispatch the corresponding event type
+    if (e.type.startsWith("pointer")) {
+      canvas.dispatchEvent(new PointerEvent(e.type, eventProps));
+    } else if (e.type.startsWith("mouse")) {
+      canvas.dispatchEvent(new MouseEvent(e.type, eventProps));
+    }
+  }
 
   onMount(() => {
-    isMobile =
-      window.matchMedia("(hover: none), (pointer: coarse), (max-width: 1024px)")
-        .matches || window.innerWidth <= 1024;
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
     let destroyed = false;
-    let cleanup = () => {};
+    let splineApp;
 
     (async () => {
-      const [{ default: gsap }, scrollTriggerModule] = await Promise.all([
-        import("gsap"),
-        import("gsap/ScrollTrigger"),
-      ]);
+      if (typeof window === "undefined") return;
+      if (!canvas) return;
 
-      const { ScrollTrigger } = scrollTriggerModule;
-      if (destroyed) return;
-      if (typeof window === "undefined" || !container || !sectionRef) return;
-
-      gsap.registerPlugin(ScrollTrigger);
-
-      const ctx = gsap.context(() => {
-        const strips = container.querySelectorAll(".char-strip");
-        
-        if (!prefersReducedMotion) {
-          gsap.to(strips, {
-            y: "-1.2em", // Exact height of one slot (calculated from 1.2em line-height)
-            duration: 1.4,
-            ease: "expo.out",
-            stagger: 0.015,
-            delay: 0.2,
-          });
+      // ALLOW ZOOM ON SCROLL: Remove the wheel event blocking
+      const originalAddEventListener = canvas.addEventListener;
+      canvas.addEventListener = function (type, listener, options) {
+        if (
+          type === "wheel" ||
+          type === "mousewheel" ||
+          type === "DOMMouseScroll"
+        ) {
+          return; // Block Spline from adding scroll listeners
         }
-
-        if (!prefersReducedMotion) {
-          gsap.to(sectionRef, {
-            scrollTrigger: {
-              trigger: sectionRef,
-              start: "top top",
-              end: "bottom top",
-              scrub: true,
-            },
-            y: 300,
-            opacity: 0,
-            // Optimized blur: lighter on mobile (10px) vs desktop (20px)
-            filter: isMobile ? "blur(10px)" : "blur(20px)", 
-            willChange: "transform, opacity, filter",
-            force3D: true, // Force GPU layer
-            ease: "none",
-          });
-        }
-
-        gsap.fromTo(
-          ctaBtn,
-          { y: isMobile ? 30 : 100, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            ease: "power2.out",
-            delay: isMobile ? 0.6 : 1.8,
-          },
-        );
-      }, sectionRef);
-
-      let mouseMoveHandler;
-      if (
-        !isMobile &&
-        !prefersReducedMotion &&
-        window.matchMedia("(hover: hover) and (pointer: fine)").matches
-      ) {
-        mouseMoveHandler = (e) => {
-          if (!ctaBtn) return;
-          const btn = ctaBtn;
-          const btnRect = btn.getBoundingClientRect();
-          const btnCenterX = btnRect.left + btnRect.width / 2;
-          const btnCenterY = btnRect.top + btnRect.height / 2;
-
-          const distanceX = e.clientX - btnCenterX;
-          const distanceY = e.clientY - btnCenterY;
-          const distance = Math.sqrt(
-            distanceX * distanceX + distanceY * distanceY,
-          );
-          const maxDistance = 150;
-
-          if (distance < maxDistance) {
-            const strength = (maxDistance - distance) / maxDistance;
-            gsap.to(btn, {
-              x: distanceX * strength * 0.5,
-              y: distanceY * strength * 0.5,
-              duration: 0.3,
-              ease: "power2.out",
-              overwrite: "auto",
-            });
-          } else {
-            gsap.to(btn, {
-              x: 0,
-              y: 0,
-              duration: 0.5,
-              ease: "elastic.out(1, 0.3)",
-              overwrite: "auto",
-            });
-          }
-        };
-
-        window.addEventListener("mousemove", mouseMoveHandler);
-      }
-
-      cleanup = () => {
-        ctx.revert();
-        if (mouseMoveHandler) {
-          window.removeEventListener("mousemove", mouseMoveHandler);
-        }
+        return originalAddEventListener.call(this, type, listener, options);
       };
+
+      try {
+        const { Application } = await import("@splinetool/runtime");
+        splineApp = new Application(canvas);
+        await splineApp.load("/scene.splinecode");
+        isLoaded = true;
+        splineApp.setZoom(0.35);
+
+        // Force multiple resize events to ensure it renders correctly after load
+        const forceResize = () => window.dispatchEvent(new Event("resize"));
+        setTimeout(forceResize, 100);
+        setTimeout(forceResize, 500);
+        setTimeout(forceResize, 1000);
+      } catch (error) {
+        console.error("Spline loading error:", error);
+      }
     })();
 
     return () => {
       destroyed = true;
-      cleanup();
+      if (splineApp) splineApp.dispose();
     };
   });
 </script>
 
+<svelte:head>
+  <link rel="preload" href="/scene.splinecode" as="fetch" crossorigin="anonymous">
+</svelte:head>
+
+<svelte:window on:mousemove={handleGlobalEvent} on:pointermove={handleGlobalEvent} />
+
+<LoadingScreen isSplineLoaded={isLoaded} />
+
 <section
   id="acasa"
   bind:this={sectionRef}
-  class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden perspective-1000"
+  class="hero-section relative min-h-screen -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A]"
 >
-  <!-- BACKGROUND -->
+  <!-- Fallback Gradients (Optional/Subtle) -->
   <div
-    class="absolute inset-0 z-0"
-    style="background: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(20, 33, 61, 0.4) 0%, #0a0a0a 70%);"
-  ></div>
+    class="absolute inset-0 z-0 pointer-events-none opacity-20 mix-blend-soft-light"
+  >
+    <div
+      class="absolute inset-0"
+      style="background: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(20, 33, 61, 0.4) 0%, #0a0a0a 70%);"
+    ></div>
+  </div>
+
   <div
-    class="absolute inset-0 pointer-events-none opacity-[0.03] z-50 mix-blend-overlay"
-    style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E&quot;);"
-  ></div>
+    class="absolute inset-0 z-0 pointer-events-none opacity-[0.03] mix-blend-overlay"
+  >
+    <div
+      class="absolute inset-0"
+      style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E&quot;);"
+    ></div>
+  </div>
+
+  <!-- Spline Background -->
+  <div
+    class="absolute inset-0 transition-opacity duration-700 ease-in-out pointer-events-none"
+    class:opacity-0={!isLoaded}
+    class:opacity-100={isLoaded}
+    style="z-index: 1 !important; backface-visibility: hidden; transform: translateZ(0);"
+  >
+    <canvas
+      bind:this={canvas}
+      class="pointer-events-auto"
+      style="width: 100%; height: 100%; display: block; transform: translateZ(0);"
+    ></canvas>
+  </div>
 
   <!-- CONTENT -->
   <div
-    bind:this={container}
-    class="hero-container relative z-10 px-6 text-left max-w-7xl mx-auto flex flex-col items-start pt-24 pb-24 -mt-24 w-full"
-    aria-label="Atinge potențialul business-ului tău cu Bloom Media. Pentru branduri care refuză să fie invizibile."
+    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-screen w-full pointer-events-none pb-12 pt-32 md:pt-48"
+    aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
   >
-    <!-- SECTION LABEL (Integrated) -->
-    <div
-      class="hero-label mb-4 text-xs md:text-sm font-bold tracking-[0.15em] text-white/40 uppercase font-['Inter']"
-    >
-      01 / HERO
+    <!-- TOP CONTENT WRAPPER -->
+    <div class="flex flex-col items-center w-full">
+      <!-- SECTION LABEL (Integrated) -->
+      <div
+        class="hero-label mb-6 text-[10px] md:text-xs font-bold tracking-[0.2em] text-white/90 uppercase font-['Inter'] pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+      >
+        01 / REVENUE ENGINEERING
+      </div>
+
+      <!-- Small Title -->
+      <h2
+        class="hero-subtitle mb-0 text-[clamp(1.2rem,2.25vw,1.8rem)] font-bold font-['Montserrat'] leading-[1.4] tracking-[-0.02em] text-white opacity-100 max-w-3xl pointer-events-none"
+        style="text-shadow: 0 4px 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.8); -webkit-text-stroke: 0.5px rgba(0,0,0,0.5);"
+      >
+        {smallTitle}
+      </h2>
     </div>
 
-    <!-- Line 1: "Atinge..." -->
-    <div
-      class="hero-subtitle mb-2 text-[clamp(1.5rem,3vw,3rem)] font-bold font-['Montserrat'] leading-[1.2] tracking-tight flex flex-wrap justify-start gap-x-[0.2em] opacity-80"
-    >
-      {#each line1.split(" ") as word, wIndex}
-        <span class="inline-flex whitespace-nowrap">
-          {#each word.split("") as char, cIndex}
-            <RollingChar {char} isHighlight={false} />
-          {/each}
-        </span>
-      {/each}
-    </div>
-
-    <!-- Line 2: "BLOOM MEDIA" (Massive Block Style) -->
-    <div
-      class="hero-title mb-8 -mt-2 md:-mt-4 text-[clamp(2.5rem,10vw,10rem)] font-black font-['Montserrat'] leading-[1.2] tracking-tighter flex flex-wrap justify-start gap-x-[0.15em] text-white uppercase"
-    >
-      {#each line2.split(" ") as word, wIndex}
-        <span class="inline-flex whitespace-nowrap">
-          {#each word.split("") as char, cIndex}
-            <RollingChar {char} isHighlight={false} isThemeColor={true} />
-          {/each}
-        </span>
-      {/each}
-    </div>
-
-    <!-- Line 3: "Pentru..." + "invizibile" (Highlight) -->
-    <div
-      class="hero-description mb-12 text-[clamp(1rem,1.5vw,1.5rem)] font-light font-['Montserrat'] max-w-2xl flex flex-wrap justify-start gap-x-[0.3em] leading-[1.2]"
-    >
-      <!-- Part 1: Normal text -->
-      {#each line3Part1.split(" ") as word, wIndex}
-        {#if word}
-          <span class="inline-flex whitespace-nowrap text-white/60">
-            {#each word.split("") as char, cIndex}
-              <RollingChar {char} isHighlight={false} />
-            {/each}
-          </span>
-        {/if}
-      {/each}
-
-      <!-- Part 2: "invizibile" (Highlight) -->
-      <span class="inline-flex whitespace-nowrap">
-        {#each line3Part2.split("") as char, cIndex}
-          <RollingChar {char} isHighlight={true} />
-        {/each}
-      </span>
-    </div>
+    <!-- Main Title: "BLOOM MEDIA" REMOVED -->
+    <!-- <div class="mb-10 flex justify-center w-full px-2 md:px-4 relative z-20 pointer-events-none">
+      <div class="hero-pill-text pointer-events-none">
+        {mainTitle}
+      </div>
+    </div> -->
 
     <!-- CTA BUTTON -->
-    <div class="overflow-hidden p-2">
+    <div class="pointer-events-auto relative z-20 mb-8 md:mb-12">
       <a
-        bind:this={ctaBtn}
         href="#contact"
-        class="cta-button inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full text-lg font-bold text-black bg-[#fca311] relative group opacity-0"
+        class="cta-button inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full text-base md:text-lg font-bold text-black bg-[#fca311]/90 backdrop-blur-sm relative group transition-all duration-300 shadow-[0_0_30px_rgba(252,163,17,0.3)] hover:shadow-[0_0_60px_rgba(252,163,17,0.6)]"
       >
-        <span class="relative z-10">DISCUTĂ CU NOI</span>
+        <span class="relative z-10">Hai să creștem împreună</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -243,15 +202,67 @@
 </section>
 
 <style>
-  .hero-container {
-    will-change: transform;
+  .hero-pill-text {
+    width: auto;
+    text-align: center;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.1em; /* Generous spacing */
+    text-transform: uppercase;
+    font-size: clamp(2.5rem, 6vw, 5rem); /* Larger for maximum visibility */
+    line-height: 1.1;
+    white-space: nowrap;
+    padding: 1rem;
+    position: relative;
+    z-index: 20;
+
+    /* REMOVED PILL CONTAINER STYLES */
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    /* LIQUID GLASS TEXT EFFECT - VIBRANT ORANGE */
+    color: transparent;
+    
+    /* Complex Gradient for Volume, Reflection & Translucency */
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 1) 0%,        /* 100% Brightness Top Highlight */
+      rgba(255, 215, 0, 0.9) 15%,       /* Golden Reflection (#FFD700) */
+      rgba(255, 167, 85, 0.65) 30%,     /* Light Orange Highlight (#FFA755) - Translucent */
+      rgba(255, 107, 53, 0.65) 50%,     /* Main Vibrant Orange (#FF6B35) - 65% Opacity */
+      rgba(232, 84, 14, 0.85) 75%,      /* Dark Orange Shadow (#E8540E) */
+      rgba(255, 107, 53, 0.95) 100%     /* Bottom Refraction/Glow */
+    );
+    
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    /* ADVANCED FILTERS FOR GLOW & SHADOWS */
+    /* 1. Deep Drop Shadow (#1a0a00) */
+    /* 2. Intense Outer Glow (Orange) */
+    /* 3. Caustics/Ambient Glow */
+    filter: 
+      drop-shadow(0 8px 12px rgba(26, 10, 0, 0.6))
+      drop-shadow(0 0 18px rgba(255, 107, 53, 0.75))
+      drop-shadow(0 0 30px rgba(255, 107, 53, 0.4));
+
+    /* INNER LIGHTING & RIM EFFECTS */
+    text-shadow: 
+      0 -2px 3px rgba(255, 255, 255, 0.9),   /* Strong Top Rim Light */
+      0 3px 6px rgba(232, 84, 14, 0.5);      /* Inner Volume Depth */
+
+    /* PHYSICAL RIM DEFINITION */
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.35); /* Pronounced outer rim */
   }
 
-  .cta-button {
-    will-change: transform;
-  }
-
-  :global(.char-strip) {
-    will-change: transform;
+  @media (max-width: 420px) {
+    .hero-pill-text {
+      font-size: clamp(1.8rem, 8vw, 2.5rem);
+      letter-spacing: 0.05em;
+    }
   }
 </style>
