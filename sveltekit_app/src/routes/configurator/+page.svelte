@@ -9,8 +9,6 @@
 
   gsap.registerPlugin(ScrollTrigger);
 
-  export let form;
-
   // --- Constants & Data ---
   const BASE_STRATEGY_FEE = 249.99;
   
