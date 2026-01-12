@@ -2,4 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { env } from '$env/dynamic/public';
 
-export const supabase = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY);
+const supabaseUrl = env.PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = env.PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
