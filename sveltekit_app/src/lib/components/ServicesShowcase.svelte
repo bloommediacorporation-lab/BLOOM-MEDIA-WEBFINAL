@@ -1,6 +1,6 @@
 <script>
     import { ArrowLeft, ArrowRight } from 'lucide-svelte';
-    import { fly } from 'svelte/transition';
+    import { fly, fade } from 'svelte/transition';
     import { quartOut, cubicOut } from 'svelte/easing';
 
     // Definim serviciile
