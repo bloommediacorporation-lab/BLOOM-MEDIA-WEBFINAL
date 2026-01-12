@@ -61,7 +61,7 @@
             
             <!-- MASSIVE TITLE (CAROUSEL) -->
             <!-- Using grid for absolute positioning without layout shift -->
-            <div class="relative w-full grid grid-cols-1 grid-rows-1 items-end overflow-hidden">
+            <div class="relative w-full grid grid-cols-1 grid-rows-1 items-end overflow-hidden pointer-events-none z-10">
                 {#key currentIndex}
                     <div 
                         class="col-start-1 row-start-1 w-full pointer-events-none"

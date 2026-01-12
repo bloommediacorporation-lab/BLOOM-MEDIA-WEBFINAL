@@ -1,28 +1,12 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import path from 'path';
-import compression from 'vite-plugin-compression';
 
 export default defineConfig({
 	plugins: [
 		sveltekit(),
-		// Gzip + Brotli compression for production
-		compression({
-			verbose: true,
-			disable: false,
-			threshold: 1024, // Only compress files > 1KB
-			algorithm: 'gzip',
-			ext: '.gz',
-		}),
-		compression({
-			verbose: true,
-			disable: false,
-			threshold: 1024,
-			algorithm: 'brotli',
-			ext: '.br',
-		}),
 	],
-    server: {
+	server: {
         port: 5174,
         fs: {
             allow: ['..']
