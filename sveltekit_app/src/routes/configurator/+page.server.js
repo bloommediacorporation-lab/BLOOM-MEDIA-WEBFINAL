@@ -1,8 +1,16 @@
-import { supabase } from '$lib/supabaseClient';
+import { supabase, isSupabaseConfigured } from '$lib/supabaseClient';
 import { fail } from '@sveltejs/kit';
 
 export const actions = {
   default: async ({ request }) => {
+    if (!isSupabaseConfigured) {
+        console.error('Supabase is not configured (missing env vars).');
+        return fail(503, {
+            error: true,
+            message: 'Serviciul de baze de date nu este configurat. Te rog contactează administratorul.'
+        });
+    }
+
     const formData = await request.formData();
     
     const businessName = formData.get('businessName');
