@@ -9,6 +9,9 @@
     import FilmGrain from "$lib/components/FilmGrain.svelte";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
+    import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+    injectSpeedInsights();
 
     let { children } = $props();
 
