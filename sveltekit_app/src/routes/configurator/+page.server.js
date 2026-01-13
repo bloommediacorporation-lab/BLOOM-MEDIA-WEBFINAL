@@ -1,14 +1,16 @@
-import { supabase, isSupabaseConfigured } from '$lib/supabaseClient';
 import { fail } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
+import { ConvexHttpClient } from 'convex/browser';
+import { anyApi } from 'convex/server';
 
 export const actions = {
   default: async ({ request }) => {
-    if (!isSupabaseConfigured) {
-        console.error('Supabase is not configured (missing env vars).');
-        return fail(503, {
-            error: true,
-            message: 'Serviciul de baze de date nu este configurat. Te rog contactează administratorul.'
-        });
+    const convexUrl = env.CONVEX_URL;
+    if (!convexUrl) {
+      return fail(503, {
+        error: true,
+        message: 'Serviciul de baze de date nu este configurat. Te rog contactează administratorul.'
+      });
     }
 
     const formData = await request.formData();
@@ -30,7 +32,7 @@ export const actions = {
 
     let selectedServices = [];
     try {
-      if (servicesJson) {
+      if (typeof servicesJson === 'string' && servicesJson) {
         selectedServices = JSON.parse(servicesJson);
       }
     } catch (e) {
@@ -41,22 +43,22 @@ export const actions = {
       });
     }
 
-    const { error } = await supabase
-      .from('leads')
-      .insert({
-        business_name: businessName,
-        nume_client: name,
-        adresa_email: email,
-        telefon: phone,
-        servicii_alese: selectedServices,
-        pret_total: parseFloat(totalPrice) || 0
+    try {
+      const convex = new ConvexHttpClient(convexUrl);
+      const api = anyApi;
+      await convex.mutation(api.leads.create, {
+        businessName: businessName ? String(businessName) : '',
+        name: String(name),
+        email: String(email),
+        phone: String(phone),
+        selectedServices,
+        totalPrice: typeof totalPrice === 'string' ? Number.parseFloat(totalPrice) || 0 : 0
       });
-
-    if (error) {
-      console.error('Supabase error:', error);
+    } catch (e) {
+      console.error('Convex error:', e);
       return fail(500, {
         error: true,
-        message: `Eroare Supabase: ${error.message} (Code: ${error.code})`
+        message: 'Eroare la trimiterea cererii. Te rog încearcă din nou.'
       });
     }
 
