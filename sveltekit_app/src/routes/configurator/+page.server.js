@@ -1,11 +1,12 @@
 import { fail } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 import { ConvexHttpClient } from 'convex/browser';
 import { anyApi } from 'convex/server';
 
 export const actions = {
   default: async ({ request }) => {
-    const convexUrl = env.CONVEX_URL;
+    const convexUrl = privateEnv.CONVEX_URL || publicEnv.PUBLIC_CONVEX_URL;
     if (!convexUrl) {
       return fail(503, {
         error: true,
