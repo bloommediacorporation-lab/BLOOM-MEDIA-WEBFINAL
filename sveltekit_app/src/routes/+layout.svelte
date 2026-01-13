@@ -26,11 +26,21 @@
     let isNavVisible = $state(true);
     let isScrolled = $state(false);
     let isMenuOpen = $state(false);
+    let isMobile = $state(true); // Default to true to prevent hydration mismatch or heavy load initially
     let lastScrollY = 0;
     let scrollY = 0;
 
     onMount(() => {
         if (typeof window === "undefined") return;
+
+        // Optimization: Detect mobile to disable heavy effects
+        const checkMobile = () => {
+            isMobile = window.matchMedia('(max-width: 768px)').matches || 
+                       ('ontouchstart' in window) || 
+                       (navigator.maxTouchPoints > 0);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile, { passive: true });
 
         let destroyed = false;
 
@@ -129,12 +139,11 @@
     <title>Bloom Media — Marketing Digital & Automatizare</title>
 </svelte:head>
 
-{#if browser}
+{#if browser && !isMobile}
   <Cursor />
+  <FilmGrain />
+  <BackgroundOrbs />
 {/if}
-
-<FilmGrain />
-<BackgroundOrbs />
 
 <div class="app-wrapper">
     <Navbar {navigate} bind:isMenuOpen />

@@ -178,7 +178,7 @@
     top: 1rem;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1000;
+    z-index: 1005; /* FIX: Higher than overlay (1001) to keep hamburger clickable */
     width: 95%;
     max-width: 1280px;
     padding: 0 2.5rem;

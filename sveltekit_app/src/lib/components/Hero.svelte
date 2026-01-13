@@ -143,7 +143,7 @@
 <section
   id="acasa"
   bind:this={sectionRef}
-  class="hero-section relative min-h-screen -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A]"
+  class="hero-section relative min-h-[100svh] md:min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y"
 >
   <!-- Fallback Gradients (Optional/Subtle) -->
   <div
