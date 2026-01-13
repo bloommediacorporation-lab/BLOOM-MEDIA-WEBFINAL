@@ -3,9 +3,12 @@
   import LoadingScreen from "./LoadingScreen.svelte";
 
   let sectionRef;
+  let heroContainer;
+  let splineWrapper;
   let canvas;
   let isLoaded = $state(false);
-  let isVisible = $state(true); // Optimization: Track visibility
+  let isVisible = $state(true); // Performance Fix
+  let isFinePointer = $state(false); // Performance Fix
 
   const smallTitle = "Soluția ta pentru a deveni un magnet pentru clienți";
 
@@ -13,6 +16,7 @@
   // Listen to mouse moves on the entire window and forward them to the canvas
   // This ensures Spline reacts even when hovering over the Navbar or CTA buttons
   function handleGlobalEvent(e) {
+    if (!isFinePointer) return; // Performance Fix
     if (!canvas || !isVisible) return; // Optimization: Don't process if hidden
     if (e.target === canvas) return; // Canvas already receives these events
 
@@ -55,17 +59,19 @@
   }
 
   onMount(() => {
-    let destroyed = false;
     let splineApp;
+
+    isFinePointer = window.matchMedia?.("(hover: hover) and (pointer: fine)")?.matches ?? false; // Performance Fix
+    if (sectionRef) sectionRef.style.minHeight = "100dvh"; // Performance Fix
+    if (heroContainer) heroContainer.style.height = "100dvh"; // Performance Fix
 
     // Optimization: IntersectionObserver to pause/hide Spline when out of view
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           isVisible = entry.isIntersecting;
-          if (canvas) {
-            // Toggle visibility to free up GPU
-            canvas.style.visibility = isVisible ? "visible" : "hidden";
+          if (splineWrapper) {
+            splineWrapper.style.visibility = isVisible ? "visible" : "hidden"; // Performance Fix
           }
         });
       },
@@ -75,10 +81,6 @@
     if (sectionRef) {
       observer.observe(sectionRef);
     }
-
-    // Optimization: Add passive listeners for window events
-    window.addEventListener("mousemove", handleGlobalEvent, { passive: true });
-    window.addEventListener("pointermove", handleGlobalEvent, { passive: true });
 
     (async () => {
       if (typeof window === "undefined") return;
@@ -93,14 +95,6 @@
           type === "DOMMouseScroll"
         ) {
           return; // Block Spline from adding scroll listeners
-        }
-        // Optimization: Ensure passive listeners where possible
-        if (type === "touchstart" || type === "touchmove") {
-            if (typeof options === 'object') {
-                options.passive = true;
-            } else if (options === undefined) {
-                options = { passive: true };
-            }
         }
         return originalAddEventListener.call(this, type, listener, options);
       };
@@ -122,12 +116,10 @@
       }
     })();
 
+
     return () => {
-      destroyed = true;
       if (splineApp) splineApp.dispose();
       observer.disconnect();
-      window.removeEventListener("mousemove", handleGlobalEvent);
-      window.removeEventListener("pointermove", handleGlobalEvent);
     };
   });
 </script>
@@ -143,7 +135,7 @@
 <section
   id="acasa"
   bind:this={sectionRef}
-  class="hero-section relative min-h-[100svh] md:min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y"
+  class="hero-section relative min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y"
 >
   <!-- Fallback Gradients (Optional/Subtle) -->
   <div
@@ -166,6 +158,7 @@
 
   <!-- Spline Background -->
   <div
+    bind:this={splineWrapper}
     class="absolute inset-0 transition-opacity duration-700 ease-in-out pointer-events-none"
     class:opacity-0={!isLoaded}
     class:opacity-100={isLoaded}
@@ -180,6 +173,7 @@
 
   <!-- CONTENT -->
   <div
+    bind:this={heroContainer}
     class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-[100dvh] w-full pointer-events-none pb-12 pt-32 md:pt-48"
     aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
   >
@@ -234,5 +228,4 @@
     </div>
   </div>
 </section>
-
 
