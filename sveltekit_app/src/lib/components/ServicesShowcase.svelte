@@ -75,10 +75,10 @@
                         class="col-start-1 row-start-1 w-full pointer-events-none"
                         in:fly={{ y: 50 * direction, duration: 900, easing: quartOut, opacity: 0 }}
                         out:fly={{ y: -50 * direction, duration: 900, easing: quartOut, opacity: 0 }}
-                        on:introstart={(e) => applyWillChange(e.currentTarget)}
-                        on:introend={(e) => clearWillChange(e.currentTarget)}
-                        on:outrostart={(e) => applyWillChange(e.currentTarget)}
-                        on:outroend={(e) => clearWillChange(e.currentTarget)}
+                        onintrostart={(e) => applyWillChange(e.currentTarget)}
+                        onintroend={(e) => clearWillChange(e.currentTarget)}
+                        onoutrostart={(e) => applyWillChange(e.currentTarget)}
+                        onoutroend={(e) => clearWillChange(e.currentTarget)}
                     >
                         <h2 class="text-white font-black text-[15vw] xl:text-[13vw] leading-[0.8] tracking-tighter uppercase mix-blend-difference">
                             {currentService.title}
@@ -119,10 +119,10 @@
                     in:fly={{ y: 20, duration: 600, delay: 200, easing: cubicOut }}
                     out:fade={{ duration: 200 }}
                     class="max-w-xl"
-                    on:introstart={(e) => applyWillChange(e.currentTarget)}
-                    on:introend={(e) => clearWillChange(e.currentTarget)}
-                    on:outrostart={(e) => applyWillChange(e.currentTarget)}
-                    on:outroend={(e) => clearWillChange(e.currentTarget)}
+                    onintrostart={(e) => applyWillChange(e.currentTarget)}
+                    onintroend={(e) => clearWillChange(e.currentTarget)}
+                    onoutrostart={(e) => applyWillChange(e.currentTarget)}
+                    onoutroend={(e) => clearWillChange(e.currentTarget)}
                 >
                     <p class="text-sm md:text-base leading-relaxed text-gray-300">
                         {currentService.description}
