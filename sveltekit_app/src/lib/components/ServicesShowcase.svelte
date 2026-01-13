@@ -44,7 +44,7 @@
     let currentService = $derived(services[currentIndex]);
 </script>
 
-<section class="relative w-full h-screen bg-[#000100] overflow-hidden flex flex-col justify-center">
+<section class="relative w-full h-[100dvh] bg-[#000100] overflow-hidden flex flex-col justify-center touch-pan-y">
     
     <!-- TOP LEFT LABEL -->
     <div class="absolute top-8 left-6 md:top-12 md:left-12 lg:left-20 z-20">

@@ -5,6 +5,7 @@
   let sectionRef;
   let canvas;
   let isLoaded = $state(false);
+  let isVisible = $state(true); // Optimization: Track visibility
 
   const smallTitle = "Soluția ta pentru a deveni un magnet pentru clienți";
 
@@ -12,7 +13,7 @@
   // Listen to mouse moves on the entire window and forward them to the canvas
   // This ensures Spline reacts even when hovering over the Navbar or CTA buttons
   function handleGlobalEvent(e) {
-    if (!canvas) return;
+    if (!canvas || !isVisible) return; // Optimization: Don't process if hidden
     if (e.target === canvas) return; // Canvas already receives these events
 
     // Forward events to ensure continuous tracking
@@ -57,6 +58,28 @@
     let destroyed = false;
     let splineApp;
 
+    // Optimization: IntersectionObserver to pause/hide Spline when out of view
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (canvas) {
+            // Toggle visibility to free up GPU
+            canvas.style.visibility = isVisible ? "visible" : "hidden";
+          }
+        });
+      },
+      { threshold: 0 }
+    );
+
+    if (sectionRef) {
+      observer.observe(sectionRef);
+    }
+
+    // Optimization: Add passive listeners for window events
+    window.addEventListener("mousemove", handleGlobalEvent, { passive: true });
+    window.addEventListener("pointermove", handleGlobalEvent, { passive: true });
+
     (async () => {
       if (typeof window === "undefined") return;
       if (!canvas) return;
@@ -70,6 +93,14 @@
           type === "DOMMouseScroll"
         ) {
           return; // Block Spline from adding scroll listeners
+        }
+        // Optimization: Ensure passive listeners where possible
+        if (type === "touchstart" || type === "touchmove") {
+            if (typeof options === 'object') {
+                options.passive = true;
+            } else if (options === undefined) {
+                options = { passive: true };
+            }
         }
         return originalAddEventListener.call(this, type, listener, options);
       };
@@ -94,6 +125,9 @@
     return () => {
       destroyed = true;
       if (splineApp) splineApp.dispose();
+      observer.disconnect();
+      window.removeEventListener("mousemove", handleGlobalEvent);
+      window.removeEventListener("pointermove", handleGlobalEvent);
     };
   });
 </script>
@@ -146,7 +180,7 @@
 
   <!-- CONTENT -->
   <div
-    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-screen w-full pointer-events-none pb-12 pt-32 md:pt-48"
+    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-[100dvh] w-full pointer-events-none pb-12 pt-32 md:pt-48"
     aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
   >
     <!-- TOP CONTENT WRAPPER -->
