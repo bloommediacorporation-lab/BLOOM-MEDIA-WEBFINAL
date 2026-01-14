@@ -166,17 +166,17 @@
 <section
   id="acasa"
   bind:this={sectionRef}
-  class="hero-section relative min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y"
+  class="hero-section relative min-h-[100svh] md:min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y"
 >
-  <!-- Fallback Image (Always Present, z-index: 1) -->
-  <img 
+  <!-- Fallback Image (Removed because file is missing) -->
+  <!-- <img 
     src="/hero-fallback.webp" 
     alt="Bloom Media Hero Background" 
     class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-screen"
     style="z-index: 1;"
     fetchpriority="high"
     loading="eager"
-  />
+  /> -->
 
   <!-- Fallback Gradients (Optional/Subtle) -->
   <div
@@ -200,7 +200,7 @@
   <!-- Static Mobile Fallback (Performance) -->
   <div class="absolute inset-0 z-0 block md:hidden pointer-events-none">
     <img 
-      src="/images/hero-mobile-fallback.jpg" 
+      src="/images/hero-mobile-fallback.png" 
       alt="Bloom Media 3D Scene" 
       class="w-full h-full object-cover opacity-80"
     />
