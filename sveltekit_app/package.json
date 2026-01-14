@@ -9,6 +9,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
     "optimize-images": "node optimize-images.js",
+    "postinstall": "node -e \"if(process.env.ROLLUP_NATIVE_FIX_RAN)return;const p=process.platform,a=process.arch;if(p!=='linux'||a!=='x64')return;try{require('@rollup/rollup-linux-x64-gnu');}catch(e){const{execSync}=require('child_process');execSync('npm i --no-audit --no-fund --include=optional',{stdio:'inherit',env:{...process.env,ROLLUP_NATIVE_FIX_RAN:'1'}});}\"",
     "convex": "convex dev"
   },
   "devDependencies": {
