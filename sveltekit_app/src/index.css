@@ -20,12 +20,32 @@ body {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   overscroll-behavior-y: none; /* Disable mobile rubber-banding */
+  overscroll-behavior-x: none;
   width: 100%;
   max-width: 100vw;
   scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   touch-action: pan-y; /* Optimization: Improve touch scrolling performance */
+}
+
+/* Prevent rubber-banding on hero section specifically for Brave/iOS */
+.hero-section {
+  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+}
+
+/* Additional prevention for mobile browsers */
+.hero-section > * {
+  overscroll-behavior: contain !important;
+}
+
+/* Specific fix for Spline canvas in hero section */
+.hero-section canvas {
+  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  touch-action: manipulation !important;
 }
 
 html.lenis {
