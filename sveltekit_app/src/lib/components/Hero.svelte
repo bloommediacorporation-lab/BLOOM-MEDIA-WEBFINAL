@@ -66,7 +66,7 @@
     let splineApp;
 
     // Mobile Guard & Layout Stability
-    const checkIsDesktop = () => window.innerWidth > 1024;
+    const checkIsDesktop = () => window.innerWidth > 768;
     isDesktop = checkIsDesktop();
 
     // Force loader dismiss after 1.2s regardless of Spline
@@ -107,17 +107,22 @@
         if (!canvas) return;
 
         // ALLOW ZOOM ON SCROLL: Remove the wheel event blocking
+        // Store original method and create wrapper to prevent scroll listeners
         const originalAddEventListener = canvas.addEventListener;
-        canvas.addEventListener = function (type, listener, options) {
-          if (
-            type === "wheel" ||
-            type === "mousewheel" ||
-            type === "DOMMouseScroll"
-          ) {
-            return; // Block Spline from adding scroll listeners
-          }
-          return originalAddEventListener.call(this, type, listener, options);
-        };
+        Object.defineProperty(canvas, 'addEventListener', {
+          value: function (type, listener, options) {
+            if (
+              type === "wheel" ||
+              type === "mousewheel" ||
+              type === "DOMMouseScroll"
+            ) {
+              return; // Block Spline from adding scroll listeners
+            }
+            return originalAddEventListener.call(this, type, listener, options);
+          },
+          writable: true,
+          configurable: true
+        });
 
         try {
           const { Application } = await import("@splinetool/runtime");
@@ -192,10 +197,21 @@
     ></div>
   </div>
 
+  <!-- Static Mobile Fallback (Performance) -->
+  <div class="absolute inset-0 z-0 block md:hidden pointer-events-none">
+    <img 
+      src="/images/hero-mobile-fallback.jpg" 
+      alt="Bloom Media 3D Scene" 
+      class="w-full h-full object-cover opacity-80"
+    />
+    <!-- Gradient Overlay for better text readability -->
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
+  </div>
+
   <!-- Spline Background (Only on Desktop, z-index: 2) -->
   <div
     bind:this={splineWrapper}
-    class="absolute inset-0 transition-opacity duration-1000 ease-in-out pointer-events-none"
+    class="absolute inset-0 hidden md:block transition-opacity duration-1000 ease-in-out pointer-events-none"
     class:opacity-0={!isSplineVisible}
     class:opacity-100={isSplineVisible}
     style="z-index: 2 !important; backface-visibility: hidden; transform: translateZ(0);"
@@ -204,7 +220,7 @@
       <canvas
         bind:this={canvas}
         class="pointer-events-auto"
-        style="width: 100%; height: 100%; display: block; transform: translateZ(0);"
+        style="width: 100% !important; height: 100% !important; display: block; transform: translateZ(0);"
       ></canvas>
     {/if}
   </div>

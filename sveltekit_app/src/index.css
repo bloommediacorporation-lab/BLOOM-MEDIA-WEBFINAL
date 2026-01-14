@@ -19,6 +19,7 @@ body {
   font-family: 'Montserrat', 'Inter', sans-serif;
   overflow-x: hidden !important;
   overflow-y: auto !important;
+  overscroll-behavior-y: none; /* Disable mobile rubber-banding */
   width: 100%;
   max-width: 100vw;
   scrollbar-gutter: stable;

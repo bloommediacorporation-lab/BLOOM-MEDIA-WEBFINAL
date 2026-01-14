@@ -70,8 +70,21 @@
 
 <!-- Mobile Menu -->
 {#if isMenuOpen}
-  <div class="mobile-overlay" onclick={() => isMenuOpen = false}>
-    <div class="mobile-menu" onclick={(e) => e.stopPropagation()}>
+  <div 
+    class="mobile-overlay" 
+    role="button"
+    tabindex="0"
+    aria-label="Închide meniul"
+    onclick={() => isMenuOpen = false}
+    onkeypress={(e) => e.key === 'Enter' || e.key === ' ' ? isMenuOpen = false : null}
+  >
+    <div 
+      class="mobile-menu" 
+      role="dialog"
+      aria-label="Meniu de navigare"
+      onclick={(e) => e.stopPropagation()}
+      onkeypress={(e) => e.stopPropagation()}
+    >
       <a href="/" onclick={(e) => { e.preventDefault(); handleNavigate('/'); }}>Acasă</a>
       <a href="/#servicii" onclick={(e) => handleScrollTo(e, 'servicii')}>Servicii</a>
       <a href="/configurator" onclick={(e) => { e.preventDefault(); handleNavigate('/configurator'); }}>Configurator</a>
