@@ -6,10 +6,13 @@
   let heroContainer;
   let splineWrapper;
   let canvas;
-  let isLoaded = $state(false);
-  let isVisible = $state(true); // Performance Fix
-  let isFinePointer = $state(false); // Performance Fix
-  let isDesktop = $state(false); // Mobile Guard
+  
+  // State
+  let isLoaderDismissed = $state(false); // Controls the fake loader
+  let isSplineVisible = $state(false);   // Controls the canvas fade-in
+  let isDesktop = $state(false);         // Mobile Guard
+  let isVisible = $state(true);          // Intersection Observer
+  let isFinePointer = $state(false);
 
   const smallTitle = "Soluția ta pentru a deveni un magnet pentru clienți";
 
@@ -66,9 +69,20 @@
     const checkIsDesktop = () => window.innerWidth > 1024;
     isDesktop = checkIsDesktop();
 
-    isFinePointer = window.matchMedia?.("(hover: hover) and (pointer: fine)")?.matches ?? false; // Performance Fix
-    if (sectionRef) sectionRef.style.minHeight = "100dvh"; // Performance Fix
-    if (heroContainer) heroContainer.style.height = "100dvh"; // Performance Fix
+    // Force loader dismiss after 1.2s regardless of Spline
+    setTimeout(() => {
+        isLoaderDismissed = true;
+    }, 1200);
+
+    // If Mobile: STOP HERE. No Spline.
+    if (!isDesktop) {
+        return;
+    }
+
+    // DESKTOP: Continue with lazy loading
+    isFinePointer = window.matchMedia?.("(hover: hover) and (pointer: fine)")?.matches ?? false; 
+    if (sectionRef) sectionRef.style.minHeight = "100dvh"; 
+    if (heroContainer) heroContainer.style.height = "100dvh"; 
 
     // Optimization: IntersectionObserver to pause/hide Spline when out of view
     const observer = new IntersectionObserver(
@@ -76,7 +90,7 @@
         entries.forEach((entry) => {
           isVisible = entry.isIntersecting;
           if (splineWrapper) {
-            splineWrapper.style.visibility = isVisible ? "visible" : "hidden"; // Performance Fix
+            splineWrapper.style.visibility = isVisible ? "visible" : "hidden"; 
           }
         });
       },
@@ -87,9 +101,8 @@
       observer.observe(sectionRef);
     }
 
-    // Initialize Spline ONLY if Desktop
-    if (isDesktop) {
-      (async () => {
+    // Spline Loader Function
+    const initSpline = async () => {
         if (typeof window === "undefined") return;
         if (!canvas) return;
 
@@ -110,7 +123,10 @@
           const { Application } = await import("@splinetool/runtime");
           splineApp = new Application(canvas);
           await splineApp.load("/scene.splinecode");
-          isLoaded = true;
+          
+          // Once loaded, fade it in
+          isSplineVisible = true;
+          
           splineApp.setZoom(0.35);
 
           // Force multiple resize events to ensure it renders correctly after load
@@ -120,14 +136,15 @@
           setTimeout(forceResize, 1000);
         } catch (error) {
           console.error("Spline loading error:", error);
-          isLoaded = true; // Ensure content shows even on error
         }
-      })();
-    } else {
-      // Mobile: Mark as loaded immediately to show content over static image
-      isLoaded = true;
-    }
+    };
 
+    // IDLE STRATEGY: Wait for browser idle before loading Spline
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => initSpline());
+    } else {
+        setTimeout(initSpline, 200); // Safari fallback
+    }
 
     return () => {
       if (splineApp) splineApp.dispose();
@@ -138,7 +155,8 @@
 
 <svelte:window on:mousemove={handleGlobalEvent} on:pointermove={handleGlobalEvent} />
 
-<LoadingScreen isSplineLoaded={isLoaded} />
+<!-- Pass isLoaderDismissed to LoadingScreen to trigger exit -->
+<LoadingScreen isSplineLoaded={isLoaderDismissed} />
 
 <section
   id="acasa"
@@ -148,9 +166,11 @@
   <!-- Fallback Image (Always Present, z-index: 1) -->
   <img 
     src="/hero-fallback.webp" 
-    alt="" 
+    alt="Bloom Media Hero Background" 
     class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-screen"
     style="z-index: 1;"
+    fetchpriority="high"
+    loading="eager"
   />
 
   <!-- Fallback Gradients (Optional/Subtle) -->
@@ -175,9 +195,9 @@
   <!-- Spline Background (Only on Desktop, z-index: 2) -->
   <div
     bind:this={splineWrapper}
-    class="absolute inset-0 transition-opacity duration-700 ease-in-out pointer-events-none"
-    class:opacity-0={!isLoaded}
-    class:opacity-100={isLoaded}
+    class="absolute inset-0 transition-opacity duration-1000 ease-in-out pointer-events-none"
+    class:opacity-0={!isSplineVisible}
+    class:opacity-100={isSplineVisible}
     style="z-index: 2 !important; backface-visibility: hidden; transform: translateZ(0);"
   >
     {#if isDesktop}

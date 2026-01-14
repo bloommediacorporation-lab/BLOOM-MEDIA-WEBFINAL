@@ -181,7 +181,7 @@
     z-index: 1005; /* FIX: Higher than overlay (1001) to keep hamburger clickable */
     width: 95%;
     max-width: 1280px;
-    padding: 0 2.5rem;
+    padding: 0 1rem;
     pointer-events: none; /* KEY FIX: Let mouse pass through by default */
   }
 

@@ -23,10 +23,10 @@
       document.body.style.height = '100vh';
     }
 
-    // Minimum display time (1.5s)
+    // Minimum display time (1.2s)
     const minTimer = setTimeout(() => {
       minTimeElapsed = true;
-    }, 1500);
+    }, 1200);
 
     // Fallback force dismiss (8s)
     const maxTimer = setTimeout(() => {
