@@ -166,7 +166,7 @@
 <section
   id="acasa"
   bind:this={sectionRef}
-  class="hero-section relative min-h-[100svh] md:min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y"
+  class="hero-section relative h-[100svh] md:h-auto md:min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y overscroll-none"
 >
   <!-- Fallback Image (Removed because file is missing) -->
   <!-- <img 
