@@ -81,6 +81,7 @@
     <div 
       class="mobile-menu" 
       role="dialog"
+      tabindex="-1"
       aria-label="Meniu de navigare"
       onclick={(e) => e.stopPropagation()}
       onkeypress={(e) => e.stopPropagation()}

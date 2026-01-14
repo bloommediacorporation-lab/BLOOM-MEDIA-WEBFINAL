@@ -1,7 +1,46 @@
-<script>
-  import { onDestroy } from "svelte";
+<script lang="ts">
+  import { onDestroy, onMount } from "svelte";
 
   let { navigate, isMenuOpen = $bindable(false) } = $props();
+
+  let navbar: HTMLElement | null = $state(null);
+  let scrollY = $state(0);
+  let w = $state(0);
+  let h = $state(0);
+  let observer: ResizeObserver | null = null;
+
+  let isScrolled = $derived(scrollY > 50);
+
+  const radius = 99;
+  const opacity = 0.08;
+  const padding = "1.2rem 2.5rem";
+  const scrolledPadding = "1rem 2.2rem";
+  const distortionScale = 40;
+  const blur = 0;
+
+  const id = `liquid-${Math.random().toString(36).slice(2, 9)}`;
+
+  const navbarPadding = $derived(isScrolled ? scrolledPadding : padding);
+
+  let svgDataUri = $derived.by(() => {
+    if (w === 0 || h === 0) return "";
+
+    const svg = `
+      <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g-${id}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+            <stop offset="10%" stop-color="#888" stop-opacity="0.5"/>
+            <stop offset="90%" stop-color="#888" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#000" stop-opacity="1"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="${w}" height="${h}" rx="${radius}" fill="url(#g-${id})" />
+      </svg>
+    `;
+
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  });
 
   $effect(() => {
     if (typeof document !== "undefined") {
@@ -9,10 +48,60 @@
     }
   });
 
+  onMount(() => {
+    if (typeof window === "undefined") return;
+
+    const updateScroll = () => {
+      const lenis = window["lenis"];
+      const nextScroll =
+        lenis && typeof lenis.scroll === "number" ? lenis.scroll : window.scrollY;
+      scrollY = Number.isFinite(nextScroll) ? nextScroll : 0;
+    };
+
+    updateScroll();
+
+    window.addEventListener("scroll", updateScroll, { passive: true });
+
+    if (navbar) {
+      const rect = navbar.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+
+      observer = new ResizeObserver((entries) => {
+        const rect = entries[0]?.contentRect;
+        if (!rect) return;
+        w = rect.width;
+        h = rect.height;
+      });
+      observer.observe(navbar);
+    }
+
+    const lenis = window["lenis"];
+    let unsubscribeLenis = null;
+    if (lenis && typeof lenis.on === "function") {
+      const onLenisScroll = ({ scroll }) => {
+        scrollY = Number.isFinite(scroll) ? scroll : 0;
+      };
+      lenis.on("scroll", onLenisScroll);
+      unsubscribeLenis = () => {
+        if (typeof lenis.off === "function") lenis.off("scroll", onLenisScroll);
+      };
+    }
+
+    return () => {
+      window.removeEventListener("scroll", updateScroll);
+      if (unsubscribeLenis) unsubscribeLenis();
+      observer?.disconnect();
+      observer = null;
+    };
+  });
+
   onDestroy(() => {
     if (typeof document !== "undefined") {
       document.body.style.overflow = "";
     }
+    observer?.disconnect();
+    observer = null;
   });
 
   function toggleMenu() {
@@ -49,79 +138,111 @@
   }
 </script>
 
-<!-- 🎯 LIQUID GLASS NAVBAR -->
-<nav class:menu-open={isMenuOpen} class="navbar-wrapper">
-  <!-- Main navbar with liquid glass effect -->
-  <div class="navbar-glass">
-    <div class="navbar-content">
+<nav
+  bind:this={navbar}
+  class="liquid-glass-navbar"
+  class:menu-open={isMenuOpen}
+  class:scrolled={isScrolled}
+  style={`--radius: ${radius}px; --padding: ${navbarPadding}; --opacity: ${opacity}; backdrop-filter: url(#${id}); -webkit-backdrop-filter: url(#${id});`}
+>
+  <svg class="liquid-filter" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs>
+      <filter
+        id={id}
+        x="-20%"
+        y="-20%"
+        width="140%"
+        height="140%"
+        color-interpolation-filters="sRGB"
+      >
+        <feImage
+          result="map"
+          href={svgDataUri}
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          preserveAspectRatio="none"
+        />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="map"
+          scale={distortionScale}
+          xChannelSelector="R"
+          yChannelSelector="G"
+          result="displaced"
+        />
+        <feGaussianBlur in="displaced" stdDeviation={blur} />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="navbar-content">
+    <a
+      href="/"
+      class="logo"
+      onclick={(e) => {
+        e.preventDefault();
+        handleNavigate("/");
+      }}
+    >
+      Bloom Media <span class="dot"></span>
+    </a>
+
+    <div id="desktop-nav" class="links nav-links hidden lg:flex">
+      <a href="/#servicii" onclick={(e) => handleScrollTo(e, "servicii")}
+        >Servicii</a
+      >
       <a
-        href="/"
-        class="logo"
+        href="/configurator"
         onclick={(e) => {
           e.preventDefault();
-          handleNavigate("/");
+          handleNavigate("/configurator");
         }}
+        class="active-dot-link"
       >
-        Bloom Media <span class="dot"></span>
+        Configurator <span class="nav-dot"></span>
       </a>
-
-      <!-- Desktop Links -->
-      <div id="desktop-nav" class="links nav-links hidden lg:flex">
-        <a href="/#servicii" onclick={(e) => handleScrollTo(e, "servicii")}
-          >Servicii</a
-        >
-        <a
-          href="/configurator"
-          onclick={(e) => {
-            e.preventDefault();
-            handleNavigate("/configurator");
-          }}
-          class="active-dot-link"
-        >
-          Configurator <span class="nav-dot"></span>
-        </a>
-        <a
-          href="/despre"
-          onclick={(e) => {
-            e.preventDefault();
-            handleNavigate("/despre");
-          }}>Despre</a
-        >
-        <a
-          href="/echipa"
-          onclick={(e) => {
-            e.preventDefault();
-            handleNavigate("/echipa");
-          }}>Echipă</a
-        >
-        <a
-          href="/dashboard"
-          onclick={(e) => {
-            e.preventDefault();
-            handleNavigate("/dashboard");
-          }}>Client Portal</a
-        >
-        <a href="/#contact" onclick={(e) => handleScrollTo(e, "contact")}
-          >Contact</a
-        >
-      </div>
-
-      <div id="desktop-cta" class="hidden lg:block">
-        <button class="cta" onclick={() => handleNavigate("/")}
-          >Începe un proiect</button
-        >
-      </div>
-
-      <!-- Mobile Hamburger Button -->
-      <button
-        class="hamburger lg:hidden flex"
-        onclick={toggleMenu}
-        aria-label="Menu"
+      <a
+        href="/despre"
+        onclick={(e) => {
+          e.preventDefault();
+          handleNavigate("/despre");
+        }}>Despre</a
       >
-        <div class="bar bar-1"></div>
-        <div class="bar bar-2"></div>
-      </button>
+      <a
+        href="/echipa"
+        onclick={(e) => {
+          e.preventDefault();
+          handleNavigate("/echipa");
+        }}>Echipă</a
+      >
+      <a
+        href="/dashboard"
+        onclick={(e) => {
+          e.preventDefault();
+          handleNavigate("/dashboard");
+        }}>Client Portal</a
+      >
+      <a href="/#contact" onclick={(e) => handleScrollTo(e, "contact")}
+        >Contact</a
+      >
     </div>
+
+    <div id="desktop-cta" class="hidden lg:block">
+      <button class="cta" onclick={() => handleNavigate("/")}
+        >Începe un proiect</button
+      >
+    </div>
+
+    <button
+      class="hamburger lg:hidden flex"
+      onclick={toggleMenu}
+      aria-label="Menu"
+    >
+      <div class="bar bar-1"></div>
+      <div class="bar bar-2"></div>
+    </button>
   </div>
 </nav>
 
@@ -169,96 +290,56 @@
 </div>
 
 <style>
-  /* ═══════════════════════════════════════════════════════════ */
-  /* NAVBAR WRAPPER */
-  /* ═══════════════════════════════════════════════════════════ */
-
-  .navbar-wrapper {
+  .liquid-glass-navbar {
     position: fixed;
-    top: 1rem;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1005; /* FIX: Higher than overlay (1001) to keep hamburger clickable */
-    width: 95%;
-    max-width: 1280px;
-    padding: 0 1rem;
-    pointer-events: none; /* KEY FIX: Let mouse pass through by default */
-  }
+    width: calc(100% - 40px);
+    max-width: 1400px;
+    padding: var(--padding);
+    border-radius: var(--radius);
+    z-index: 1005;
 
-  @media (min-width: 768px) {
-    .navbar-wrapper {
-      padding: 0 2.5rem;
-    }
-  }
+    background-color: rgba(20, 20, 20, var(--opacity));
 
-  /* ═══════════════════════════════════════════════════════════ */
-  /* 🎯 LIQUID GLASS EFFECT - TRANSPARENT NAVBAR */
-  /* ═══════════════════════════════════════════════════════════ */
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 0 20px rgba(0, 0, 0, 0.5),
+      0 10px 20px rgba(0, 0, 0, 0.3);
 
-  .navbar-glass {
-    position: relative;
-    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
     overflow: hidden;
-    pointer-events: none; /* KEY FIX: Glass background is transparent to mouse */
-
-    /* CRITICAL: Pure transparent background */
-    background: transparent;
-
-    /* Liquid glass blur effect */
-    backdrop-filter: blur(12px) brightness(1.12) saturate(1.18);
-    -webkit-backdrop-filter: blur(12px) brightness(1.12) saturate(1.18);
-
-    /* Ultra subtle gradient overlay (almost invisible) */
-    background:
-      linear-gradient(
-        120deg,
-        rgba(255, 255, 255, 0.04) 0%,
-        rgba(147, 51, 234, 0.02) 25%,
-        rgba(255, 255, 255, 0.04) 50%,
-        rgba(59, 130, 246, 0.02) 75%,
-        rgba(255, 255, 255, 0.04) 100%
-      );
-
-    background-size: 300% 300%;
-    animation: subtleShimmer 20s ease-in-out infinite;
-
-    /* Glass depth shadows */
-    box-shadow:
-      rgba(0, 0, 0, 0.15) 0px 8px 24px,
-      rgba(255, 255, 255, 0.12) 0px -1px 2px inset,
-      rgba(0, 0, 0, 0.08) 0px -4px 12px inset;
-
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
-  .navbar-glass:hover {
-    backdrop-filter: blur(16px) brightness(1.15) saturate(1.22);
-    -webkit-backdrop-filter: blur(16px) brightness(1.15) saturate(1.22);
-    box-shadow:
-      rgba(0, 0, 0, 0.2) 0px 12px 32px,
-      rgba(255, 255, 255, 0.15) 0px -1px 2px inset,
-      rgba(0, 0, 0, 0.1) 0px -6px 16px inset;
+  .liquid-glass-navbar.scrolled {
+    top: 14px;
   }
 
-  @keyframes subtleShimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+  nav a {
+    color: white;
+    mix-blend-mode: difference;
+    text-shadow:
+      0 0 2px rgba(0, 0, 0, 0.9),
+      0 2px 8px rgba(0, 0, 0, 0.6);
   }
 
-  /* ═══════════════════════════════════════════════════════════ */
-  /* NAVBAR CONTENT */
-  /* ═══════════════════════════════════════════════════════════ */
+  .liquid-filter {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
 
   .navbar-content {
-    width: 100%;
-    padding: 0.8rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     position: relative;
-    z-index: 1005;
-    /* pointer-events: none; removed to simplify event chain */
+    z-index: 1;
   }
 
   .logo {
@@ -266,6 +347,7 @@
     font-weight: 900;
     font-size: 1.5rem;
     color: white;
+    mix-blend-mode: difference;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -293,7 +375,8 @@
   }
 
   .links a {
-    color: rgba(255, 255, 255, 0.7);
+    color: white;
+    mix-blend-mode: difference;
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 500;
@@ -399,15 +482,15 @@
     transition: all 0.3s ease;
   }
 
-  .navbar-wrapper.menu-open .bar {
+  .liquid-glass-navbar.menu-open .bar {
     background-color: #fca311;
   }
 
-  .navbar-wrapper.menu-open .bar-1 {
+  .liquid-glass-navbar.menu-open .bar-1 {
     transform: translateY(8px) rotate(45deg);
   }
 
-  .navbar-wrapper.menu-open .bar-2 {
+  .liquid-glass-navbar.menu-open .bar-2 {
     transform: translateY(-8px) rotate(-45deg);
     width: 30px;
   }
@@ -459,6 +542,7 @@
     font-size: 1.5rem;
     font-weight: 800;
     color: white;
+    mix-blend-mode: difference;
     text-decoration: none;
     text-transform: uppercase;
     transition:
@@ -468,7 +552,7 @@
   }
 
   .mobile-links a:hover {
-    color: #fca311;
+    color: white;
     transform: scale(1.05);
   }
 
@@ -487,11 +571,24 @@
 
   @media (max-width: 1024px) {
     .navbar-content {
-      padding: 1rem 1.25rem;
+      gap: 1rem;
     }
 
     .logo {
       font-size: 1.25rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .liquid-glass-navbar {
+      top: 14px;
+      width: calc(100% - 24px);
+      padding: 10px 18px;
+    }
+
+    .liquid-glass-navbar.scrolled {
+      top: 10px;
+      padding: 9px 16px;
     }
   }
 </style>

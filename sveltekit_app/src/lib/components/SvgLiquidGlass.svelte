@@ -9,6 +9,7 @@
     className = "",
     class: customClass = "",
     style = "",
+    children,
     ...rest
   } = $props();
 
@@ -122,7 +123,7 @@
   
   <!-- Content on top of glass -->
   <div class="lg-content">
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 
@@ -292,6 +293,9 @@
         rgba(255, 255, 255, 0.0) 70%
       );
     -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask: 
       linear-gradient(#fff 0 0) content-box, 
       linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;

@@ -148,7 +148,7 @@
 <div class="app-wrapper">
     <Navbar {navigate} bind:isMenuOpen />
 
-    <main class="relative z-10 min-h-screen pt-24">
+    <main class="relative z-10 min-h-screen pt-[104px]">
         {#key $page.url.pathname}
             <div in:fade={{ duration: 300 }}>
                 {@render children()}

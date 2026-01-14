@@ -8,7 +8,8 @@
     radius = 24,
     variant = "navbar",
     captureBackground = true,
-    class: className = ""
+    class: className = "",
+    children
   } = $props();
 
   let container;
@@ -37,7 +38,7 @@
     }
   };
 
-  const config = variants[variant] || variants.navbar;
+  const config = $derived(variants[variant] || variants.navbar);
 
   onMount(() => {
     if (typeof window === "undefined") return;
@@ -288,7 +289,7 @@
 </script>
 
 <div class="liquid-glass-container {className}" bind:this={container}>
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>
@@ -300,12 +301,5 @@
     overflow: hidden;
     pointer-events: none;
     z-index: 1000;
-  }
-  
-  canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
   }
 </style>

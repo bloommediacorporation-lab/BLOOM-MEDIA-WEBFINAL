@@ -3,7 +3,8 @@
 
   let {
     containerClass = '',
-    class: className = ''
+    class: className = '',
+    children
   } = $props();
 
   let container;
@@ -69,7 +70,7 @@
     <!-- Content container with liquid effect -->
     <div class="liquid-content-wrapper" bind:this={contentContainer}>
       <div class="liquid-content {className}">
-        <slot></slot>
+        {@render children?.()}
       </div>
     </div>
   </div>

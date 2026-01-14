@@ -6,7 +6,6 @@
   // Props pentru personalizare
   export let speed = 0.5;
   export let distortion = 0.6;
-  export let zoom = 1.0;
   export let color = 0xffffff;
 
   let container;
@@ -151,7 +150,7 @@
 </script>
 
 <div class="liquid-container" bind:this={container}>
-  <canvas bind:this={canvas} />
+  <canvas bind:this={canvas}></canvas>
 </div>
 
 <style>

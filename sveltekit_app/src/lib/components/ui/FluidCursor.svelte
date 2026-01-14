@@ -48,21 +48,21 @@
   
   // Internal state
   let config = {
-    SIM_RESOLUTION: simResolution,
-    DYE_RESOLUTION: dyeResolution,
-    CAPTURE_RESOLUTION: captureResolution,
-    DENSITY_DISSIPATION: densityDissipation,
-    VELOCITY_DISSIPATION: velocityDissipation,
-    PRESSURE: pressure,
-    PRESSURE_ITERATIONS: pressureIterations,
-    CURL: curl,
-    SPLAT_RADIUS: splatRadius,
-    SPLAT_FORCE: splatForce,
-    SHADING: shading,
-    COLOR_UPDATE_SPEED: colorUpdateSpeed,
+    SIM_RESOLUTION: 128,
+    DYE_RESOLUTION: 1440,
+    CAPTURE_RESOLUTION: 512,
+    DENSITY_DISSIPATION: 3.5,
+    VELOCITY_DISSIPATION: 2,
+    PRESSURE: 0.1,
+    PRESSURE_ITERATIONS: 20,
+    CURL: 3,
+    SPLAT_RADIUS: 0.2,
+    SPLAT_FORCE: 6000,
+    SHADING: true,
+    COLOR_UPDATE_SPEED: 10,
     PAUSED: false,
-    BACK_COLOR: backColor,
-    TRANSPARENT: transparent,
+    BACK_COLOR: { r: 0.5, g: 0, b: 0 },
+    TRANSPARENT: true,
   };
 
   interface Pointer {
@@ -1437,5 +1437,5 @@
     id="fluid"
     bind:this={canvas}
     class="block h-screen w-screen"
-  />
+  ></canvas>
 </div>

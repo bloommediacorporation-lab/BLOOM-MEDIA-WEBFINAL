@@ -1,24 +1,24 @@
-<script>
+<script lang="ts">
 	import { tv } from "tailwind-variants";
 	import { cn } from "$lib/utils";
 
 	let {
-		class: className,
-		variant,
-		size,
+		'class': className,
+		variant = "default",
+		size = "default",
 		builders = [],
-		type,
+		type = "button",
 		children,
 		...rest
-	} = $props();
-
-	/** @typedef {'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'} Variant */
-	/** @typedef {'default' | 'sm' | 'lg' | 'icon'} Size */
-	/** @typedef {'button' | 'reset' | 'submit'} ButtonType */
-
-	variant = /** @type {Variant} */ (variant ?? "default");
-	size = /** @type {Size} */ (size ?? "default");
-	type = /** @type {ButtonType} */ (type ?? "button");
+	} = $props<{
+		'class'?: string;
+		variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+		size?: 'default' | 'sm' | 'lg' | 'icon';
+		builders?: any[];
+		type?: 'button' | 'reset' | 'submit';
+		children?: any;
+		[key: string]: any;
+	}>();
 
 	const buttonVariants = tv({
 		base: "inline-flex items-center justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",

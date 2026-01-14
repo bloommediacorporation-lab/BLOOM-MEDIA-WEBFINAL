@@ -15,6 +15,7 @@
   class:disabled
   onclick={toggle}
   role="switch"
+  aria-label="Toggle switch"
   aria-checked={checked}
   aria-disabled={disabled}
 >

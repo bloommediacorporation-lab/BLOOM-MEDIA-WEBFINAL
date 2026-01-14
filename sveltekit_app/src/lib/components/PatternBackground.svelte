@@ -6,6 +6,7 @@
     speed = 'normal',
     mask = 'none',
     class: className = '',
+    children,
     ...rest
   } = $props();
 
@@ -27,7 +28,7 @@
   style="--animation-duration: {animationDuration};"
   {...rest}
 >
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>
