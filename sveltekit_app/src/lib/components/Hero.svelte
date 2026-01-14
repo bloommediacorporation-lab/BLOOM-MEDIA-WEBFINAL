@@ -9,6 +9,7 @@
   let isLoaded = $state(false);
   let isVisible = $state(true); // Performance Fix
   let isFinePointer = $state(false); // Performance Fix
+  let isDesktop = $state(false); // Mobile Guard
 
   const smallTitle = "Soluția ta pentru a deveni un magnet pentru clienți";
 
@@ -16,7 +17,7 @@
   // Listen to mouse moves on the entire window and forward them to the canvas
   // This ensures Spline reacts even when hovering over the Navbar or CTA buttons
   function handleGlobalEvent(e) {
-    if (!isFinePointer) return; // Performance Fix
+    if (!isFinePointer || !isDesktop) return; // Performance Fix & Mobile Guard
     if (!canvas || !isVisible) return; // Optimization: Don't process if hidden
     if (e.target === canvas) return; // Canvas already receives these events
 
@@ -61,6 +62,10 @@
   onMount(() => {
     let splineApp;
 
+    // Mobile Guard & Layout Stability
+    const checkIsDesktop = () => window.innerWidth > 1024;
+    isDesktop = checkIsDesktop();
+
     isFinePointer = window.matchMedia?.("(hover: hover) and (pointer: fine)")?.matches ?? false; // Performance Fix
     if (sectionRef) sectionRef.style.minHeight = "100dvh"; // Performance Fix
     if (heroContainer) heroContainer.style.height = "100dvh"; // Performance Fix
@@ -82,39 +87,46 @@
       observer.observe(sectionRef);
     }
 
-    (async () => {
-      if (typeof window === "undefined") return;
-      if (!canvas) return;
+    // Initialize Spline ONLY if Desktop
+    if (isDesktop) {
+      (async () => {
+        if (typeof window === "undefined") return;
+        if (!canvas) return;
 
-      // ALLOW ZOOM ON SCROLL: Remove the wheel event blocking
-      const originalAddEventListener = canvas.addEventListener;
-      canvas.addEventListener = function (type, listener, options) {
-        if (
-          type === "wheel" ||
-          type === "mousewheel" ||
-          type === "DOMMouseScroll"
-        ) {
-          return; // Block Spline from adding scroll listeners
+        // ALLOW ZOOM ON SCROLL: Remove the wheel event blocking
+        const originalAddEventListener = canvas.addEventListener;
+        canvas.addEventListener = function (type, listener, options) {
+          if (
+            type === "wheel" ||
+            type === "mousewheel" ||
+            type === "DOMMouseScroll"
+          ) {
+            return; // Block Spline from adding scroll listeners
+          }
+          return originalAddEventListener.call(this, type, listener, options);
+        };
+
+        try {
+          const { Application } = await import("@splinetool/runtime");
+          splineApp = new Application(canvas);
+          await splineApp.load("/scene.splinecode");
+          isLoaded = true;
+          splineApp.setZoom(0.35);
+
+          // Force multiple resize events to ensure it renders correctly after load
+          const forceResize = () => window.dispatchEvent(new Event("resize"));
+          setTimeout(forceResize, 100);
+          setTimeout(forceResize, 500);
+          setTimeout(forceResize, 1000);
+        } catch (error) {
+          console.error("Spline loading error:", error);
+          isLoaded = true; // Ensure content shows even on error
         }
-        return originalAddEventListener.call(this, type, listener, options);
-      };
-
-      try {
-        const { Application } = await import("@splinetool/runtime");
-        splineApp = new Application(canvas);
-        await splineApp.load("/scene.splinecode");
-        isLoaded = true;
-        splineApp.setZoom(0.35);
-
-        // Force multiple resize events to ensure it renders correctly after load
-        const forceResize = () => window.dispatchEvent(new Event("resize"));
-        setTimeout(forceResize, 100);
-        setTimeout(forceResize, 500);
-        setTimeout(forceResize, 1000);
-      } catch (error) {
-        console.error("Spline loading error:", error);
-      }
-    })();
+      })();
+    } else {
+      // Mobile: Mark as loaded immediately to show content over static image
+      isLoaded = true;
+    }
 
 
     return () => {
@@ -123,10 +135,6 @@
     };
   });
 </script>
-
-<svelte:head>
-  <link rel="preload" href="/scene.splinecode" as="fetch" crossorigin="anonymous">
-</svelte:head>
 
 <svelte:window on:mousemove={handleGlobalEvent} on:pointermove={handleGlobalEvent} />
 
@@ -137,6 +145,14 @@
   bind:this={sectionRef}
   class="hero-section relative min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y"
 >
+  <!-- Fallback Image (Always Present, z-index: 1) -->
+  <img 
+    src="/hero-fallback.webp" 
+    alt="" 
+    class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-screen"
+    style="z-index: 1;"
+  />
+
   <!-- Fallback Gradients (Optional/Subtle) -->
   <div
     class="absolute inset-0 z-0 pointer-events-none opacity-20 mix-blend-soft-light"
@@ -156,22 +172,24 @@
     ></div>
   </div>
 
-  <!-- Spline Background -->
+  <!-- Spline Background (Only on Desktop, z-index: 2) -->
   <div
     bind:this={splineWrapper}
     class="absolute inset-0 transition-opacity duration-700 ease-in-out pointer-events-none"
     class:opacity-0={!isLoaded}
     class:opacity-100={isLoaded}
-    style="z-index: 1 !important; backface-visibility: hidden; transform: translateZ(0);"
+    style="z-index: 2 !important; backface-visibility: hidden; transform: translateZ(0);"
   >
-    <canvas
-      bind:this={canvas}
-      class="pointer-events-auto"
-      style="width: 100%; height: 100%; display: block; transform: translateZ(0);"
-    ></canvas>
+    {#if isDesktop}
+      <canvas
+        bind:this={canvas}
+        class="pointer-events-auto"
+        style="width: 100%; height: 100%; display: block; transform: translateZ(0);"
+      ></canvas>
+    {/if}
   </div>
 
-  <!-- CONTENT -->
+  <!-- CONTENT (z-index: 10) -->
   <div
     bind:this={heroContainer}
     class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-[100dvh] w-full pointer-events-none pb-12 pt-32 md:pt-48"
