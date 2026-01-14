@@ -197,15 +197,21 @@
     ></div>
   </div>
 
-  <!-- Static Mobile Fallback (Performance) -->
-  <div class="absolute inset-0 z-0 block md:hidden pointer-events-none">
+  <!-- Static Mobile Fallback (Performance) - Optimized for mobile -->
+  <div class="fixed inset-0 z-0 block md:hidden pointer-events-none h-[100svh] w-full bg-[#0A0A0A]">
     <img 
       src="/images/hero-mobile-fallback.png" 
       alt="Bloom Media 3D Scene" 
       class="w-full h-full object-cover opacity-80"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      sizes="100vw"
+      srcset="/images/hero-mobile-fallback.png 768w, /images/hero-mobile-fallback.png 1024w"
+      style="object-position: center 30%;"
     />
-    <!-- Gradient Overlay for better text readability -->
-    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
+    <!-- Enhanced Gradient Overlay for better text readability -->
+    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/90"></div>
   </div>
 
   <!-- Spline Background (Only on Desktop, z-index: 2) -->
@@ -233,16 +239,16 @@
   >
     <!-- TOP CONTENT WRAPPER -->
     <div class="flex flex-col items-center w-full">
-      <!-- SECTION LABEL (Integrated) -->
+      <!-- SECTION LABEL (Integrated) - Optimized for mobile -->
       <div
-        class="hero-label mb-6 text-[10px] md:text-xs font-bold tracking-[0.2em] text-white/90 uppercase font-['Inter'] pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+        class="hero-label mb-4 md:mb-6 text-[11px] md:text-xs font-bold tracking-[0.2em] text-white/90 uppercase font-['Inter'] pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2 text-center"
       >
         01 / REVENUE ENGINEERING
       </div>
 
-      <!-- Small Title -->
+      <!-- Small Title - Optimized for mobile -->
       <h2
-        class="hero-subtitle mb-0 text-[clamp(1.2rem,2.25vw,1.8rem)] font-bold font-['Montserrat'] leading-[1.4] tracking-[-0.02em] text-white opacity-100 max-w-3xl pointer-events-none"
+        class="hero-subtitle mb-0 text-[clamp(1.4rem,4vw,2rem)] md:text-[clamp(1.2rem,2.25vw,1.8rem)] font-bold font-['Montserrat'] leading-[1.3] md:leading-[1.4] tracking-[-0.02em] text-white opacity-100 max-w-3xl pointer-events-none px-4 md:px-0"
         style="text-shadow: 0 4px 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.8); -webkit-text-stroke: 0.5px rgba(0,0,0,0.5);"
       >
         {smallTitle}
@@ -256,24 +262,25 @@
       </div>
     </div> -->
 
-    <!-- CTA BUTTON -->
-    <div class="pointer-events-auto relative z-20 mb-8 md:mb-12">
+    <!-- CTA BUTTON - Optimized for mobile -->
+    <div class="pointer-events-auto relative z-20 mb-6 md:mb-12 px-4">
       <a
         href="#contact"
-        class="cta-button inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full text-base md:text-lg font-bold text-black bg-[#fca311]/90 backdrop-blur-sm relative group transition-all duration-300 shadow-[0_0_30px_rgba(252,163,17,0.3)] hover:shadow-[0_0_60px_rgba(252,163,17,0.6)]"
+        class="cta-button inline-flex items-center justify-center gap-2 md:gap-3 px-6 md:px-10 py-4 md:py-5 rounded-full text-sm md:text-base lg:text-lg font-bold text-black bg-[#fca311]/90 backdrop-blur-sm relative group transition-all duration-300 shadow-[0_0_20px_rgba(252,163,17,0.4)] md:shadow-[0_0_30px_rgba(252,163,17,0.3)] hover:shadow-[0_0_40px_rgba(252,163,17,0.6)] active:scale-95 md:active:scale-100 w-full max-w-xs md:max-w-none"
+        style="-webkit-tap-highlight-color: transparent;"
       >
         <span class="relative z-10">Hai să creștem împreună</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="relative z-10 transition-transform group-hover:translate-x-1"
+          class="relative z-10 transition-transform group-hover:translate-x-1 flex-shrink-0"
         >
           <line x1="5" y1="12" x2="19" y2="12"></line>
           <polyline points="12 5 19 12 12 19"></polyline>
