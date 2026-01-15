@@ -211,6 +211,9 @@
         if (typeof localStorage !== 'undefined') {
           localStorage.removeItem('bloom_config');
         }
+        if (result.data?.emailSent === false) {
+          alert('Cererea a fost trimisă, dar emailul nu a putut fi livrat acum.');
+        }
       } else if (result.type === 'failure') {
         alert(result.data?.message || 'Submission failed');
       } else if (result.type === 'error') {
@@ -358,6 +361,7 @@
                     <div class="form-field full-width">
                         <textarea 
                             id="details" 
+                            name="details"
                             class="form-input form-textarea" 
                             placeholder=" " 
                             bind:value={formData.details}

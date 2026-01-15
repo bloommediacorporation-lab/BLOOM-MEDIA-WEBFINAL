@@ -152,7 +152,7 @@
 
       <!-- RIGHT COLUMN: REVENUE ENGINEERING -->
       <div
-        class="comparison-card group bg-gradient-to-br from-[#F59E0B]/5 to-transparent border border-[#F59E0B]/10 p-8 md:p-12 rounded-3xl backdrop-blur-sm transition-all duration-500 hover:from-[#F59E0B]/10 hover:border-[#F59E0B]/20 shadow-[0_0_50px_rgba(245,158,11,0.03)]"
+        class="comparison-card group bg-orange-500/5 border border-orange-500/30 p-8 md:p-12 rounded-3xl backdrop-blur-sm transition-all duration-500 shadow-2xl shadow-orange-500/10 hover:shadow-orange-500/20"
       >
         <div class="flex items-center gap-4 mb-12">
           <div

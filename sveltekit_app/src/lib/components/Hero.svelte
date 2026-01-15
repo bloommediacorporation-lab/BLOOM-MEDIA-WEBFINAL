@@ -1,15 +1,14 @@
 <script>
-  import { onMount } from "svelte";
-  import LoadingScreen from "./LoadingScreen.svelte";
+  import { onMount, tick } from "svelte";
 
   let sectionRef;
   let heroContainer;
   let splineWrapper;
-  let canvas;
+  let canvas = $state(null);
   
   // State
-  let isLoaderDismissed = $state(false); // Controls the fake loader
   let isSplineVisible = $state(false);   // Controls the canvas fade-in
+  let isSplineMounted = $state(false);
   let isDesktop = $state(false);         // Mobile Guard
   let isVisible = $state(true);          // Intersection Observer
   let isFinePointer = $state(false);
@@ -64,15 +63,12 @@
 
   onMount(() => {
     let splineApp;
+    let destroyed = false;
+    let delayId;
 
     // Mobile Guard & Layout Stability
     const checkIsDesktop = () => window.innerWidth > 768;
     isDesktop = checkIsDesktop();
-
-    // Force loader dismiss after 1.2s regardless of Spline
-    setTimeout(() => {
-        isLoaderDismissed = true;
-    }, 1200);
 
     // If Mobile: STOP HERE. No Spline.
     if (!isDesktop) {
@@ -104,30 +100,35 @@
     // Spline Loader Function
     const initSpline = async () => {
         if (typeof window === "undefined") return;
-        if (!canvas) return;
-
-        // ALLOW ZOOM ON SCROLL: Remove the wheel event blocking
-        // Store original method and create wrapper to prevent scroll listeners
-        const originalAddEventListener = canvas.addEventListener;
-        Object.defineProperty(canvas, 'addEventListener', {
-          value: function (type, listener, options) {
-            if (
-              type === "wheel" ||
-              type === "mousewheel" ||
-              type === "DOMMouseScroll"
-            ) {
-              return; // Block Spline from adding scroll listeners
-            }
-            return originalAddEventListener.call(this, type, listener, options);
-          },
-          writable: true,
-          configurable: true
-        });
 
         try {
           const { Application } = await import("@splinetool/runtime");
+          if (destroyed) return;
+
+          isSplineMounted = true;
+          await tick();
+          if (destroyed) return;
+          if (!canvas) return;
+
+          const originalAddEventListener = canvas.addEventListener;
+          Object.defineProperty(canvas, 'addEventListener', {
+            value: function (type, listener, options) {
+              if (
+                type === "wheel" ||
+                type === "mousewheel" ||
+                type === "DOMMouseScroll"
+              ) {
+                return;
+              }
+              return originalAddEventListener.call(this, type, listener, options);
+            },
+            writable: true,
+            configurable: true
+          });
+
           splineApp = new Application(canvas);
           await splineApp.load("/scene.splinecode");
+          if (destroyed) return;
           
           // Once loaded, fade it in
           isSplineVisible = true;
@@ -144,14 +145,13 @@
         }
     };
 
-    // IDLE STRATEGY: Wait for browser idle before loading Spline
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => initSpline());
-    } else {
-        setTimeout(initSpline, 200); // Safari fallback
-    }
+    delayId = setTimeout(() => {
+      void initSpline();
+    }, 2500);
 
     return () => {
+      destroyed = true;
+      if (delayId) clearTimeout(delayId);
       if (splineApp) splineApp.dispose();
       observer.disconnect();
     };
@@ -160,24 +160,12 @@
 
 <svelte:window on:mousemove={handleGlobalEvent} on:pointermove={handleGlobalEvent} />
 
-<!-- Pass isLoaderDismissed to LoadingScreen to trigger exit -->
-<LoadingScreen isSplineLoaded={isLoaderDismissed} />
-
 <section
   id="acasa"
   bind:this={sectionRef}
   class="hero-section relative h-[100svh] md:h-auto md:min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y overscroll-none"
+  style="content-visibility: auto; contain: paint layout;"
 >
-  <!-- Fallback Image (Removed because file is missing) -->
-  <!-- <img 
-    src="/hero-fallback.webp" 
-    alt="Bloom Media Hero Background" 
-    class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-screen"
-    style="z-index: 1;"
-    fetchpriority="high"
-    loading="eager"
-  /> -->
-
   <!-- Fallback Gradients (Optional/Subtle) -->
   <div
     class="absolute inset-0 z-0 pointer-events-none opacity-20 mix-blend-soft-light"
@@ -195,6 +183,21 @@
       class="absolute inset-0"
       style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E&quot;);"
     ></div>
+  </div>
+
+  <!-- Atmospheric Background (Desktop Fallback) -->
+  <div class="absolute inset-0 z-0 hidden md:block w-full h-full bg-black pointer-events-none">
+    <!-- Lava Lamp Effect -->
+    <div 
+        class="absolute inset-0 overflow-hidden transition-opacity duration-1000 will-change-[opacity]"
+        class:opacity-100={!isSplineVisible}
+        class:opacity-0={isSplineVisible}
+    >
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
+    </div>
+    
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/40 to-black"></div>
   </div>
 
   <!-- Static Mobile Fallback (Performance) - Optimized for mobile -->
@@ -215,21 +218,21 @@
   </div>
 
   <!-- Spline Background (Only on Desktop, z-index: 2) -->
-  <div
-    bind:this={splineWrapper}
-    class="absolute inset-0 hidden md:block transition-opacity duration-1000 ease-in-out pointer-events-none"
-    class:opacity-0={!isSplineVisible}
-    class:opacity-100={isSplineVisible}
-    style="z-index: 2 !important; backface-visibility: hidden; transform: translateZ(0);"
-  >
-    {#if isDesktop}
-      <canvas
-        bind:this={canvas}
-        class="pointer-events-auto"
-        style="width: 100% !important; height: 100% !important; display: block; transform: translateZ(0);"
-      ></canvas>
-    {/if}
-  </div>
+  {#if isDesktop && isSplineMounted}
+    <div
+      bind:this={splineWrapper}
+      class="absolute inset-0 hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
+      class:opacity-0={!isSplineVisible}
+      class:opacity-100={isSplineVisible}
+      style="z-index: 2 !important; backface-visibility: hidden; transform: translateZ(0);"
+    >
+        <canvas
+          bind:this={canvas}
+          class="pointer-events-auto"
+          style="width: 100% !important; height: 100% !important; display: block; transform: translateZ(0);"
+        ></canvas>
+    </div>
+  {/if}
 
   <!-- CONTENT (z-index: 10) -->
   <div
@@ -249,7 +252,7 @@
       <!-- Small Title - Optimized for mobile -->
       <h2
         class="hero-subtitle mb-0 text-[clamp(1.4rem,4vw,2rem)] md:text-[clamp(1.2rem,2.25vw,1.8rem)] font-bold font-['Montserrat'] leading-[1.3] md:leading-[1.4] tracking-[-0.02em] text-white opacity-100 max-w-3xl pointer-events-none px-4 md:px-0"
-        style="text-shadow: 0 4px 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.8); -webkit-text-stroke: 0.5px rgba(0,0,0,0.5);"
+        style="text-shadow: 0 4px 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.8); -webkit-text-stroke: 0.5px rgba(0,0,0,0.5); text-rendering: optimizeLegibility;"
       >
         {smallTitle}
       </h2>
@@ -289,4 +292,3 @@
     </div>
   </div>
 </section>
-

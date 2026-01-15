@@ -43,6 +43,7 @@
     "matter-js": "^0.20.0",
     "motion": "^12.23.26",
     "nodemailer": "^7.0.12",
+    "resend": "^6.7.0",
     "sqlite3": "^5.1.7",
     "stripe": "^20.1.0",
     "tailwind-merge": "^3.4.0",
