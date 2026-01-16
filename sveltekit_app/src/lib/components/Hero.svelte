@@ -1,164 +1,103 @@
 <script>
-  import { onMount, tick } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
 
-  let sectionRef;
-  let heroContainer;
-  let splineWrapper;
+  let sectionRef = $state(null);
+  let heroContainer = $state(null);
+  let splineWrapper = $state(null);
   let canvas = $state(null);
-  
-  // State
-  let isSplineVisible = $state(false);   // Controls the canvas fade-in
+
+  let isMobile = $state(false);
+  let isLoading = $state(false);
+  let isSplineVisible = $state(false);
   let isSplineMounted = $state(false);
-  let isDesktop = $state(false);         // Mobile Guard
-  let isVisible = $state(true);          // Intersection Observer
-  let isFinePointer = $state(false);
 
-  const smallTitle = "Soluția ta pentru a deveni un magnet pentru clienți";
+  const heroTitle = "Devino un magnet pentru clienții tăi";
 
-  // GLOBAL MOUSE PROXY:
-  // Listen to mouse moves on the entire window and forward them to the canvas
-  // This ensures Spline reacts even when hovering over the Navbar or CTA buttons
-  function handleGlobalEvent(e) {
-    if (!isFinePointer || !isDesktop) return; // Performance Fix & Mobile Guard
-    if (!canvas || !isVisible) return; // Optimization: Don't process if hidden
-    if (e.target === canvas) return; // Canvas already receives these events
+  let splineApp;
+  let idleId;
+  let timeoutId;
+  let destroyed = false;
 
-    // Forward events to ensure continuous tracking
-    // We need to clone the event properties to create a valid synthetic event
-    const eventProps = {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      detail: e.detail,
-      screenX: e.screenX,
-      screenY: e.screenY,
-      clientX: e.clientX,
-      clientY: e.clientY,
-      ctrlKey: e.ctrlKey,
-      altKey: e.altKey,
-      shiftKey: e.shiftKey,
-      metaKey: e.metaKey,
-      button: e.button,
-      buttons: e.buttons,
-      relatedTarget: canvas, // Pretend the relation is the canvas
-      pointerId: e.pointerId,
-      width: e.width,
-      height: e.height,
-      pressure: e.pressure,
-      tangentialPressure: e.tangentialPressure,
-      tiltX: e.tiltX,
-      tiltY: e.tiltY,
-      twist: e.twist,
-      pointerType: e.pointerType || "mouse",
-      isPrimary: e.isPrimary ?? true,
-    };
+  function detectMobile() {
+    if (typeof window === "undefined") return false;
+    return (
+      window.matchMedia?.("(max-width: 768px)")?.matches ??
+      false
+    ) || ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
+  }
 
-    // Dispatch the corresponding event type
-    if (e.type.startsWith("pointer")) {
-      canvas.dispatchEvent(new PointerEvent(e.type, eventProps));
-    } else if (e.type.startsWith("mouse")) {
-      canvas.dispatchEvent(new MouseEvent(e.type, eventProps));
+  function scheduleIdle(callback) {
+    if (typeof window === "undefined") return;
+
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(callback, { timeout: 2000 });
+      return;
+    }
+
+    timeoutId = setTimeout(callback, 1);
+  }
+
+  function cancelScheduled() {
+    if (idleId && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+      window.cancelIdleCallback(idleId);
+      idleId = undefined;
+    }
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = undefined;
     }
   }
 
   onMount(() => {
-    let splineApp;
-    let destroyed = false;
-    let delayId;
+    if (typeof window === "undefined") return;
 
-    // Mobile Guard & Layout Stability
-    const checkIsDesktop = () => window.innerWidth > 768;
-    isDesktop = checkIsDesktop();
+    isMobile = detectMobile();
+    if (isMobile) return;
 
-    // If Mobile: STOP HERE. No Spline.
-    if (!isDesktop) {
-        return;
-    }
+    isLoading = true;
+    if (sectionRef) sectionRef.style.minHeight = "100dvh";
+    if (heroContainer) heroContainer.style.height = "100dvh";
 
-    // DESKTOP: Continue with lazy loading
-    isFinePointer = window.matchMedia?.("(hover: hover) and (pointer: fine)")?.matches ?? false; 
-    if (sectionRef) sectionRef.style.minHeight = "100dvh"; 
-    if (heroContainer) heroContainer.style.height = "100dvh"; 
+    scheduleIdle(async () => {
+      if (destroyed || isMobile) return;
 
-    // Optimization: IntersectionObserver to pause/hide Spline when out of view
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          isVisible = entry.isIntersecting;
-          if (splineWrapper) {
-            splineWrapper.style.visibility = isVisible ? "visible" : "hidden"; 
-          }
-        });
-      },
-      { threshold: 0 }
-    );
+      isSplineMounted = true;
+      await tick();
+      if (destroyed) return;
+      if (!canvas) return;
 
-    if (sectionRef) {
-      observer.observe(sectionRef);
-    }
+      try {
+        const { Application } = await import("@splinetool/runtime");
+        if (destroyed) return;
 
-    // Spline Loader Function
-    const initSpline = async () => {
-        if (typeof window === "undefined") return;
+        splineApp = new Application(canvas);
 
-        try {
-          const { Application } = await import("@splinetool/runtime");
-          if (destroyed) return;
+await splineApp.load("/scene.splinecode");
+if (destroyed) return;
 
-          isSplineMounted = true;
-          await tick();
-          if (destroyed) return;
-          if (!canvas) return;
+// activează global events DUPĂ ce scena e gata
+if (typeof splineApp.setGlobalEvents === "function") {
+  splineApp.setGlobalEvents(true);
+}
 
-          const originalAddEventListener = canvas.addEventListener;
-          Object.defineProperty(canvas, 'addEventListener', {
-            value: function (type, listener, options) {
-              if (
-                type === "wheel" ||
-                type === "mousewheel" ||
-                type === "DOMMouseScroll"
-              ) {
-                return;
-              }
-              return originalAddEventListener.call(this, type, listener, options);
-            },
-            writable: true,
-            configurable: true
-          });
+splineApp.setZoom(0.35);
+isSplineVisible = true;
+isLoading = false;
+      } catch (error) {
+        if (destroyed) return;
+        isLoading = false;
+        console.error("Spline loading error:", error);
+      }
+    });
+  });
 
-          splineApp = new Application(canvas);
-          await splineApp.load("/scene.splinecode");
-          if (destroyed) return;
-          
-          // Once loaded, fade it in
-          isSplineVisible = true;
-          
-          splineApp.setZoom(0.35);
-
-          // Force multiple resize events to ensure it renders correctly after load
-          const forceResize = () => window.dispatchEvent(new Event("resize"));
-          setTimeout(forceResize, 100);
-          setTimeout(forceResize, 500);
-          setTimeout(forceResize, 1000);
-        } catch (error) {
-          console.error("Spline loading error:", error);
-        }
-    };
-
-    delayId = setTimeout(() => {
-      void initSpline();
-    }, 2500);
-
-    return () => {
-      destroyed = true;
-      if (delayId) clearTimeout(delayId);
-      if (splineApp) splineApp.dispose();
-      observer.disconnect();
-    };
+  onDestroy(() => {
+    destroyed = true;
+    cancelScheduled();
+    splineApp?.dispose?.();
+    splineApp = undefined;
   });
 </script>
-
-<svelte:window on:mousemove={handleGlobalEvent} on:pointermove={handleGlobalEvent} />
 
 <section
   id="acasa"
@@ -185,59 +124,60 @@
     ></div>
   </div>
 
-  <!-- Atmospheric Background (Desktop Fallback) -->
-  <div class="absolute inset-0 z-0 hidden md:block w-full h-full bg-black pointer-events-none">
-    <!-- Lava Lamp Effect -->
-    <div 
-        class="absolute inset-0 overflow-hidden transition-opacity duration-1000 will-change-[opacity]"
-        class:opacity-100={!isSplineVisible}
-        class:opacity-0={isSplineVisible}
-    >
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
-    </div>
-    
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/40 to-black"></div>
-  </div>
-
   <!-- Static Mobile Fallback (Performance) - Optimized for mobile -->
-  <div class="fixed inset-0 z-0 block md:hidden pointer-events-none h-[100svh] w-full bg-[#0A0A0A]">
-    <img 
-      src="/images/hero-mobile-fallback.png" 
-      alt="Bloom Media 3D Scene" 
-      class="w-full h-full object-cover opacity-80"
-      loading="eager"
-      fetchpriority="high"
-      decoding="async"
-      sizes="100vw"
-      srcset="/images/hero-mobile-fallback.png 768w, /images/hero-mobile-fallback.png 1024w"
-      style="object-position: center 30%;"
-    />
-    <!-- Enhanced Gradient Overlay for better text readability -->
-    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/90"></div>
-  </div>
-
-  <!-- Spline Background (Only on Desktop, z-index: 2) -->
-  {#if isDesktop && isSplineMounted}
-    <div
-      bind:this={splineWrapper}
-      class="absolute inset-0 hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
-      class:opacity-0={!isSplineVisible}
-      class:opacity-100={isSplineVisible}
-      style="z-index: 2 !important; backface-visibility: hidden; transform: translateZ(0);"
-    >
-        <canvas
-          bind:this={canvas}
-          class="pointer-events-auto"
-          style="width: 100% !important; height: 100% !important; display: block; transform: translateZ(0);"
-        ></canvas>
+  {#if isMobile}
+    <div class="fixed inset-0 z-0 block md:hidden pointer-events-none h-[100svh] w-full bg-[#0A0A0A]">
+      <img
+        src="/images/hero-mobile-fallback.png"
+        alt="Bloom Media 3D Scene"
+        class="w-full h-full object-cover opacity-80"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        sizes="100vw"
+        srcset="/images/hero-mobile-fallback.png 768w, /images/hero-mobile-fallback.png 1024w"
+        style="object-position: center 30%;"
+      />
+      <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/90"></div>
     </div>
   {/if}
+
+  {#if !isMobile && isLoading}
+    <div class="absolute inset-0 z-0 hidden md:block pointer-events-none">
+      <div class="absolute inset-0 overflow-hidden">
+        <div
+          class="absolute -top-24 -left-24 h-[520px] w-[520px] opacity-70 will-change-transform"
+          style="background: radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.55) 0%, rgba(168, 85, 247, 0.22) 35%, rgba(0,0,0,0) 70%); animation: heroFloat 9s ease-in-out infinite;"
+        ></div>
+        <div
+          class="absolute -bottom-28 -right-28 h-[560px] w-[560px] opacity-65 will-change-transform"
+          style="background: radial-gradient(circle at 60% 55%, rgba(252, 163, 17, 0.55) 0%, rgba(252, 163, 17, 0.2) 35%, rgba(0,0,0,0) 72%); animation: heroFloat2 12s ease-in-out infinite;"
+        ></div>
+      </div>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/30 to-black"></div>
+    </div>
+  {/if}
+
+  <!-- Spline Background (Only on Desktop, z-index: 2) -->
+  {#if !isMobile && isSplineMounted}
+  <div
+    bind:this={splineWrapper}
+    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vh] hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
+    class:opacity-0={!isSplineVisible}
+    class:opacity-100={isSplineVisible}
+    style="z-index: 2; backface-visibility: hidden;"
+  >
+    <canvas
+      bind:this={canvas}
+      class="pointer-events-none w-full h-full block"
+    ></canvas>
+  </div>
+{/if}
 
   <!-- CONTENT (z-index: 10) -->
   <div
     bind:this={heroContainer}
-    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-[100dvh] w-full pointer-events-none pb-12 pt-32 md:pt-48"
+    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-[100dvh] w-full pointer-events-none pb-10 pt-28 md:pt-40"
     aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
   >
     <!-- TOP CONTENT WRAPPER -->
@@ -251,11 +191,11 @@
 
       <!-- Small Title - Optimized for mobile -->
       <h2
-        class="hero-subtitle mb-0 text-[clamp(1.4rem,4vw,2rem)] md:text-[clamp(1.2rem,2.25vw,1.8rem)] font-bold font-['Montserrat'] leading-[1.3] md:leading-[1.4] tracking-[-0.02em] text-white opacity-100 max-w-3xl pointer-events-none px-4 md:px-0"
-        style="text-shadow: 0 4px 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.8); -webkit-text-stroke: 0.5px rgba(0,0,0,0.5); text-rendering: optimizeLegibility;"
-      >
-        {smallTitle}
-      </h2>
+  class="hero-subtitle mt-6 md:mt-10 mb-2 text-[clamp(1.5rem,3.2vw,2.2rem)] md:text-[clamp(1.4rem,2.4vw,2.1rem)] font-bold font-['Montserrat'] leading-[1.2] tracking-[-0.03em] text-white opacity-100 max-w-4xl md:max-w-5xl pointer-events-none px-6 md:px-0"
+  style="text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.8); -webkit-text-stroke: 0.35px rgba(0,0,0,0.45); text-rendering: optimizeLegibility;"
+>
+  {heroTitle}
+</h2>
     </div>
 
     <!-- Main Title: "BLOOM MEDIA" REMOVED -->
@@ -292,3 +232,29 @@
     </div>
   </div>
 </section>
+
+<style>
+  @keyframes heroFloat {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(22px, -18px, 0) scale(1.06);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes heroFloat2 {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(-18px, 20px, 0) scale(1.05);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+</style>

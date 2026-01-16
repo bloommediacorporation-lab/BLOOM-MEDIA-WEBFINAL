@@ -8,6 +8,7 @@ export default defineSchema({
     email: v.string(),
     phone: v.string(),
     selectedServices: v.any(),
-    totalPrice: v.number()
-  })
+    totalPrice: v.number(),
+    createdAt: v.optional(v.number()),  // ← OPTIONAL
+  }),
 });

@@ -92,13 +92,20 @@
   class="bg-[#000100] py-24 md:py-40 relative overflow-hidden font-sans border-t border-white/5"
   bind:this={sectionRef}
 >
-  <!-- Background Accents -->
+   <!-- Background Accents - variantă subtilă, fără blur greu -->
+  <div class="absolute inset-0 pointer-events-none z-0">
   <div
-    class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 blur-[120px] rounded-full pointer-events-none"
+    class="absolute inset-0 opacity-15"
+    style="
+      background:
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(245, 158, 11, 0.10) 0,
+          transparent 55%
+        );
+    "
   ></div>
-  <div
-    class="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F59E0B]/5 blur-[120px] rounded-full pointer-events-none"
-  ></div>
+</div>
 
   <div class="container mx-auto px-6 md:px-12 max-w-7xl relative z-10">
     <div class="mb-16 md:mb-24">
@@ -150,10 +157,10 @@
         </ul>
       </div>
 
-      <!-- RIGHT COLUMN: REVENUE ENGINEERING -->
+           <!-- RIGHT COLUMN: REVENUE ENGINEERING -->
       <div
-        class="comparison-card group bg-orange-500/5 border border-orange-500/30 p-8 md:p-12 rounded-3xl backdrop-blur-sm transition-all duration-500 shadow-2xl shadow-orange-500/10 hover:shadow-orange-500/20"
-      >
+  class="comparison-card group bg-[#0b0704] border border-orange-500/20 p-8 md:p-12 rounded-3xl transition-all duration-500 shadow-[0_0_22px_rgba(252,163,17,0.10)] hover:shadow-[0_0_32px_rgba(252,163,17,0.16)]"
+>
         <div class="flex items-center gap-4 mb-12">
           <div
             class="p-3 rounded-2xl bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B]"

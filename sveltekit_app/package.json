@@ -9,7 +9,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
     "optimize-images": "node optimize-images.js",
-    "convex": "convex dev"
+    "convex": "convex dev",
+    "convex:deploy":"convex deploy"
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "^5.0.0",
