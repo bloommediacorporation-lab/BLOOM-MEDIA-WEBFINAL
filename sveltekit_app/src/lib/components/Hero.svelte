@@ -16,37 +16,15 @@
   let splineApp;
   let idleId;
   let timeoutId;
+  let resizeObserver;
+  let resizeTimeout;
+  let handleResize;
   let destroyed = false;
+  let splineReady = false;
 
-  function detectMobile() {
-    if (typeof window === "undefined") return false;
-    return (
-      window.matchMedia?.("(max-width: 768px)")?.matches ?? false
-    ) || ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
-  }
-
-  function scheduleIdle(callback) {
-    if (typeof window === "undefined") return;
-
-    if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(callback, { timeout: 2000 });
-      return;
-    }
-
-    timeoutId = setTimeout(callback, 1);
-  }
-
-  function cancelScheduled() {
-    if (idleId && typeof window !== "undefined" && "cancelIdleCallback" in window) {
-      window.cancelIdleCallback(idleId);
-      idleId = undefined;
-    }
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      timeoutId = undefined;
-    }
-  }
-
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FIX #1: Previne "e.target.closest is not a function"
+  // ═══════════════════════════════════════════════════════════════════════════
   function installClosestGuards() {
     if (typeof window === "undefined") return;
 
@@ -89,37 +67,140 @@
     }
   }
 
-  // ✅ Funcția care lipsea - asigură dimensiuni valide pentru canvas
-  function ensureCanvasDimensions(canvasEl) {
-    return new Promise((resolve) => {
-      let attempts = 0;
-      const maxAttempts = 20;
-
-      function check() {
-        attempts++;
-        const rect = canvasEl.getBoundingClientRect();
-
-        if (rect.width > 0 && rect.height > 0) {
-          // Setează dimensiunile reale (limitat la 2x pentru performanță)
-          const dpr = Math.min(window.devicePixelRatio || 1, 2);
-          canvasEl.width = Math.floor(rect.width * dpr);
-          canvasEl.height = Math.floor(rect.height * dpr);
-          resolve();
-        } else if (attempts < maxAttempts) {
-          requestAnimationFrame(check);
-        } else {
-          // Fallback - folosește dimensiunile default din HTML
-          console.warn("Canvas dimensions fallback used");
-          resolve();
-        }
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FIX #2: Yield to main thread
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function yieldToMain() {
+    if (
+      typeof globalThis !== "undefined" &&
+      globalThis.scheduler &&
+      typeof globalThis.scheduler.yield === "function"
+    ) {
+      try {
+        await globalThis.scheduler.yield();
+        return;
+      } catch {
+        // Fallback
       }
-
-      check();
-    });
+    }
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FIX #3: Mobile viewport height (previne stretch)
+  // ═══════════════════════════════════════════════════════════════════════════
+  function setVh() {
+    if (typeof window === "undefined") return;
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FIX #4: Canvas sizing - ROBUST
+  // ═══════════════════════════════════════════════════════════════════════════
+  function getWrapperDimensions() {
+    if (!splineWrapper) return { width: 0, height: 0 };
+    
+    const rect = splineWrapper.getBoundingClientRect();
+    const style = getComputedStyle(splineWrapper);
+    
+    if (style.display === "none" || style.visibility === "hidden") {
+      return { width: 0, height: 0 };
+    }
+    
+    return {
+      width: Math.floor(rect.width),
+      height: Math.floor(rect.height)
+    };
+  }
+
+  function syncCanvasToWrapper() {
+    if (!canvas || !splineWrapper) return false;
+    
+    const { width, height } = getWrapperDimensions();
+    if (width < 10 || height < 10) return false;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(1, Math.floor(width * dpr));
+    const h = Math.max(1, Math.floor(height * dpr));
+
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+      
+      if (splineReady && splineApp?.resize) {
+        try {
+          splineApp.resize();
+        } catch (e) {
+          // Ignoră
+        }
+      }
+    }
+
+    return true;
+  }
+
+  async function waitForValidDimensions(maxAttempts = 100) {
+    for (let i = 0; i < maxAttempts; i++) {
+      if (destroyed) return false;
+      
+      const { width, height } = getWrapperDimensions();
+      
+      if (width >= 10 && height >= 10) {
+        syncCanvasToWrapper();
+        return true;
+      }
+      
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    
+    console.warn("Canvas: using fallback dimensions");
+    return false;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // UTILITĂȚI
+  // ═══════════════════════════════════════════════════════════════════════════
+  function detectMobile() {
+    if (typeof window === "undefined") return false;
+    return (
+      window.matchMedia?.("(max-width: 768px)")?.matches ?? false
+    ) || ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
+  }
+
+  function scheduleIdle(callback) {
+    if (typeof window === "undefined") return;
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(callback, { timeout: 3000 });
+      return;
+    }
+    timeoutId = setTimeout(callback, 50);
+  }
+
+  function cancelScheduled() {
+    if (idleId && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+      window.cancelIdleCallback(idleId);
+      idleId = undefined;
+    }
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = undefined;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LIFECYCLE
+  // ═══════════════════════════════════════════════════════════════════════════
   onMount(() => {
     if (typeof window === "undefined") return;
+
+    // FIX MOBILE VIEWPORT
+    setVh();
+    handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(setVh, 150);
+    };
+    window.addEventListener('resize', handleResize);
 
     installClosestGuards();
 
@@ -127,39 +208,79 @@
     if (isMobile) return;
 
     isLoading = true;
-    if (sectionRef) sectionRef.style.minHeight = "100dvh";
-    if (heroContainer) heroContainer.style.height = "100dvh";
+
+    const sceneUrl = "/scene.splinecode";
+    fetch(sceneUrl, { priority: "low" }).catch(() => null);
 
     scheduleIdle(async () => {
       if (destroyed || isMobile) return;
 
       isSplineMounted = true;
       await tick();
-      if (destroyed) return;
-      if (!canvas) return;
+      await yieldToMain();
+      
+      if (destroyed || !canvas || !splineWrapper) return;
 
       try {
-        // ✅ Așteaptă dimensiunile înainte de Spline
-        await ensureCanvasDimensions(canvas);
+        const hasValidSize = await waitForValidDimensions(100);
+        if (destroyed) return;
+
+        if (!hasValidSize) {
+          canvas.width = 1920;
+          canvas.height = 1080;
+        }
+
+        await yieldToMain();
         if (destroyed) return;
 
         const { Application } = await import("@splinetool/runtime");
+        
+        await yieldToMain();
+        if (destroyed) return;
+
+        const { width, height } = getWrapperDimensions();
+        if (width < 10 || height < 10) {
+          await waitForValidDimensions(50);
+        }
+
+        await yieldToMain();
         if (destroyed) return;
 
         splineApp = new Application(canvas);
 
-        await splineApp.load("/scene.splinecode");
+        await yieldToMain();
         if (destroyed) return;
 
-        // ✅ IMPORTANT: activează global events pentru urmărirea cursorului
-        // Aceasta permite personajelor să urmărească mouse-ul
+        await splineApp.load(sceneUrl);
+        
+        if (destroyed) return;
+
+        splineReady = true;
+
         if (typeof splineApp.setGlobalEvents === "function") {
           splineApp.setGlobalEvents(true);
         }
 
+        resizeObserver = new ResizeObserver(() => {
+          if (destroyed || !splineReady) return;
+          requestAnimationFrame(() => {
+            if (!destroyed && splineReady) {
+              syncCanvasToWrapper();
+            }
+          });
+        });
+        
+        if (splineWrapper) {
+          resizeObserver.observe(splineWrapper);
+        }
+
+        await yieldToMain();
+        syncCanvasToWrapper();
+
         splineApp.setZoom(0.35);
         isSplineVisible = true;
         isLoading = false;
+
       } catch (error) {
         if (destroyed) return;
         isLoading = false;
@@ -170,7 +291,16 @@
 
   onDestroy(() => {
     destroyed = true;
+    splineReady = false;
     cancelScheduled();
+    clearTimeout(resizeTimeout);
+    
+    if (typeof window !== "undefined" && handleResize) {
+      window.removeEventListener('resize', handleResize);
+    }
+    
+    resizeObserver?.disconnect?.();
+    resizeObserver = undefined;
     splineApp?.dispose?.();
     splineApp = undefined;
   });
@@ -179,8 +309,8 @@
 <section
   id="acasa"
   bind:this={sectionRef}
-  class="hero-section relative h-[100svh] md:h-auto md:min-h-[100dvh] -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y overscroll-none"
-  style="content-visibility: auto; contain: paint layout;"
+  class="hero-section relative -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y overscroll-none"
+  style="height: calc(var(--vh, 1vh) * 100);"
 >
   <!-- Fallback Gradients (Optional/Subtle) -->
   <div
@@ -202,22 +332,19 @@
   </div>
 
   <!-- Static Mobile Fallback (Performance) - Optimized for mobile -->
-  {#if isMobile}
-    <div class="fixed inset-0 z-0 block md:hidden pointer-events-none h-[100svh] w-full bg-[#0A0A0A]">
-      <img
-        src="/images/hero-mobile-fallback.png"
-        alt="Bloom Media 3D Scene"
-        class="w-full h-full object-cover opacity-80"
-        loading="eager"
-        fetchpriority="high"
-        decoding="async"
-        sizes="100vw"
-        srcset="/images/hero-mobile-fallback.png 768w, /images/hero-mobile-fallback.png 1024w"
-        style="object-position: center 30%;"
-      />
-      <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/90"></div>
-    </div>
-  {/if}
+{#if isMobile}
+  <div class="absolute inset-0 z-0 pointer-events-none w-full bg-[#0A0A0A]">
+    <img
+      src="/images/hero-mobile-fallback.webp"
+      alt="Bloom Media 3D Scene"
+      class="w-full h-full object-cover object-center opacity-80"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80"></div>
+  </div>
+{/if}
 
   <!-- Loading State with Animated Gradients -->
   {#if !isMobile && isLoading}
@@ -257,8 +384,9 @@
 
   <!-- CONTENT (z-index: 10) -->
   <div
-    bind:this={heroContainer}
-    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between h-[100dvh] w-full pointer-events-none pb-10 pt-28 md:pt-40"
+  bind:this={heroContainer}
+  class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between w-full pointer-events-none pb-10 pt-28 md:pt-40"
+  style="height: calc(var(--vh, 1vh) * 100);"
     aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
   >
     <!-- TOP CONTENT WRAPPER -->
