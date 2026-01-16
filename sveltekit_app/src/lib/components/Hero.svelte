@@ -86,15 +86,22 @@
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // FIX #3: Mobile viewport height (previne stretch)
-  // ═══════════════════════════════════════════════════════════════════════════
-  function setVh() {
-    if (typeof window === "undefined") return;
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
+ // ═══════════════════════════════════════════════════════════════════════════
+// FIX #3: Mobile viewport height (previne stretch) - VERSIUNE ÎMBUNĂTĂȚITĂ
+// ═══════════════════════════════════════════════════════════════════════════
+let initialVhSet = false;
 
+function setVh() {
+  if (typeof window === "undefined") return;
+  
+  // Pe mobil, setează --vh DOAR O SINGURĂ DATĂ
+  // Asta previne "jump"-ul când address bar apare/dispare
+  if (isMobile && initialVhSet) return;
+  
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+  initialVhSet = true;
+}
   // ═══════════════════════════════════════════════════════════════════════════
   // FIX #4: Canvas sizing - ROBUST
   // ═══════════════════════════════════════════════════════════════════════════
@@ -192,20 +199,28 @@
   // LIFECYCLE
   // ═══════════════════════════════════════════════════════════════════════════
   onMount(() => {
-    if (typeof window === "undefined") return;
+  if (typeof window === "undefined") return;
 
-    // FIX MOBILE VIEWPORT
-    setVh();
-    handleResize = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(setVh, 150);
-    };
-    window.addEventListener('resize', handleResize);
+  // Detectează mobil ÎNAINTE de setVh
+  isMobile = detectMobile();
 
-    installClosestGuards();
-
-    isMobile = detectMobile();
+  // FIX MOBILE VIEWPORT
+  setVh();
+  
+  handleResize = () => {
+    // Pe mobil, NU recalcula --vh (previne stretch)
     if (isMobile) return;
+    
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(setVh, 150);
+  };
+  window.addEventListener('resize', handleResize);
+
+  installClosestGuards();
+
+  if (isMobile) return;
+
+  // ... restul codului rămâne la fel ...
 
     isLoading = true;
 
@@ -337,7 +352,8 @@
     <img
       src="/images/hero-mobile-fallback.webp"
       alt="Bloom Media 3D Scene"
-      class="w-full h-full object-cover object-center opacity-80"
+      class="w-full h-full object-cover opacity-80"
+      style="object-position: 57% center;"
       loading="eager"
       fetchpriority="high"
       decoding="async"
