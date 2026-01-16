@@ -21,8 +21,7 @@
   function detectMobile() {
     if (typeof window === "undefined") return false;
     return (
-      window.matchMedia?.("(max-width: 768px)")?.matches ??
-      false
+      window.matchMedia?.("(max-width: 768px)")?.matches ?? false
     ) || ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
   }
 
@@ -48,8 +47,81 @@
     }
   }
 
+  function installClosestGuards() {
+    if (typeof window === "undefined") return;
+
+    const noopClosest = () => null;
+
+    if (typeof Window !== "undefined" && !("closest" in Window.prototype)) {
+      Object.defineProperty(Window.prototype, "closest", {
+        value: noopClosest,
+        configurable: true,
+        writable: true
+      });
+    }
+
+    if (typeof Document !== "undefined" && !("closest" in Document.prototype)) {
+      Object.defineProperty(Document.prototype, "closest", {
+        value: noopClosest,
+        configurable: true,
+        writable: true
+      });
+    }
+
+    if (typeof Text !== "undefined" && !("closest" in Text.prototype)) {
+      Object.defineProperty(Text.prototype, "closest", {
+        value: function (selector) {
+          return this.parentElement?.closest?.(selector) ?? null;
+        },
+        configurable: true,
+        writable: true
+      });
+    }
+
+    if (typeof Comment !== "undefined" && !("closest" in Comment.prototype)) {
+      Object.defineProperty(Comment.prototype, "closest", {
+        value: function (selector) {
+          return this.parentElement?.closest?.(selector) ?? null;
+        },
+        configurable: true,
+        writable: true
+      });
+    }
+  }
+
+  // ✅ Funcția care lipsea - asigură dimensiuni valide pentru canvas
+  function ensureCanvasDimensions(canvasEl) {
+    return new Promise((resolve) => {
+      let attempts = 0;
+      const maxAttempts = 20;
+
+      function check() {
+        attempts++;
+        const rect = canvasEl.getBoundingClientRect();
+
+        if (rect.width > 0 && rect.height > 0) {
+          // Setează dimensiunile reale (limitat la 2x pentru performanță)
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvasEl.width = Math.floor(rect.width * dpr);
+          canvasEl.height = Math.floor(rect.height * dpr);
+          resolve();
+        } else if (attempts < maxAttempts) {
+          requestAnimationFrame(check);
+        } else {
+          // Fallback - folosește dimensiunile default din HTML
+          console.warn("Canvas dimensions fallback used");
+          resolve();
+        }
+      }
+
+      check();
+    });
+  }
+
   onMount(() => {
     if (typeof window === "undefined") return;
+
+    installClosestGuards();
 
     isMobile = detectMobile();
     if (isMobile) return;
@@ -67,22 +139,27 @@
       if (!canvas) return;
 
       try {
+        // ✅ Așteaptă dimensiunile înainte de Spline
+        await ensureCanvasDimensions(canvas);
+        if (destroyed) return;
+
         const { Application } = await import("@splinetool/runtime");
         if (destroyed) return;
 
         splineApp = new Application(canvas);
 
-await splineApp.load("/scene.splinecode");
-if (destroyed) return;
+        await splineApp.load("/scene.splinecode");
+        if (destroyed) return;
 
-// activează global events DUPĂ ce scena e gata
-if (typeof splineApp.setGlobalEvents === "function") {
-  splineApp.setGlobalEvents(true);
-}
+        // ✅ IMPORTANT: activează global events pentru urmărirea cursorului
+        // Aceasta permite personajelor să urmărească mouse-ul
+        if (typeof splineApp.setGlobalEvents === "function") {
+          splineApp.setGlobalEvents(true);
+        }
 
-splineApp.setZoom(0.35);
-isSplineVisible = true;
-isLoading = false;
+        splineApp.setZoom(0.35);
+        isSplineVisible = true;
+        isLoading = false;
       } catch (error) {
         if (destroyed) return;
         isLoading = false;
@@ -142,6 +219,7 @@ isLoading = false;
     </div>
   {/if}
 
+  <!-- Loading State with Animated Gradients -->
   {#if !isMobile && isLoading}
     <div class="absolute inset-0 z-0 hidden md:block pointer-events-none">
       <div class="absolute inset-0 overflow-hidden">
@@ -160,19 +238,22 @@ isLoading = false;
 
   <!-- Spline Background (Only on Desktop, z-index: 2) -->
   {#if !isMobile && isSplineMounted}
-  <div
-    bind:this={splineWrapper}
-    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vh] hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
-    class:opacity-0={!isSplineVisible}
-    class:opacity-100={isSplineVisible}
-    style="z-index: 2; backface-visibility: hidden;"
-  >
-    <canvas
-      bind:this={canvas}
-      class="pointer-events-none w-full h-full block"
-    ></canvas>
-  </div>
-{/if}
+    <div
+      bind:this={splineWrapper}
+      class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vh] hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
+      class:opacity-0={!isSplineVisible}
+      class:opacity-100={isSplineVisible}
+      style="z-index: 2; backface-visibility: hidden;"
+    >
+      <!-- ✅ Canvas cu dimensiuni default pentru WebGL -->
+      <canvas
+        bind:this={canvas}
+        width="1920"
+        height="1080"
+        class="pointer-events-none w-full h-full block"
+      ></canvas>
+    </div>
+  {/if}
 
   <!-- CONTENT (z-index: 10) -->
   <div
@@ -182,30 +263,23 @@ isLoading = false;
   >
     <!-- TOP CONTENT WRAPPER -->
     <div class="flex flex-col items-center w-full">
-      <!-- SECTION LABEL (Integrated) - Optimized for mobile -->
+      <!-- SECTION LABEL -->
       <div
         class="hero-label mb-4 md:mb-6 text-[11px] md:text-xs font-bold tracking-[0.2em] text-white/90 uppercase font-['Inter'] pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2 text-center"
       >
         01 / REVENUE ENGINEERING
       </div>
 
-      <!-- Small Title - Optimized for mobile -->
+      <!-- Small Title -->
       <h2
-  class="hero-subtitle mt-6 md:mt-10 mb-2 text-[clamp(1.5rem,3.2vw,2.2rem)] md:text-[clamp(1.4rem,2.4vw,2.1rem)] font-bold font-['Montserrat'] leading-[1.2] tracking-[-0.03em] text-white opacity-100 max-w-4xl md:max-w-5xl pointer-events-none px-6 md:px-0"
-  style="text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.8); -webkit-text-stroke: 0.35px rgba(0,0,0,0.45); text-rendering: optimizeLegibility;"
->
-  {heroTitle}
-</h2>
+        class="hero-subtitle mt-6 md:mt-10 mb-2 text-[clamp(1.5rem,3.2vw,2.2rem)] md:text-[clamp(1.4rem,2.4vw,2.1rem)] font-bold font-['Montserrat'] leading-[1.2] tracking-[-0.03em] text-white opacity-100 max-w-4xl md:max-w-5xl pointer-events-none px-6 md:px-0"
+        style="text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.8); -webkit-text-stroke: 0.35px rgba(0,0,0,0.45); text-rendering: optimizeLegibility;"
+      >
+        {heroTitle}
+      </h2>
     </div>
 
-    <!-- Main Title: "BLOOM MEDIA" REMOVED -->
-    <!-- <div class="mb-10 flex justify-center w-full px-2 md:px-4 relative z-20 pointer-events-none">
-      <div class="hero-pill-text pointer-events-none">
-        {mainTitle}
-      </div>
-    </div> -->
-
-    <!-- CTA BUTTON - Optimized for mobile -->
+    <!-- CTA BUTTON -->
     <div class="pointer-events-auto relative z-20 mb-6 md:mb-12 px-4">
       <a
         href="#contact"

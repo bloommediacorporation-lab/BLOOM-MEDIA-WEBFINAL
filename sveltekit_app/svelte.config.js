@@ -38,19 +38,7 @@ const config = {
 		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter({ runtime: 'nodejs20.x' }),
-		alias: {},
-		csp: {
-			mode: 'auto',
-			directives: {
-				'default-src': ['self'],
-				'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'blob:', 'https://cdn.emailjs.com', 'https://cdn.jsdelivr.net', 'https://unpkg.com', 'https://www.gstatic.com'],
-				'worker-src': ['self', 'blob:', 'https://unpkg.com'],
-				'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com', 'https://cdn.jsdelivr.net'],
-				'font-src': ['self', 'https://fonts.gstatic.com'],
-				'img-src': ['self', 'data:', 'blob:', 'https:', 'https://i.postimg.cc'],
-				'connect-src': ['self', 'https://api.emailjs.com', 'http://localhost:5000', 'https://unpkg.com', 'https://prod.spline.design', 'https://www.gstatic.com']
-			}
-		}
+		alias: {}
 	},
     preprocess: vitePreprocess()
 };

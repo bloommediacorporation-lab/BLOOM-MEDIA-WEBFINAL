@@ -33,6 +33,48 @@
     onMount(() => {
         if (typeof window === "undefined") return;
 
+        const installClosestGuards = () => {
+            const noopClosest = () => null;
+
+            if (typeof Window !== "undefined" && !("closest" in Window.prototype)) {
+                Object.defineProperty(Window.prototype, "closest", {
+                    value: noopClosest,
+                    configurable: true,
+                    writable: true,
+                });
+            }
+
+            if (typeof Document !== "undefined" && !("closest" in Document.prototype)) {
+                Object.defineProperty(Document.prototype, "closest", {
+                    value: noopClosest,
+                    configurable: true,
+                    writable: true,
+                });
+            }
+
+            if (typeof Text !== "undefined" && !("closest" in Text.prototype)) {
+                Object.defineProperty(Text.prototype, "closest", {
+                    value: function (selector) {
+                        return this.parentElement?.closest?.(selector) ?? null;
+                    },
+                    configurable: true,
+                    writable: true,
+                });
+            }
+
+            if (typeof Comment !== "undefined" && !("closest" in Comment.prototype)) {
+                Object.defineProperty(Comment.prototype, "closest", {
+                    value: function (selector) {
+                        return this.parentElement?.closest?.(selector) ?? null;
+                    },
+                    configurable: true,
+                    writable: true,
+                });
+            }
+        };
+
+        installClosestGuards();
+
         // Optimization: Detect mobile to disable heavy effects
         const checkMobile = () => {
             isMobile = window.matchMedia('(max-width: 768px)').matches || 

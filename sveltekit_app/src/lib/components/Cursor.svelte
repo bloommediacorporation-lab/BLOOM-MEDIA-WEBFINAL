@@ -17,6 +17,15 @@
     let mouseX = -100;
     let mouseY = -100;
 
+    // ✅ Helper function pentru a verifica dacă target are .closest()
+    function getClosestInteractive(target) {
+      // Verifică dacă target este valid și are metoda closest
+      if (!target || typeof target.closest !== 'function') {
+        return null;
+      }
+      return target.closest('a, button, [data-cursor], input[type="submit"], .clickable');
+    }
+
     const moveCursor = (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
@@ -37,7 +46,8 @@
     };
 
     const handleMouseEnter = (e) => {
-      const target = e.target.closest('a, button, [data-cursor], input[type="submit"], .clickable');
+      // ✅ Folosește helper function
+      const target = getClosestInteractive(e.target);
       if (target) {
         isHovering = true;
         gsap.to(ring, {
@@ -55,7 +65,8 @@
     };
 
     const handleMouseLeave = (e) => {
-      const target = e.target.closest('a, button, [data-cursor], input[type="submit"], .clickable');
+      // ✅ Folosește helper function
+      const target = getClosestInteractive(e.target);
       if (target) {
         isHovering = false;
         gsap.to(ring, {
