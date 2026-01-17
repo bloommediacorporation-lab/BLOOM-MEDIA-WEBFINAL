@@ -2,7 +2,40 @@
 <html lang="ro" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script>
+  // Initialize the dataLayer
+  window.dataLayer = window.dataLayer || [];
+
+  // Create the gtag function that pushes to the dataLayer
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  // Set consent defaults
+  gtag('consent', 'default', {
+    analytics_storage: localStorage.getItem('silktideCookieChoice_analytics') === 'true' ? 'granted' : 'denied',
+    ad_storage: localStorage.getItem('silktideCookieChoice_marketing') === 'true' ? 'granted' : 'denied',
+    ad_user_data: localStorage.getItem('silktideCookieChoice_marketing') === 'true' ? 'granted' : 'denied',
+    ad_personalization: localStorage.getItem('silktideCookieChoice_marketing') === 'true' ? 'granted' : 'denied',
+    functionality_storage: localStorage.getItem('silktideCookieChoice_necessary') === 'true' ? 'granted' : 'denied',
+    security_storage: localStorage.getItem('silktideCookieChoice_necessary') === 'true' ? 'granted' : 'denied'
+  });
+</script>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-THRM454W');
+    </script>
+    <!-- End Google Tag Manager -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Bloom Media - agenție de marketing digital și automatizare. Creștere accelerată, rezultate măsurabile, soluții premium." />
     <meta name="theme-color" content="#080808" />
     <meta property="og:title" content="Bloom Media - Marketing Digital & Automatizare" />
@@ -13,30 +46,76 @@
     <!-- Preconnect to font services for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
     <!-- Font loading with swap strategy to prevent CLS -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <script>
-      (function () {
-        if (typeof window === 'undefined') return;
-
-        window.silktideCookieBannerManager = window.silktideCookieBannerManager || {};
-        window.silktideCookieBannerManager.init =
-          window.silktideCookieBannerManager.init || function () {};
-        window.silktideCookieBannerManager.initCookieBanner =
-          window.silktideCookieBannerManager.initCookieBanner || function () {};
-        window.silktideCookieBannerManager.updateCookieBannerConfig =
-          window.silktideCookieBannerManager.updateCookieBannerConfig || function () {};
-        window.silktideCookieBannerManager.injectScript =
-          window.silktideCookieBannerManager.injectScript || function () {};
-
-        var silktideCookieBannerManager = window.silktideCookieBannerManager;
-        void silktideCookieBannerManager;
-      })();
+    <link rel="preload" as="image" href="/images/hero-mobile-fallback.webp" media="(max-width: 768px)" />
+    <link rel="stylesheet" id="silktide-consent-manager-css" href="/cookie-banner/silktide-consent-manager.css" />
+    <script src="/cookie-banner/silktide-consent-manager.js" defer></script>
+    <script type="module">
+      if (!globalThis.silktideCookieBannerManager?.updateCookieBannerConfig) return;
+      silktideCookieBannerManager.updateCookieBannerConfig({
+        background: { showBackground: true },
+        cookieIcon: { position: 'bottomLeft' },
+        cookieTypes: [
+          {
+            id: 'necessary',
+            name: 'Necesare',
+            description:
+              '<p>Aceste cookie-uri sunt necesare pentru funcționarea corectă a site-ului și nu pot fi dezactivate. Ele ajută la lucruri precum securitatea și setările de confidențialitate.</p>',
+            required: true,
+          },
+          {
+            id: 'analytics',
+            name: 'Analitice',
+            description:
+              '<p>Aceste cookie-uri ne ajută să îmbunătățim site-ul prin măsurarea traficului și înțelegerea modului în care vizitatorii îl folosesc.</p>',
+            required: false,
+          },
+          {
+            id: 'advertising',
+            name: 'Marketing',
+            description:
+              '<p>Aceste cookie-uri pot fi folosite pentru personalizare și marketing, inclusiv pentru a măsura performanța campaniilor.</p>',
+            required: false,
+          },
+        ],
+        text: {
+          banner: {
+            description:
+              '<p>Folosim cookie-uri pentru a îmbunătăți experiența pe site, pentru analiză și pentru personalizare. <a href="/privacy" target="_blank" rel="noopener noreferrer">Politica de confidențialitate</a>.</p>',
+            acceptAllButtonText: 'Acceptă toate',
+            acceptAllButtonAccessibleLabel: 'Acceptă toate cookie-urile',
+            rejectNonEssentialButtonText: 'Respinge non-esențiale',
+            rejectNonEssentialButtonAccessibleLabel: 'Respinge cookie-urile non-esențiale',
+            preferencesButtonText: 'Preferințe',
+            preferencesButtonAccessibleLabel: 'Deschide preferințe',
+          },
+          preferences: {
+            title: 'Preferințe cookie',
+            description:
+              '<p>Poți alege ce tipuri de cookie-uri permiți. Preferințele tale se aplică pe întregul site.</p>',
+            creditLinkText: 'Get this banner for free',
+            creditLinkAccessibleLabel: 'Get this banner for free',
+          },
+        },
+        position: { banner: 'bottomLeft' },
+      });
     </script>
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
     %sveltekit.head%
   </head>
   <body class="antialiased" data-sveltekit-preload-data="hover">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-THRM454W"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

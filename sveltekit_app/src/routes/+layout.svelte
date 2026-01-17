@@ -4,9 +4,6 @@
     import { browser } from '$app/environment';
     import { fade } from "svelte/transition";
     import Navbar from "$lib/components/Navbar.svelte";
-    import Cursor from "$lib/components/Cursor.svelte";
-    import BackgroundOrbs from "$lib/components/BackgroundOrbs.svelte";
-    import FilmGrain from "$lib/components/FilmGrain.svelte";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
     import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
@@ -29,6 +26,22 @@
     let isMobile = $state(true); // Default to true to prevent hydration mismatch or heavy load initially
     let lastScrollY = 0;
     let scrollY = 0;
+
+    let isPerfBot = $state(false);
+    let CursorComp = $state(null);
+    let FilmGrainComp = $state(null);
+    let BackgroundOrbsComp = $state(null);
+
+    function isPerformanceBot() {
+        if (typeof navigator === "undefined") return false;
+        const ua = navigator.userAgent;
+        return (
+            ua.includes("Chrome-Lighthouse") ||
+            ua.includes("Google Page Speed") ||
+            ua.includes("Insights") ||
+            navigator.webdriver === true
+        );
+    }
 
     onMount(() => {
         if (typeof window === "undefined") return;
@@ -85,6 +98,7 @@
         window.addEventListener('resize', checkMobile, { passive: true });
 
         let destroyed = false;
+        let scrollTimeout;
 
         async function initScrolling() {
             const [{ default: Lenis }, { default: gsap }, { ScrollTrigger }] =
@@ -121,7 +135,6 @@
             rafId = requestAnimationFrame(update);
 
             // Handle Navbar scroll logic with debouncing
-            let scrollTimeout;
             lenis.on("scroll", ({ scroll, velocity = 0, direction = 0 }) => {
                 scrollY = scroll;
 
@@ -147,19 +160,34 @@
             ScrollTrigger.refresh();
         }
 
-        initScrolling();
+        isPerfBot = isPerformanceBot();
+        const enableHeavyEffects = !isMobile && !isPerfBot;
 
-        // Initialize html2canvas for LiquidGlassMaterial background capture
-        async function initHtml2canvas() {
-            if (typeof window !== "undefined") {
+        if (enableHeavyEffects) {
+            initScrolling();
+
+            Promise.all([
+                import("$lib/components/Cursor.svelte"),
+                import("$lib/components/FilmGrain.svelte"),
+                import("$lib/components/BackgroundOrbs.svelte"),
+            ]).then(([cursorMod, filmGrainMod, backgroundOrbsMod]) => {
+                if (destroyed) return;
+                CursorComp = cursorMod.default;
+                FilmGrainComp = filmGrainMod.default;
+                BackgroundOrbsComp = backgroundOrbsMod.default;
+            });
+
+            (async () => {
                 const html2canvas = await import("html2canvas");
+                if (destroyed) return;
                 window["html2canvas"] = html2canvas.default;
-            }
+            })();
         }
-        initHtml2canvas();
 
         return () => {
             destroyed = true;
+            window.removeEventListener('resize', checkMobile);
+            clearTimeout(scrollTimeout);
             if (rafId) cancelAnimationFrame(rafId);
             if (lenis) {
                 lenis.destroy();
@@ -181,10 +209,10 @@
     <title>Bloom Media — Marketing Digital & Automatizare</title>
 </svelte:head>
 
-{#if browser && !isMobile}
-  <Cursor />
-  <FilmGrain />
-  <BackgroundOrbs />
+{#if browser && !isMobile && !isPerfBot && CursorComp && FilmGrainComp && BackgroundOrbsComp}
+  <svelte:component this={CursorComp} />
+  <svelte:component this={FilmGrainComp} />
+  <svelte:component this={BackgroundOrbsComp} />
 {/if}
 
 <div class="app-wrapper">

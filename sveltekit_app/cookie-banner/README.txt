@@ -28,7 +28,7 @@ silktideCookieBannerManager.updateCookieBannerConfig({
       id: "analytics",
       name: "Analytics",
       description: "<p>These cookies help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>",
-      defaultValue: true,
+      required: false,
       onAccept: function() {
         gtag('consent', 'update', {
           analytics_storage: 'granted',
@@ -47,6 +47,7 @@ silktideCookieBannerManager.updateCookieBannerConfig({
       id: "advertising",
       name: "Advertising",
       description: "<p>These cookies provide extra features and personalization to improve your experience. They may be set by us or by partners whose services we use.</p>",
+      required: false,
       onAccept: function() {
         gtag('consent', 'update', {
           ad_storage: 'granted',
