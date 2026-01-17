@@ -69,17 +69,26 @@
     <link rel="preload" as="image" href="/images/hero-mobile-fallback.webp" media="(max-width: 768px)" />
     
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
-    <style>
-  /* Fix cursor în bannerul Cookiebot – funcționează 100% */
+ <style>
+  /* 1. Fix pentru Bannerul Mare (inițial) */
   #CybotCookiebotDialog,
   #CybotCookiebotDialog * {
     cursor: auto !important;
   }
 
-  /* Opțional: cursorul tău custom revine la hover peste butoane */
+  /* 2. Fix pentru Fereastra Mică (cea din screenshot) */
+  #CookiebotWidget,
+  #CookiebotWidget * {
+    cursor: auto !important;
+  }
+
+  /* 3. Efecte hover: cursorul tău custom revine pe butoane (Premium feel) */
+  /* Butoane Banner Mare */
   #CybotCookiebotDialogBodyLevelButtonAccept:hover,
   #CybotCookiebotDialogBodyButtonSettings:hover,
-  #CybotCookiebotDialogBodyLevelButtonDecline:hover {
+  #CybotCookiebotDialogBodyLevelButtonDecline:hover,
+  /* Butoane Fereastra Mică */
+  #CookiebotWidget .CookiebotWidget-btn:hover {
     cursor: none !important;
   }
 </style>
