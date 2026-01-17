@@ -2,93 +2,77 @@
 <html lang="ro" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- 1. Google Consent Mode v2 Defaults -->
-    <!-- Este recomandat să rămână aici pentru a preveni "race conditions" înainte să se încarce GTM -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PASUL 1: Google Consent Mode v2 - TREBUIE SĂ FIE PRIMUL SCRIPT -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
       
-      // Setăm totul pe 'denied' implicit. 
-      // Cookiebot din GTM va actualiza asta automat la 'granted' după accept.
+      // Default: totul denied până la consimțământ
       gtag('consent', 'default', {
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
         'ad_personalization': 'denied',
         'analytics_storage': 'denied',
-        'functionality_storage': 'granted', // De obicei necesare
+        'functionality_storage': 'granted',
         'security_storage': 'granted',
         'wait_for_update': 500
       });
       
-      // Redactare date ads pentru privacy
       gtag('set', 'ads_data_redaction', true);
     </script>
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND98V20SJ5"></script>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PASUL 2: Cookiebot Banner - TREBUIE SĂ FIE ÎNAINTE DE GTM       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <script 
+      id="Cookiebot" 
+      src="https://consent.cookiebot.com/uc.js" 
+      data-cbid="c4162480-9dd0-4d9a-9d64-3527d2289375"
+      data-blockingmode="auto"
+      type="text/javascript"
+    ></script>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PASUL 3: Google Tag Manager                                     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <script>
-      gtag('js', new Date());
-      gtag('config', 'G-ND98V20SJ5');
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-THRM454W');
     </script>
 
-    <!-- Meta Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1584394466084944');
-      fbq('track', 'PageView');
-    </script>
-    <!-- End Meta Pixel Code -->
-
-    <!-- 2. Google Tag Manager -->
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : '';
-        j.async = true;
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, 'script', 'dataLayer', 'GTM-THRM454W');
-    </script>
-    <!-- End Google Tag Manager -->
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- META TAGS & FONTS                                               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <meta name="description" content="Bloom Media - agenție de marketing digital și automatizare. Creștere accelerată, rezultate măsurabile, soluții premium." />
     <meta name="theme-color" content="#080808" />
     
-    <!-- Open Graph / Meta Tags -->
     <meta property="og:title" content="Bloom Media - Marketing Digital & Automatizare" />
     <meta property="og:description" content="Transformăm viziunea ta în realitate digitală. Marketing inteligent, automatizare avansată, rezultate măsurabile." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/og-image.jpg" />
     <meta property="og:locale" content="ro_RO" />
     
-    <!-- Preconnect pentru performanță -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-    <!-- Preconnect pentru Cookiebot (ajută să se încarce bannerul mai repede via GTM) -->
-    <link rel="preconnect" href="https://consent.cookiebot.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://consent.cookiebot.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="preload" as="image" href="/images/hero-mobile-fallback.webp" media="(max-width: 768px)" />
     
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
     %sveltekit.head%
   </head>
+  
   <body class="antialiased" data-sveltekit-preload-data="hover">
-    <!-- Google Tag Manager (noscript) -->
+    <!-- GTM noscript fallback -->
     <noscript>
       <iframe
         src="https://www.googletagmanager.com/ns.html?id=GTM-THRM454W"
@@ -97,8 +81,8 @@
         style="display: none; visibility: hidden"
       ></iframe>
     </noscript>
-    <!-- End Google Tag Manager (noscript) -->
 
+    <!-- Facebook Pixel noscript fallback -->
     <noscript>
       <img
         height="1"
