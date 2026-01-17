@@ -1,19 +1,5 @@
 <!doctype html>
 <html lang="ro" class="scroll-smooth">
-  <style>
-  /* FIX CURSOR în bannerul Cookiebot - pentru Svelte */
-  #CybotCookiebotDialog *,
-  #CybotCookiebotDialogBodyLevelButtonAccept,
-  #CybotCookiebotDialogBodyButtonSettings {
-    cursor: auto !important;
-  }
-
-  /* Opțional: dacă vrei să revină cursorul tău custom la hover peste butoane */
-  #CybotCookiebotDialogBodyLevelButtonAccept:hover,
-  #CybotCookiebotDialogBodyButtonSettings:hover {
-    cursor: none !important;
-  }
-</style>
 </head>
   <head>
     <meta charset="UTF-8" />
@@ -83,6 +69,21 @@
     <link rel="preload" as="image" href="/images/hero-mobile-fallback.webp" media="(max-width: 768px)" />
     
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+    <style>
+  /* Fix cursor în bannerul Cookiebot – funcționează 100% */
+  #CybotCookiebotDialog,
+  #CybotCookiebotDialog * {
+    cursor: auto !important;
+  }
+
+  /* Opțional: cursorul tău custom revine la hover peste butoane */
+  #CybotCookiebotDialogBodyLevelButtonAccept:hover,
+  #CybotCookiebotDialogBodyButtonSettings:hover,
+  #CybotCookiebotDialogBodyLevelButtonDecline:hover {
+    cursor: none !important;
+  }
+</style>
+
     %sveltekit.head%
   </head>
   
