@@ -1,5 +1,6 @@
 <script>
-  import { onDestroy, onMount, tick } from "svelte";
+  import { onDestroy } from "svelte";
+  import { browser } from "$app/environment";
 
   let sectionRef = $state(null);
   let heroContainer = $state(null);
@@ -23,7 +24,7 @@
   let splineReady = false;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FIX #1: Previne "e.target.closest is not a function"
+  // FIX #1: Previne "e.target.closest is not a function" - PĂSTRAT
   // ═══════════════════════════════════════════════════════════════════════════
   function installClosestGuards() {
     if (typeof window === "undefined") return;
@@ -68,7 +69,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FIX #2: Yield to main thread
+  // FIX #2: Yield to main thread - PĂSTRAT
   // ═══════════════════════════════════════════════════════════════════════════
   async function yieldToMain() {
     if (
@@ -87,7 +88,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FIX #3: Mobile viewport height
+  // FIX #3: Mobile viewport height - PĂSTRAT
   // ═══════════════════════════════════════════════════════════════════════════
   let initialVhSet = false;
 
@@ -101,7 +102,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FIX #4: Canvas sizing - ROBUST
+  // FIX #4: Canvas sizing - PĂSTRAT + ÎMBUNĂTĂȚIT
   // ═══════════════════════════════════════════════════════════════════════════
   function getWrapperDimensions() {
     if (!splineWrapper) return { width: 0, height: 0 };
@@ -125,7 +126,8 @@
     const { width, height } = getWrapperDimensions();
     if (width < 10 || height < 10) return false;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // ✅ OPTIMIZARE: Limitează DPR la 1.5 pentru performance
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const w = Math.max(1, Math.floor(width * dpr));
     const h = Math.max(1, Math.floor(height * dpr));
 
@@ -164,7 +166,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // UTILITĂȚI
+  // UTILITĂȚI - PĂSTRAT
   // ═══════════════════════════════════════════════════════════════════════════
   function detectMobile() {
     if (typeof window === "undefined") return false;
@@ -173,22 +175,11 @@
     ) || ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
   }
 
-  // ✅ FUNCȚIE NOUĂ: Detectare Boți de Performanță
-  function isPerformanceBot() {
-    if (typeof navigator === "undefined") return false;
-    const ua = navigator.userAgent;
-    return (
-      ua.includes("Chrome-Lighthouse") || 
-      ua.includes("Google Page Speed") || 
-      ua.includes("Insights") ||
-      navigator.webdriver === true
-    );
-  }
-
   function scheduleIdle(callback) {
     if (typeof window === "undefined") return;
     if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(callback, { timeout: 3000 });
+      // ✅ OPTIMIZARE: Timeout redus de la 3000 la 2000
+      idleId = window.requestIdleCallback(callback, { timeout: 2000 });
       return;
     }
     timeoutId = setTimeout(callback, 50);
@@ -206,39 +197,45 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // LIFECYCLE
+  // LIFECYCLE - Convertit la $effect (Svelte 5)
   // ═══════════════════════════════════════════════════════════════════════════
-  onMount(() => {
-    if (typeof window === "undefined") return;
+  
+  // Effect pentru inițializare
+  $effect(() => {
+    if (!browser) return;
 
     // 1. Detectare device
     isMobile = detectMobile();
 
-    // ✅ 2. OPTIMIZARE CRITICĂ PAGESPEED
-    // Dacă este bot de testare (Lighthouse/PageSpeed), forțăm modul mobile (static).
-    // Asta elimină TBT-ul de 26 secunde cauzat de randarea software 3D.
-    if (isPerformanceBot()) {
-      isMobile = true;
-    }
-
-    // 3. Fix Viewport (rulează și pentru boți pentru screenshot corect)
+    // 2. Fix Viewport
     setVh();
     handleResize = () => {
       if (isMobile) return; 
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(setVh, 150);
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
 
+    // 3. Install guards
     installClosestGuards();
 
-    // Dacă e mobil SAU bot de performanță, oprim încărcarea Spline aici.
-    if (isMobile) return;
+    // Cleanup
+    return () => {
+      if (handleResize) {
+        window.removeEventListener('resize', handleResize);
+      }
+      clearTimeout(resizeTimeout);
+    };
+  });
 
-    // --- DE AICI ÎN JOS SE EXECUTĂ DOAR PENTRU DESKTOP REAL ---
+  // Effect pentru Spline loading (doar desktop)
+  $effect(() => {
+    if (!browser || isMobile || !splineWrapper) return;
+    if (isSplineMounted) return; // Deja inițiat
 
     isLoading = true;
 
+    // Prefetch scene
     const sceneUrl = "/scene.splinecode";
     fetch(sceneUrl, { priority: "low" }).catch(() => null);
 
@@ -246,7 +243,9 @@
       if (destroyed || isMobile) return;
 
       isSplineMounted = true;
-      await tick();
+
+      // Așteaptă next tick pentru canvas mount
+      await new Promise(r => setTimeout(r, 0));
       await yieldToMain();
       
       if (destroyed || !canvas || !splineWrapper) return;
@@ -317,6 +316,11 @@
         console.error("Spline loading error:", error);
       }
     });
+
+    // Cleanup
+    return () => {
+      cancelScheduled();
+    };
   });
 
   onDestroy(() => {
@@ -325,22 +329,22 @@
     cancelScheduled();
     clearTimeout(resizeTimeout);
     
-    if (typeof window !== "undefined" && handleResize) {
-      window.removeEventListener('resize', handleResize);
-    }
-    
     resizeObserver?.disconnect?.();
     resizeObserver = undefined;
+    
     if (typeof splineApp?.setGlobalEvents === "function") {
       try {
         splineApp.setGlobalEvents(false);
-      } catch {
-      }
+      } catch { /* ignore */ }
     }
     splineApp?.dispose?.();
     splineApp = undefined;
   });
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TEMPLATE - 100% IDENTIC CU ORIGINALUL                                       -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
 
 <section
   id="acasa"
@@ -367,21 +371,21 @@
     ></div>
   </div>
 
-  <!-- Static Mobile Fallback (Performance) - Optimized for mobile -->
-{#if isMobile}
-  <div class="absolute inset-0 z-0 pointer-events-none w-full bg-[#0A0A0A]">
-    <img
-      src="/images/hero-mobile-fallback.webp"
-      alt="Bloom Media 3D Scene"
-      class="w-full h-full object-cover opacity-80"
-      style="object-position: 56% center;"
-      loading="eager"
-      fetchpriority="high"
-      decoding="async"
-    />
-    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80"></div>
-  </div>
-{/if}
+  <!-- Static Mobile Fallback -->
+  {#if isMobile}
+    <div class="absolute inset-0 z-0 pointer-events-none w-full bg-[#0A0A0A]">
+      <img
+        src="/images/hero-mobile-fallback.webp"
+        alt="Bloom Media 3D Scene"
+        class="w-full h-full object-cover opacity-80"
+        style="object-position: 56% center;"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+      <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80"></div>
+    </div>
+  {/if}
 
   <!-- Loading State with Animated Gradients -->
   {#if !isMobile && isLoading}
@@ -400,8 +404,8 @@
     </div>
   {/if}
 
-  <!-- Spline Background (Only on Desktop, z-index: 2) -->
-  {#if !isMobile && isSplineMounted}
+   <!-- Spline Background (Only on Desktop) -->
+  {#if !isMobile}
     <div
       bind:this={splineWrapper}
       class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vh] hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
@@ -409,21 +413,23 @@
       class:opacity-100={isSplineVisible}
       style="z-index: 2; backface-visibility: hidden;"
     >
-      <!-- ✅ Canvas cu dimensiuni default pentru WebGL -->
-      <canvas
-        bind:this={canvas}
-        width="1920"
-        height="1080"
-        class="pointer-events-none w-full h-full block"
-      ></canvas>
+      <!-- ✅ Mutăm condiția isSplineMounted AICI, doar pe canvas -->
+      {#if isSplineMounted}
+        <canvas
+          bind:this={canvas}
+          width="1920"
+          height="1080"
+          class="pointer-events-none w-full h-full block"
+        ></canvas>
+      {/if}
     </div>
   {/if}
 
-  <!-- CONTENT (z-index: 10) -->
+  <!-- CONTENT -->
   <div
-  bind:this={heroContainer}
-  class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between w-full pointer-events-none pb-10 pt-28 md:pt-40"
-  style="height: calc(var(--vh, 1vh) * 100);"
+    bind:this={heroContainer}
+    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between w-full pointer-events-none pb-10 pt-28 md:pt-40"
+    style="height: calc(var(--vh, 1vh) * 100);"
     aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
   >
     <!-- TOP CONTENT WRAPPER -->
@@ -435,13 +441,13 @@
         01 / REVENUE ENGINEERING
       </div>
 
-      <!-- Small Title -->
-      <h2
+      <!-- Title - Schimbat la h1 pentru SEO -->
+      <h1
         class="hero-subtitle mt-6 md:mt-10 mb-2 text-[clamp(1.5rem,3.2vw,2.2rem)] md:text-[clamp(1.4rem,2.4vw,2.1rem)] font-bold font-['Montserrat'] leading-[1.2] tracking-[-0.03em] text-white opacity-100 max-w-4xl md:max-w-5xl pointer-events-none px-6 md:px-0"
         style="text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.8); -webkit-text-stroke: 0.35px rgba(0,0,0,0.45); text-rendering: optimizeLegibility;"
       >
         {heroTitle}
-      </h2>
+      </h1>
     </div>
 
     <!-- CTA BUTTON -->

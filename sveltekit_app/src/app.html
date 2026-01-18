@@ -1,18 +1,24 @@
 <!doctype html>
 <html lang="ro" class="scroll-smooth">
-</head>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- PASUL 1: Google Consent Mode v2 - TREBUIE SĂ FIE PRIMUL SCRIPT -->
-    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PRECONNECTS FIRST -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://consent.cookiebot.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    
+    <!-- META TAGS -->
+    <meta name="description" content="Bloom Media - agenție de marketing digital și automatizare." />
+    <meta name="theme-color" content="#080808" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+    
+    <!-- CONSENT DEFAULTS - PRIMUL SCRIPT -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
-      
-      // Default: totul denied până la consimțământ
       gtag('consent', 'default', {
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
@@ -22,13 +28,13 @@
         'security_storage': 'granted',
         'wait_for_update': 500
       });
-      
       gtag('set', 'ads_data_redaction', true);
     </script>
 
-    <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- PASUL 2: Cookiebot Banner - TREBUIE SĂ FIE ÎNAINTE DE GTM       -->
-    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- 
+      COOKIEBOT - FĂRĂ ASYNC (blocking) 
+      Sacrifice ~300-500ms pentru 100% GDPR compliance
+    -->
     <script 
       id="Cookiebot" 
       src="https://consent.cookiebot.com/uc.js" 
@@ -37,86 +43,47 @@
       type="text/javascript"
     ></script>
 
-    <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- PASUL 3: Google Tag Manager                                     -->
-    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- GTM - ASYNC (nu blocking, dar după Cookiebot) -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-THRM454W"></script>
     <script>
-      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-THRM454W');
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
     </script>
 
-    <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- META TAGS & FONTS                                               -->
-    <!-- ═══════════════════════════════════════════════════════════════ -->
-    <meta name="description" content="Bloom Media - agenție de marketing digital și automatizare. Creștere accelerată, rezultate măsurabile, soluții premium." />
-    <meta name="theme-color" content="#080808" />
-    
-    <meta property="og:title" content="Bloom Media - Marketing Digital & Automatizare" />
-    <meta property="og:description" content="Transformăm viziunea ta în realitate digitală. Marketing inteligent, automatizare avansată, rezultate măsurabile." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="/og-image.jpg" />
-    <meta property="og:locale" content="ro_RO" />
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://consent.cookiebot.com" crossorigin />
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="preload" as="image" href="/images/hero-mobile-fallback.webp" media="(max-width: 768px)" />
-    
-    <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
- <style>
-  /* 1. Fix pentru Bannerul Mare (inițial) */
-  #CybotCookiebotDialog,
-  #CybotCookiebotDialog * {
-    cursor: auto !important;
-  }
+    <!-- FONTS - NON-BLOCKING -->
+    <link 
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" 
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    </noscript>
 
-  /* 2. Fix pentru Fereastra Mică (cea din screenshot) */
-  #CookiebotWidget,
-  #CookiebotWidget * {
-    cursor: auto !important;
-  }
-
-  /* 3. Efecte hover: cursorul tău custom revine pe butoane (Premium feel) */
-  /* Butoane Banner Mare */
-  #CybotCookiebotDialogBodyLevelButtonAccept:hover,
-  #CybotCookiebotDialogBodyButtonSettings:hover,
-  #CybotCookiebotDialogBodyLevelButtonDecline:hover,
-  /* Butoane Fereastra Mică */
-  #CookiebotWidget .CookiebotWidget-btn:hover {
-    cursor: none !important;
-  }
-</style>
+    <!-- HERO PRELOAD -->
+    <link rel="preload" as="image" href="/images/hero-mobile-fallback.webp" media="(max-width: 768px)" type="image/webp" />
+    
+    <style>
+      #CybotCookiebotDialog, #CybotCookiebotDialog * { cursor: auto !important; }
+      #CookiebotWidget, #CookiebotWidget * { cursor: auto !important; }
+      #CybotCookiebotDialogBodyLevelButtonAccept:hover,
+      #CybotCookiebotDialogBodyButtonSettings:hover,
+      #CybotCookiebotDialogBodyLevelButtonDecline:hover,
+      #CookiebotWidget .CookiebotWidget-btn:hover { cursor: none !important; }
+      html { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    </style>
 
     %sveltekit.head%
   </head>
   
   <body class="antialiased" data-sveltekit-preload-data="hover">
-    <!-- GTM noscript fallback -->
     <noscript>
-      <iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-THRM454W"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-THRM454W" height="0" width="0" style="display:none;visibility:hidden" title="GTM"></iframe>
     </noscript>
-
-    <!-- Facebook Pixel noscript fallback -->
     <noscript>
-      <img
-        height="1"
-        width="1"
-        style="display:none"
-        src="https://www.facebook.com/tr?id=1584394466084944&ev=PageView&noscript=1"
-      />
+      <img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1584394466084944&ev=PageView&noscript=1" />
     </noscript>
-    
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

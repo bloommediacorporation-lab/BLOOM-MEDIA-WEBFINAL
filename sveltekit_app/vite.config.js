@@ -1,55 +1,97 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import path from 'path';
 
 export default defineConfig({
-	plugins: [
-		sveltekit(),
-	],
+	plugins: [sveltekit()],
+	
 	server: {
-        port: 5174,
-        fs: {
-            allow: ['..']
-        }
-    },
-    resolve: {
-        alias: {
-            // '@legacy': path.resolve('../src'),
-            // '$lib': path.resolve('../src/lib')
-        }
-    },
-    ssr: {
-        noExternal: ['gsap']
-    },
+		port: 5174,
+		fs: {
+			allow: ['..']
+		}
+	},
+
+	ssr: {
+		noExternal: ['gsap']
+	},
+
 	build: {
-		// Optimize build output
+		target: 'esnext',
+		
 		minify: 'terser',
 		terserOptions: {
 			compress: {
 				drop_console: true,
 				drop_debugger: true,
+				passes: 2,
+				pure_funcs: ['console.log', 'console.info', 'console.debug']
 			},
+			mangle: {
+				safari10: true
+			},
+			format: {
+				comments: false
+			}
 		},
-		// Code splitting for better caching
+
 		rollupOptions: {
 			output: {
-				manualChunks: {
-					// 'gsap': ['gsap'],
-					// 'lenis': ['@studio-freight/lenis'],
-					// 'vendor': ['motion', 'lucide-svelte'],
-				},
-			},
+				manualChunks: (id) => {
+					if (
+						id.includes('@splinetool') || 
+						id.includes('three') ||
+						id.includes('troika')
+					) {
+						return 'spline-vendor';
+					}
+
+					if (id.includes('gsap')) {
+						return 'gsap-vendor';
+					}
+
+					if (
+						id.includes('lenis') || 
+						id.includes('@studio-freight')
+					) {
+						return 'scroll-vendor';
+					}
+
+					if (id.includes('@threlte')) {
+						return 'threlte-vendor';
+					}
+
+					if (id.includes('matter-js') || id.includes('matter')) {
+						return 'physics-vendor';
+					}
+
+					if (id.includes('html2canvas')) {
+						return 'canvas-vendor';
+					}
+
+					if (id.includes('motion') || id.includes('framer-motion')) {
+						return 'motion-vendor';
+					}
+
+					if (id.includes('lucide')) {
+						return 'icons-vendor';
+					}
+
+					return undefined;
+				}
+			}
 		},
-		// Reduce chunk size warnings
+
 		chunkSizeWarningLimit: 1000,
-		// Enable source maps for production debugging
 		sourcemap: false,
-		// CSS code splitting
-		cssCodeSplit: true,
+		cssCodeSplit: true
 	},
-	// Optimize dependencies
+
 	optimizeDeps: {
-		include: ['gsap', '@studio-freight/lenis', 'motion', '@splinetool/runtime'],
-		exclude: ['@sveltejs/kit'],
+		include: ['gsap', '@studio-freight/lenis'],
+		exclude: ['@sveltejs/kit', '@splinetool/runtime']
 	},
+
+	esbuild: {
+		legalComments: 'none'
+	}
 });

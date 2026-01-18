@@ -1,70 +1,78 @@
 <script>
   import Hero from '$lib/components/Hero.svelte';
-  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
 
   function navigate(path) {
-      goto(path);
+    goto(path);
   }
 
   let belowFoldMarker = $state(null);
-  let restReady = $state(false);
+  let isLoading = $state(false);
+  
+  // ✅ Toate componentele într-un singur obiect
+  let components = $state({
+    ComparisonSection: null,
+    ServicesShowcase: null,
+    ProcessTimeline: null,
+    Services: null,
+    FAQ: null,
+    Contact: null,
+    Footer: null
+  });
 
-  let ComparisonSectionComp = $state(null);
-  let ServicesShowcaseComp = $state(null);
-  let ProcessTimelineComp = $state(null);
-  let ServicesComp = $state(null);
-  let FAQComp = $state(null);
-  let ContactComp = $state(null);
-  let FooterComp = $state(null);
+  // ✅ Derived state
+  let restReady = $derived(Object.values(components).every(Boolean));
 
   async function loadBelowFold() {
-    if (restReady) return;
+    if (restReady || isLoading) return;
+    isLoading = true;
 
-    const [
-      comparisonMod,
-      servicesShowcaseMod,
-      processTimelineMod,
-      servicesMod,
-      faqMod,
-      contactMod,
-      footerMod
-    ] = await Promise.all([
-      import('$lib/components/ComparisonSection.svelte'),
-      import('$lib/components/ServicesShowcase.svelte'),
-      import('$lib/components/ProcessTimeline.svelte'),
-      import('$lib/components/Services.svelte'),
-      import('$lib/components/FAQ.svelte'),
-      import('$lib/components/Contact.svelte'),
-      import('$lib/components/Footer.svelte')
-    ]);
+    try {
+      const modules = await Promise.all([
+        import('$lib/components/ComparisonSection.svelte'),
+        import('$lib/components/ServicesShowcase.svelte'),
+        import('$lib/components/ProcessTimeline.svelte'),
+        import('$lib/components/Services.svelte'),
+        import('$lib/components/FAQ.svelte'),
+        import('$lib/components/Contact.svelte'),
+        import('$lib/components/Footer.svelte')
+      ]);
 
-    ComparisonSectionComp = comparisonMod.default;
-    ServicesShowcaseComp = servicesShowcaseMod.default;
-    ProcessTimelineComp = processTimelineMod.default;
-    ServicesComp = servicesMod.default;
-    FAQComp = faqMod.default;
-    ContactComp = contactMod.default;
-    FooterComp = footerMod.default;
-    restReady = true;
+      // ✅ Destructuring curat
+      [
+        components.ComparisonSection,
+        components.ServicesShowcase,
+        components.ProcessTimeline,
+        components.Services,
+        components.FAQ,
+        components.Contact,
+        components.Footer
+      ] = modules.map(m => m.default);
+      
+    } catch (error) {
+      console.error('Failed to load components:', error);
+      isLoading = false;
+    }
   }
 
-  onMount(() => {
-    if (typeof window === 'undefined') return;
+  $effect(() => {
+    if (!browser || restReady || !belowFoldMarker) return;
 
-    if (!belowFoldMarker) {
-      void loadBelowFold();
+    const rect = belowFoldMarker.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 600) {
+      loadBelowFold();
       return;
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
+        if (entries.some(e => e.isIntersecting)) {
           observer.disconnect();
-          void loadBelowFold();
+          loadBelowFold();
         }
       },
-      { rootMargin: '800px 0px' }
+      { rootMargin: '600px 0px' }
     );
 
     observer.observe(belowFoldMarker);
@@ -72,25 +80,28 @@
   });
 </script>
 
-<!-- Main Content Wrapper -->
-<!-- Z-index 10 ensures it sits above the fixed footer (-10) -->
-<!-- Background color is crucial to hide footer until reveal -->
 <div class="relative z-10 bg-[#050505] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
   <Hero />
-
-  <div bind:this={belowFoldMarker} style="height: 1px;"></div>
+  
+  <div bind:this={belowFoldMarker} class="h-px -mt-px" aria-hidden="true"></div>
 
   {#if restReady}
-    <svelte:component this={ComparisonSectionComp} />
-    <svelte:component this={ServicesShowcaseComp} />
-    <svelte:component this={ProcessTimelineComp} />
-    <svelte:component this={ServicesComp} {navigate} />
-    <svelte:component this={FAQComp} />
-    <svelte:component this={ContactComp} />
+    {@const C = components}
+    <C.ComparisonSection />
+    <C.ServicesShowcase />
+    <C.ProcessTimeline />
+    <C.Services {navigate} />
+    <C.FAQ />
+    <C.Contact />
+  {:else if isLoading}
+    <div class="min-h-screen flex items-center justify-center">
+      <div class="loading-spinner"></div>
+    </div>
   {/if}
 </div>
 
-<!-- Footer with Reveal Effect (Fixed behind content) -->
 {#if restReady}
-  <svelte:component this={FooterComp} reveal={true} />
+  <components.Footer reveal={true} />
+{:else}
+  <footer class="h-[200px] bg-[#050505]" aria-hidden="true"></footer>
 {/if}

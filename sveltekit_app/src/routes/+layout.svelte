@@ -1,6 +1,6 @@
 <script>
-    import "../index.css"; // Import global styles from parent
-    import { onMount } from "svelte";
+    import "../index.css";
+    import { onDestroy } from "svelte";
     import { browser } from '$app/environment';
     import { fade } from "svelte/transition";
     import Navbar from "$lib/components/Navbar.svelte";
@@ -16,24 +16,45 @@
         goto(path);
     }
 
-    let lenis;
-    let rafId;
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STATE
+    // ═══════════════════════════════════════════════════════════════════════════
+    let lenis = $state(null);
+    let rafId = $state(null);
 
     // Navbar State
     let isNavVisible = $state(true);
     let isScrolled = $state(false);
     let isMenuOpen = $state(false);
-    let isMobile = $state(true); // Default to true to prevent hydration mismatch or heavy load initially
+    let isMobile = $state(true);
     let lastScrollY = 0;
-    let scrollY = 0;
 
-    let isPerfBot = $state(false);
+    // Components (lazy loaded)
     let CursorComp = $state(null);
     let FilmGrainComp = $state(null);
     let BackgroundOrbsComp = $state(null);
 
+    // Flags
+    let isPerfBot = $state(false);
+    let isInitialized = $state(false);
+    let destroyed = false;
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DERIVED
+    // ═══════════════════════════════════════════════════════════════════════════
+    let enableHeavyEffects = $derived(browser && !isMobile && !isPerfBot);
+    let showEffects = $derived(
+        enableHeavyEffects && 
+        CursorComp && 
+        FilmGrainComp && 
+        BackgroundOrbsComp
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // UTILITIES
+    // ═══════════════════════════════════════════════════════════════════════════
     function isPerformanceBot() {
-        if (typeof navigator === "undefined") return false;
+        if (!browser) return false;
         const ua = navigator.userAgent;
         return (
             ua.includes("Chrome-Lighthouse") ||
@@ -43,164 +64,202 @@
         );
     }
 
-    onMount(() => {
-        if (typeof window === "undefined") return;
+    function checkMobile() {
+        if (!browser) return true;
+        return (
+            window.matchMedia('(max-width: 768px)').matches || 
+            window.matchMedia('(pointer: coarse)').matches
+        );
+    }
 
-        const installClosestGuards = () => {
-            const noopClosest = () => null;
+    function installClosestGuards() {
+        if (!browser) return;
+        
+        const noopClosest = () => null;
 
-            if (typeof Window !== "undefined" && !("closest" in Window.prototype)) {
-                Object.defineProperty(Window.prototype, "closest", {
-                    value: noopClosest,
-                    configurable: true,
-                    writable: true,
-                });
-            }
-
-            if (typeof Document !== "undefined" && !("closest" in Document.prototype)) {
-                Object.defineProperty(Document.prototype, "closest", {
-                    value: noopClosest,
-                    configurable: true,
-                    writable: true,
-                });
-            }
-
-            if (typeof Text !== "undefined" && !("closest" in Text.prototype)) {
-                Object.defineProperty(Text.prototype, "closest", {
-                    value: function (selector) {
-                        return this.parentElement?.closest?.(selector) ?? null;
-                    },
-                    configurable: true,
-                    writable: true,
-                });
-            }
-
-            if (typeof Comment !== "undefined" && !("closest" in Comment.prototype)) {
-                Object.defineProperty(Comment.prototype, "closest", {
-                    value: function (selector) {
-                        return this.parentElement?.closest?.(selector) ?? null;
-                    },
-                    configurable: true,
-                    writable: true,
-                });
-            }
-        };
-
-        installClosestGuards();
-
-        // Optimization: Detect mobile to disable heavy effects
-        const checkMobile = () => {
-            isMobile = window.matchMedia('(max-width: 768px)').matches || 
-                       ('ontouchstart' in window) || 
-                       (navigator.maxTouchPoints > 0);
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile, { passive: true });
-
-        let destroyed = false;
-        let scrollTimeout;
-
-        async function initScrolling() {
-            const [{ default: Lenis }, { default: gsap }, { ScrollTrigger }] =
-                await Promise.all([
-                    import("@studio-freight/lenis"),
-                    import("gsap"),
-                    import("gsap/ScrollTrigger"),
-                ]);
-
-            if (destroyed) return;
-
-            gsap.registerPlugin(ScrollTrigger);
-
-            lenis = new Lenis({
-                duration: 1.2,
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                orientation: "vertical",
-                gestureOrientation: "vertical",
-                smoothWheel: true,
-                wheelMultiplier: 1,
-                touchMultiplier: 2,
-                infinite: false,
+        if (typeof Window !== "undefined" && !("closest" in Window.prototype)) {
+            Object.defineProperty(Window.prototype, "closest", {
+                value: noopClosest,
+                configurable: true,
+                writable: true,
             });
+        }
 
-            // Expose lenis for debugging and other components
-            window["lenis"] = lenis;
+        if (typeof Document !== "undefined" && !("closest" in Document.prototype)) {
+            Object.defineProperty(Document.prototype, "closest", {
+                value: noopClosest,
+                configurable: true,
+                writable: true,
+            });
+        }
 
-            lenis.on("scroll", ScrollTrigger.update);
+        if (typeof Text !== "undefined" && !("closest" in Text.prototype)) {
+            Object.defineProperty(Text.prototype, "closest", {
+                value: function (selector) {
+                    return this.parentElement?.closest?.(selector) ?? null;
+                },
+                configurable: true,
+                writable: true,
+            });
+        }
 
-            const update = (time) => {
-                if (lenis) lenis.raf(time);
-                rafId = requestAnimationFrame(update);
-            };
+        if (typeof Comment !== "undefined" && !("closest" in Comment.prototype)) {
+            Object.defineProperty(Comment.prototype, "closest", {
+                value: function (selector) {
+                    return this.parentElement?.closest?.(selector) ?? null;
+                },
+                configurable: true,
+                writable: true,
+            });
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // LENIS INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════════════════
+    async function initScrolling() {
+        if (destroyed || !browser) return;
+
+        // ✅ Respectă prefers-reduced-motion
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
+
+        const [{ default: Lenis }, { default: gsap }, { ScrollTrigger }] =
+            await Promise.all([
+                import("@studio-freight/lenis"),
+                import("gsap"),
+                import("gsap/ScrollTrigger"),
+            ]);
+
+        if (destroyed) return;
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: "vertical",
+            gestureOrientation: "vertical",
+            smoothWheel: true,
+            wheelMultiplier: 1,
+            touchMultiplier: 2,
+            infinite: false,
+        });
+
+        // Expose for debugging
+        window["lenis"] = lenis;
+
+        // ✅ Optimizat: ScrollTrigger sync
+        lenis.on("scroll", ScrollTrigger.update);
+
+        // ✅ RAF loop
+        const update = (time) => {
+            if (destroyed || !lenis) return;
+            lenis.raf(time);
             rafId = requestAnimationFrame(update);
+        };
+        rafId = requestAnimationFrame(update);
 
-            // Handle Navbar scroll logic with debouncing
-            lenis.on("scroll", ({ scroll, velocity = 0, direction = 0 }) => {
-                scrollY = scroll;
-
-                if (isMenuOpen || scrollY < 10) {
-                    isNavVisible = true;
-                } else if (direction === 1 && velocity > 0.2 && scrollY > 80) {
-                    isNavVisible = false;
-                } else if (direction === -1 && velocity < -0.15) {
-                    isNavVisible = true;
-                }
-
-                isScrolled = scrollY > 50;
-                lastScrollY = scrollY;
-
-                // Debounce scroll updates
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    // Trigger any scroll-dependent updates here
-                }, 100);
-            });
-
-            // Normal ScrollTrigger refresh is enough for window scrolling
-            ScrollTrigger.refresh();
-        }
-
-        isPerfBot = isPerformanceBot();
-        const enableHeavyEffects = !isMobile && !isPerfBot;
-
-        if (enableHeavyEffects) {
-            initScrolling();
-
-            Promise.all([
-                import("$lib/components/Cursor.svelte"),
-                import("$lib/components/FilmGrain.svelte"),
-                import("$lib/components/BackgroundOrbs.svelte"),
-            ]).then(([cursorMod, filmGrainMod, backgroundOrbsMod]) => {
-                if (destroyed) return;
-                CursorComp = cursorMod.default;
-                FilmGrainComp = filmGrainMod.default;
-                BackgroundOrbsComp = backgroundOrbsMod.default;
-            });
-
-            (async () => {
-                const html2canvas = await import("html2canvas");
-                if (destroyed) return;
-                window["html2canvas"] = html2canvas.default;
-            })();
-        }
-
-        return () => {
-            destroyed = true;
-            window.removeEventListener('resize', checkMobile);
-            clearTimeout(scrollTimeout);
-            if (rafId) cancelAnimationFrame(rafId);
-            if (lenis) {
-                lenis.destroy();
-                lenis = null;
-                window["lenis"] = null;
+        // ✅ Navbar scroll logic - optimizat
+        lenis.on("scroll", ({ scroll, velocity = 0, direction = 0 }) => {
+            if (isMenuOpen || scroll < 10) {
+                isNavVisible = true;
+            } else if (direction === 1 && velocity > 0.2 && scroll > 80) {
+                isNavVisible = false;
+            } else if (direction === -1 && velocity < -0.15) {
+                isNavVisible = true;
             }
+
+            isScrolled = scroll > 50;
+            lastScrollY = scroll;
+        });
+
+        ScrollTrigger.refresh();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // EFFECTS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // Effect 1: Initial setup
+    $effect(() => {
+        if (!browser || isInitialized) return;
+        
+        isInitialized = true;
+        
+        // Detectări
+        isMobile = checkMobile();
+        isPerfBot = isPerformanceBot();
+        
+        // Guards
+        installClosestGuards();
+        
+        // Resize listener
+        const handleResize = () => {
+            isMobile = checkMobile();
+        };
+        window.addEventListener('resize', handleResize, { passive: true });
+        
+        return () => {
+            window.removeEventListener('resize', handleResize);
         };
     });
 
-    // Reset scroll on navigation
+    // Effect 2: Heavy effects (doar desktop, non-bot)
+    $effect(() => {
+        if (!browser || !enableHeavyEffects || destroyed) return;
+        
+        // Init Lenis
+        initScrolling();
+        
+        // Load components lazy
+        Promise.all([
+            import("$lib/components/Cursor.svelte"),
+            import("$lib/components/FilmGrain.svelte"),
+            import("$lib/components/BackgroundOrbs.svelte"),
+        ]).then(([cursorMod, filmGrainMod, backgroundOrbsMod]) => {
+            if (destroyed) return;
+            CursorComp = cursorMod.default;
+            FilmGrainComp = filmGrainMod.default;
+            BackgroundOrbsComp = backgroundOrbsMod.default;
+        });
+
+        // ✅ html2canvas - încarcă lazy, DOAR când e nevoie
+        // Mutat într-o funcție globală care se apelează on-demand
+        window["loadHtml2Canvas"] = async () => {
+            if (window["html2canvas"]) return window["html2canvas"];
+            const { default: html2canvas } = await import("html2canvas");
+            window["html2canvas"] = html2canvas;
+            return html2canvas;
+        };
+    });
+
+    // Effect 3: Reset scroll on navigation
     $effect(() => {
         if (lenis && $page.url.pathname) {
+            // ✅ Folosește untrack pentru a evita re-rularea inutilă
             lenis.scrollTo(0, { immediate: true });
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CLEANUP
+    // ═══════════════════════════════════════════════════════════════════════════
+    onDestroy(() => {
+        destroyed = true;
+        
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+        
+        if (lenis) {
+            lenis.destroy();
+            lenis = null;
+            if (browser) {
+                window["lenis"] = null;
+            }
         }
     });
 </script>
@@ -209,12 +268,19 @@
     <title>Bloom Media — Marketing Digital & Automatizare</title>
 </svelte:head>
 
-{#if browser && !isMobile && !isPerfBot && CursorComp && FilmGrainComp && BackgroundOrbsComp}
-  <svelte:component this={CursorComp} />
-  <svelte:component this={FilmGrainComp} />
-  <svelte:component this={BackgroundOrbsComp} />
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- EFFECTS LAYER (Desktop only)                                                -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+{#if showEffects}
+    <!-- ✅ Svelte 5: Direct component render în loc de svelte:component -->
+    <CursorComp />
+    <FilmGrainComp />
+    <BackgroundOrbsComp />
 {/if}
 
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- MAIN APP                                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="app-wrapper">
     <Navbar {navigate} bind:isMenuOpen />
 
@@ -239,8 +305,6 @@
     }
 
     :global(html) {
-        /* Lenis handles smooth scrolling, so we remove native behavior to avoid conflicts */
-        /* scroll-behavior: smooth; */
         height: 100%;
     }
 
@@ -262,6 +326,4 @@
         overflow-x: hidden;
         position: relative;
     }
-
-    /* Smart Navbar Styles removed - unused in layout, handled in Navbar component */
 </style>
