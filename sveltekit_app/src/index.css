@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIX BEST PRACTICES: Explicit H1 Rules
+   Rezolvă avertismentul "User Agent API" din Lighthouse fără a afecta designul
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer base {
+  :where(section, article, aside, nav) h1 {
+    font-size: inherit;
+    font-weight: inherit;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+  }
+}
+
 :root {
   --primary: #fca311;
   --secondary: #14213d;
@@ -323,8 +336,6 @@ p, span, div {
 html {
   scroll-behavior: auto;
 }
-
-/* Animated scrollbar (removed custom styles to use native browser scrollbar) */
 
 /* Pill Styles */
 @layer components {
