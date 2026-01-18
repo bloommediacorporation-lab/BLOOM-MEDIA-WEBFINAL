@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { gsap } from 'gsap';
   import { browser } from '$app/environment';
 
@@ -7,18 +7,17 @@
   let ring = $state(null);
   let isHovering = $state(false);
   let isVisible = $state(true);
-  let isMounted = $state(false);
 
   const brandColor = '#fca311';
   const brandColorLight = 'rgba(252, 163, 17, 0.5)';
 
-  // ✅ GSAP quickTo - reutilizează același tween (MULT mai performant)
-  let dotX, dotY, ringX, ringY;
-  
-  // Cleanup refs
+  let dotX;
+  let dotY;
+  let ringX;
+  let ringY;
+
   let cleanupFns = [];
 
-  // Helper function pentru a verifica dacă target are .closest()
   function getClosestInteractive(target) {
     if (!target || typeof target.closest !== 'function') {
       return null;
@@ -26,164 +25,96 @@
     return target.closest('a, button, [data-cursor], input[type="submit"], .clickable');
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // EFFECT: Inițializare cursor
-  // ═══════════════════════════════════════════════════════════════════════════
-  $effect(() => {
+  onMount(() => {
     if (!browser) return;
-    
-    // Skip pe touch devices
-    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
-      return;
-    }
-
-    // Așteaptă elementele DOM
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
     if (!dot || !ring) return;
 
-    isMounted = true;
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // ✅ OPTIMIZARE CHEIE: Folosește quickTo în loc de gsap.to
-    // quickTo reutilizează același tween, nu creează unul nou la fiecare call
-    // ═══════════════════════════════════════════════════════════════════════
     dotX = gsap.quickTo(dot, 'x', { duration: 0.1, ease: 'power2.out' });
     dotY = gsap.quickTo(dot, 'y', { duration: 0.1, ease: 'power2.out' });
     ringX = gsap.quickTo(ring, 'x', { duration: 0.25, ease: 'power2.out' });
     ringY = gsap.quickTo(ring, 'y', { duration: 0.25, ease: 'power2.out' });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // Mouse Move Handler - Acum folosește quickTo (zero allocations)
-    // ═══════════════════════════════════════════════════════════════════════
+    const passiveOpts = /** @type {any} */ ({ passive: true });
+    const capturePassiveOpts = /** @type {any} */ ({ passive: true, capture: true });
+
     const moveCursor = (e) => {
-      const x = e.clientX;
-      const y = e.clientY;
-      
-      dotX(x);
-      dotY(y);
-      ringX(x);
-      ringY(y);
+      dotX(e.clientX);
+      dotY(e.clientY);
+      ringX(e.clientX);
+      ringY(e.clientY);
     };
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // Hover Handlers
-    // ═══════════════════════════════════════════════════════════════════════
     const handleMouseEnter = (e) => {
       const target = getClosestInteractive(e.target);
-      if (target && !isHovering) {
-        isHovering = true;
-        gsap.to(ring, {
-          scale: 1.8,
-          borderWidth: '1px',
-          borderColor: brandColorLight,
-          duration: 0.3,
-          ease: 'power2.out',
-          overwrite: 'auto' // ✅ Previne stacking de animații
-        });
-        gsap.to(dot, {
-          scale: 0.5,
-          duration: 0.3,
-          overwrite: 'auto'
-        });
-      }
+      if (!target) return;
+      isHovering = true;
+      gsap.to(ring, {
+        scale: 1.8,
+        borderWidth: '1px',
+        borderColor: brandColorLight,
+        duration: 0.3,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+      gsap.to(dot, {
+        scale: 0.5,
+        duration: 0.3,
+        overwrite: 'auto'
+      });
     };
 
     const handleMouseLeave = (e) => {
       const target = getClosestInteractive(e.target);
-      // ✅ Verifică dacă am ieșit complet din element
-      const relatedTarget = getClosestInteractive(e.relatedTarget);
-      
-      if (target && !relatedTarget && isHovering) {
-        isHovering = false;
-        gsap.to(ring, {
-          scale: 1,
-          borderWidth: '2px',
-          borderColor: brandColor,
-          duration: 0.3,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-        gsap.to(dot, {
-          scale: 1,
-          duration: 0.3,
-          overwrite: 'auto'
-        });
-      }
-    };
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Click Handlers
-    // ═══════════════════════════════════════════════════════════════════════
-    const handleMouseDown = () => {
+      if (!target) return;
+      isHovering = false;
       gsap.to(ring, {
-        scale: isHovering ? 1.5 : 0.8,
-        duration: 0.15,
+        scale: 1,
+        borderWidth: '2px',
+        borderColor: brandColor,
+        duration: 0.3,
+        ease: 'power2.out',
         overwrite: 'auto'
       });
       gsap.to(dot, {
-        scale: 0.8,
-        duration: 0.15,
+        scale: 1,
+        duration: 0.3,
         overwrite: 'auto'
       });
+    };
+
+    const handleMouseDown = () => {
+      gsap.to(ring, { scale: isHovering ? 1.5 : 0.8, duration: 0.15, overwrite: 'auto' });
+      gsap.to(dot, { scale: 0.8, duration: 0.15, overwrite: 'auto' });
     };
 
     const handleMouseUp = () => {
-      gsap.to(ring, {
-        scale: isHovering ? 1.8 : 1,
-        duration: 0.15,
-        overwrite: 'auto'
-      });
-      gsap.to(dot, {
-        scale: isHovering ? 0.5 : 1,
-        duration: 0.15,
-        overwrite: 'auto'
-      });
+      gsap.to(ring, { scale: isHovering ? 1.8 : 1, duration: 0.15, overwrite: 'auto' });
+      gsap.to(dot, { scale: isHovering ? 0.5 : 1, duration: 0.15, overwrite: 'auto' });
     };
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // Visibility Handler
-    // ═══════════════════════════════════════════════════════════════════════
     const handleVisibility = (e) => {
       isVisible = e.type === 'mouseenter';
-      gsap.to([dot, ring], {
-        opacity: isVisible ? 1 : 0,
-        duration: 0.2,
-        overwrite: 'auto'
-      });
+      gsap.to([dot, ring], { opacity: isVisible ? 1 : 0, duration: 0.2, overwrite: 'auto' });
     };
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // Register Event Listeners
-    // ✅ Toate cu { passive: true } pentru performance
-    // ═══════════════════════════════════════════════════════════════════════
-    document.addEventListener('mousemove', moveCursor, { passive: true });
-    document.addEventListener('mousedown', handleMouseDown, { passive: true });
-    document.addEventListener('mouseup', handleMouseUp, { passive: true });
-    document.documentElement.addEventListener('mouseenter', handleVisibility, { passive: true });
-    document.documentElement.addEventListener('mouseleave', handleVisibility, { passive: true });
-    
-    // ✅ Folosește event delegation în loc de capture phase
-    document.addEventListener('mouseover', handleMouseEnter, { passive: true });
-    document.addEventListener('mouseout', handleMouseLeave, { passive: true });
+    document.addEventListener('mousemove', moveCursor, passiveOpts);
+    document.addEventListener('mousedown', handleMouseDown, passiveOpts);
+    document.addEventListener('mouseup', handleMouseUp, passiveOpts);
+    document.documentElement.addEventListener('mouseenter', handleVisibility, passiveOpts);
+    document.documentElement.addEventListener('mouseleave', handleVisibility, passiveOpts);
+    document.addEventListener('mouseenter', handleMouseEnter, capturePassiveOpts);
+    document.addEventListener('mouseleave', handleMouseLeave, capturePassiveOpts);
 
-    // Store cleanup functions
     cleanupFns = [
-      () => document.removeEventListener('mousemove', moveCursor),
-      () => document.removeEventListener('mousedown', handleMouseDown),
-      () => document.removeEventListener('mouseup', handleMouseUp),
-      () => document.documentElement.removeEventListener('mouseenter', handleVisibility),
-      () => document.documentElement.removeEventListener('mouseleave', handleVisibility),
-      () => document.removeEventListener('mouseover', handleMouseEnter),
-      () => document.removeEventListener('mouseout', handleMouseLeave)
+      () => document.removeEventListener('mousemove', moveCursor, passiveOpts),
+      () => document.removeEventListener('mousedown', handleMouseDown, passiveOpts),
+      () => document.removeEventListener('mouseup', handleMouseUp, passiveOpts),
+      () => document.documentElement.removeEventListener('mouseenter', handleVisibility, passiveOpts),
+      () => document.documentElement.removeEventListener('mouseleave', handleVisibility, passiveOpts),
+      () => document.removeEventListener('mouseenter', handleMouseEnter, capturePassiveOpts),
+      () => document.removeEventListener('mouseleave', handleMouseLeave, capturePassiveOpts)
     ];
-
-    // Cleanup
-    return () => {
-      cleanupFns.forEach(fn => fn());
-      cleanupFns = [];
-      
-      // Kill any running tweens
-      gsap.killTweensOf([dot, ring]);
-    };
   });
 
   onDestroy(() => {
@@ -193,10 +124,6 @@
     }
   });
 </script>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<!-- TEMPLATE - Identic cu originalul                                            -->
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
 
 <div class="bloom-cursor" class:hidden={!isVisible}>
   <div bind:this={dot} class="cursor-dot"></div>

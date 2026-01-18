@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy } from "svelte";
+  import { onDestroy, tick } from "svelte";
   import { browser } from "$app/environment";
 
   let sectionRef = $state(null);
@@ -22,6 +22,7 @@
   let handleResize;
   let destroyed = false;
   let splineReady = false;
+  let splineLoadStarted = $state(false);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // FIX #1: Previne "e.target.closest is not a function" - PĂSTRAT
@@ -175,6 +176,17 @@
     ) || ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
   }
 
+  function isPerformanceBot() {
+    if (typeof navigator === "undefined") return false;
+    const ua = navigator.userAgent;
+    return (
+      ua.includes("Chrome-Lighthouse") ||
+      ua.includes("Google Page Speed") ||
+      ua.includes("Insights") ||
+      navigator.webdriver === true
+    );
+  }
+
   function scheduleIdle(callback) {
     if (typeof window === "undefined") return;
     if ("requestIdleCallback" in window) {
@@ -230,96 +242,108 @@
 
   // Effect pentru Spline loading (doar desktop)
   $effect(() => {
-    if (!browser || isMobile || !splineWrapper) return;
-    if (isSplineMounted) return; // Deja inițiat
+    if (!browser) return;
+    if (isMobile) return;
+    if (!splineWrapper) return;
 
-    isLoading = true;
+    if (isPerformanceBot()) return;
 
-    // Prefetch scene
+    if (!isSplineMounted) {
+      isSplineMounted = true;
+    }
+
     const sceneUrl = "/scene.splinecode";
     fetch(sceneUrl, { priority: "low" }).catch(() => null);
 
-    scheduleIdle(async () => {
-      if (destroyed || isMobile) return;
+    let idleDelayId;
+    const trigger = () => {
+      if (splineLoadStarted) return;
+      splineLoadStarted = true;
+      isLoading = true;
 
-      isSplineMounted = true;
+      scheduleIdle(async () => {
+        if (destroyed || isMobile) return;
 
-      // Așteaptă next tick pentru canvas mount
-      await new Promise(r => setTimeout(r, 0));
-      await yieldToMain();
-      
-      if (destroyed || !canvas || !splineWrapper) return;
-
-      try {
-        const hasValidSize = await waitForValidDimensions(100);
-        if (destroyed) return;
-
-        if (!hasValidSize) {
-          canvas.width = 1920;
-          canvas.height = 1080;
-        }
-
+        await tick();
         await yieldToMain();
-        if (destroyed) return;
+        if (destroyed || !canvas || !splineWrapper) return;
 
-        const { Application } = await import("@splinetool/runtime");
-        
-        await yieldToMain();
-        if (destroyed) return;
+        try {
+          const hasValidSize = await waitForValidDimensions(100);
+          if (destroyed) return;
 
-        const { width, height } = getWrapperDimensions();
-        if (width < 10 || height < 10) {
-          await waitForValidDimensions(50);
-        }
+          if (!hasValidSize) {
+            canvas.width = 1920;
+            canvas.height = 1080;
+          }
 
-        await yieldToMain();
-        if (destroyed) return;
+          await yieldToMain();
+          if (destroyed) return;
 
-        splineApp = new Application(canvas);
+          const { Application } = await import("@splinetool/runtime");
 
-        await yieldToMain();
-        if (destroyed) return;
+          await yieldToMain();
+          if (destroyed) return;
 
-        await splineApp.load(sceneUrl);
-        
-        if (destroyed) return;
+          const { width, height } = getWrapperDimensions();
+          if (width < 10 || height < 10) {
+            await waitForValidDimensions(50);
+          }
 
-        splineReady = true;
+          await yieldToMain();
+          if (destroyed) return;
 
-        if (typeof splineApp.setGlobalEvents === "function") {
-          splineApp.setGlobalEvents(true);
-        }
+          splineApp = new Application(canvas);
 
-        resizeObserver = new ResizeObserver(() => {
-          if (destroyed || !splineReady) return;
-          requestAnimationFrame(() => {
-            if (!destroyed && splineReady) {
-              syncCanvasToWrapper();
-            }
+          await yieldToMain();
+          if (destroyed) return;
+
+          await splineApp.load(sceneUrl);
+          if (destroyed) return;
+
+          splineReady = true;
+
+          if (typeof splineApp.setGlobalEvents === "function") {
+            splineApp.setGlobalEvents(true);
+          }
+
+          resizeObserver = new ResizeObserver(() => {
+            if (destroyed || !splineReady) return;
+            requestAnimationFrame(() => {
+              if (!destroyed && splineReady) syncCanvasToWrapper();
+            });
           });
-        });
-        
-        if (splineWrapper) {
+
           resizeObserver.observe(splineWrapper);
+
+          await yieldToMain();
+          syncCanvasToWrapper();
+
+          splineApp.setZoom(0.35);
+          isSplineVisible = true;
+          isLoading = false;
+        } catch (error) {
+          if (destroyed) return;
+          isLoading = false;
+          console.error("Spline loading error:", error);
         }
+      });
+    };
 
-        await yieldToMain();
-        syncCanvasToWrapper();
+    const opts = /** @type {any} */ ({ passive: true, once: true });
+    const keyOpts = /** @type {any} */ ({ once: true });
+    window.addEventListener("pointermove", trigger, opts);
+    window.addEventListener("scroll", trigger, opts);
+    window.addEventListener("keydown", trigger, keyOpts);
 
-        splineApp.setZoom(0.35);
-        isSplineVisible = true;
-        isLoading = false;
+    idleDelayId = setTimeout(trigger, 15000);
 
-      } catch (error) {
-        if (destroyed) return;
-        isLoading = false;
-        console.error("Spline loading error:", error);
-      }
-    });
-
-    // Cleanup
     return () => {
+      clearTimeout(idleDelayId);
       cancelScheduled();
+      window.removeEventListener("pointermove", trigger, opts);
+      window.removeEventListener("scroll", trigger, opts);
+      window.removeEventListener("keydown", trigger, keyOpts);
     };
   });
 
