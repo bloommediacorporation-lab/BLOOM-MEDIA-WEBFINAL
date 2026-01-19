@@ -350,4 +350,13 @@ html {
     transform-origin: center;
     transition: none;
   }
+  /* src/index.css - Adaugă asta la finalul fișierului */
+
+/* FIX: Lighthouse User Agent Warning */
+/* Această regulă îi spune browserului că noi controlăm mărimea, nu el. */
+:where(section, article, aside, nav) h1 {
+  font-size: 2em;
+  margin-block-start: 0.67em;
+  margin-block-end: 0.67em;
+}
 }

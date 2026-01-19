@@ -23,14 +23,13 @@
   let destroyed = false;
   let splineReady = false;
 
-   // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════════
   // HELPERS & GUARDS
   // ═══════════════════════════════════════════════════════════════════════════
   function installClosestGuards() {
     if (typeof window === "undefined") return;
     const noopClosest = () => null;
 
-    // Folosim 'any' pentru a scăpa de erorile din VS Code
     const win = /** @type {any} */ (Window.prototype);
     const doc = /** @type {any} */ (Document.prototype);
     const txt = /** @type {any} */ (Text.prototype);
@@ -63,7 +62,6 @@
   function getWrapperDimensions() {
     if (!splineWrapper) return { width: 0, height: 0 };
     const rect = splineWrapper.getBoundingClientRect();
-    // Verifică dacă elementul e vizibil și are dimensiuni reale
     if (rect.width === 0 || rect.height === 0) return { width: 0, height: 0 };
     return { width: Math.floor(rect.width), height: Math.floor(rect.height) };
   }
@@ -73,10 +71,8 @@
     
     const { width, height } = getWrapperDimensions();
     
-    // 🛑 GUARD: Evită erorile WebGL de "Texture dimensions must be > 0"
     if (width <= 0 || height <= 0) return false;
 
-    // Limităm DPR la 1.5 pentru performanță (fluiditate)
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const w = Math.max(1, Math.floor(width * dpr));
     const h = Math.max(1, Math.floor(height * dpr));
@@ -86,7 +82,7 @@
       canvas.height = h;
       
       if (splineReady && splineApp?.resize) {
-        try { splineApp.resize(); } catch (e) { /* WebGL context lost/busy - ignore */ }
+        try { splineApp.resize(); } catch (e) { }
       }
     }
     return true;
@@ -126,57 +122,44 @@
         await yieldToMain();
         if (destroyed || !canvas || !splineWrapper) return;
 
-        // 1. Așteaptă dimensiuni valide - Critic pentru a evita erorile WebGL
         const hasValidSize = await waitForValidDimensions(50);
         if (destroyed) return;
         
         if (!hasValidSize) {
-             // Dacă containerul e ascuns, nu încărcăm nimic.
              isLoading = false;
              return; 
         }
 
         await yieldToMain();
-        
-        // 2. Import Runtime
         const { Application } = await import("@splinetool/runtime");
         if (destroyed) return;
 
         await yieldToMain();
-        
-        // 3. Init App
         splineApp = new Application(canvas);
 
         await yieldToMain();
-        
-        // 4. Load Scene
         await splineApp.load(sceneUrl);
         if (destroyed) return;
 
         splineReady = true;
 
-        // 5. Configurare Events
         if (typeof splineApp.setGlobalEvents === "function") {
              splineApp.setGlobalEvents(true);
         }
 
-        // ✅ OPTIMIZARE FPS: Oprește randarea când nu e vizibil (Scroll down)
         visibilityObserver = new IntersectionObserver((entries) => {
             const entry = entries[0];
             if (entry.isIntersecting) {
-                // E vizibil: Pornim
                 if (canvas) canvas.style.visibility = 'visible';
                 if (splineApp) splineApp.setGlobalEvents(true);
             } else {
-                // Nu e vizibil: Oprim tot (GPU Save)
                 if (canvas) canvas.style.visibility = 'hidden';
                 if (splineApp) splineApp.setGlobalEvents(false);
             }
-        }, { threshold: 0 }); // Imediat ce iese 1 pixel din ecran
+        }, { threshold: 0 });
 
         if (splineWrapper) visibilityObserver.observe(splineWrapper);
 
-        // Resize Observer
         resizeObserver = new ResizeObserver(() => {
              if (destroyed || !splineReady) return;
              requestAnimationFrame(() => {
@@ -189,7 +172,6 @@
         syncCanvasToWrapper();
         splineApp.setZoom(0.35);
 
-        // 6. Show
         isSplineVisible = true;
         isLoading = false;
 
@@ -200,10 +182,9 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // EFECTE (Svelte 5)
+  // EFECTE
   // ═══════════════════════════════════════════════════════════════════════════
   
-  // 1. Setup General
   $effect(() => {
     if (!browser) return;
     isMobile = detectMobile();
@@ -217,7 +198,6 @@
     window.addEventListener('resize', handleResize, { passive: true });
     installClosestGuards();
 
-    // Prefetch (Low Priority)
     if (!isMobile) {
         fetch("/scene.splinecode", { priority: "low" }).catch(() => {});
     }
@@ -228,8 +208,6 @@
     };
   });
 
-  // 2. Loading Strategy: INTERACTION ONLY
-  // Fără timeout automat -> TBT 0 pentru Lighthouse
   $effect(() => {
     if (!browser || isMobile || !splineWrapper || isSplineMounted) return;
 
@@ -253,7 +231,6 @@
       userHasInteracted = true;
       triggerLoad();
       
-      // Cleanup listeners
       window.removeEventListener('mousemove', interactionHandler);
       window.removeEventListener('scroll', interactionHandler);
       window.removeEventListener('keydown', interactionHandler);
@@ -293,17 +270,12 @@
   });
 </script>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<!-- TEMPLATE -->
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-
 <section
   id="acasa"
   bind:this={sectionRef}
   class="hero-section relative -mt-24 flex items-center justify-center overflow-hidden bg-[#0A0A0A] touch-pan-y overscroll-none"
   style="height: calc(var(--vh, 1vh) * 100);"
 >
-  <!-- Background Gradients -->
   <div class="absolute inset-0 z-0 pointer-events-none opacity-20 mix-blend-soft-light">
     <div class="absolute inset-0" style="background: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(20, 33, 61, 0.4) 0%, #0a0a0a 70%);"></div>
   </div>
@@ -311,7 +283,6 @@
     <div class="absolute inset-0" style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E&quot;);"></div>
   </div>
 
-  <!-- Mobile Fallback -->
   {#if isMobile}
     <div class="absolute inset-0 z-0 pointer-events-none w-full bg-[#0A0A0A]">
       <img
@@ -327,7 +298,6 @@
     </div>
   {/if}
 
-  <!-- Loading State (Desktop Only) -->
   {#if !isMobile && isLoading}
     <div class="absolute inset-0 z-0 hidden md:block pointer-events-none">
       <div class="absolute inset-0 overflow-hidden">
@@ -349,7 +319,6 @@
       class:opacity-100={isSplineVisible}
       style="z-index: 2; backface-visibility: hidden;"
     >
-      <!-- ✅ Randăm canvas-ul doar după trigger -->
       {#if isSplineMounted}
         <canvas
           bind:this={canvas}
@@ -358,15 +327,13 @@
           class="pointer-events-none w-full h-full block"
           style="visibility: hidden;" 
         ></canvas> 
-        <!-- Style visibility hidden default pentru a nu face flash -->
       {/if}
     </div>
   {/if}
 
-  <!-- CONTENT -->
   <div
     bind:this={heroContainer}
-    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between w-full pointer-events-none pb-10 pt-28 md:pt-40"
+    class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between w-full pointer-events-none pb-10 pt-28 md:pt-32 lg:pt-40"
     style="height: calc(var(--vh, 1vh) * 100);"
     aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
   >
