@@ -136,13 +136,13 @@
 
         gsap.registerPlugin(ScrollTrigger);
 
-        lenis = new Lenis({
-            duration: 1.2,
+               lenis = new Lenis({
+            duration: 0.8, // ⚡ A fost 1.2. 0.8 e mai rapid/snappy
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             orientation: "vertical",
             gestureOrientation: "vertical",
             smoothWheel: true,
-            wheelMultiplier: 1,
+            wheelMultiplier: 1.2, // ⚡ Puțin mai multă viteză la scroll
             touchMultiplier: 2,
             infinite: false,
         });
