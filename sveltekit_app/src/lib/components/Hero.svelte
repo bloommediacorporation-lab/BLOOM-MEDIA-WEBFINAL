@@ -195,7 +195,6 @@
 
     } catch (error) {
         if (destroyed) return;
-        console.warn("Spline load skipped or failed:", error);
         isLoading = false;
     }
   }

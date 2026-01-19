@@ -131,7 +131,6 @@
       navigate(path);
       isMenuOpen = false;
     } catch (err) {
-      console.error("Navigation error:", err);
       // Fallback to native navigation if router fails
       window.location.href = path;
     }

@@ -7,6 +7,7 @@
     goto(path);
   }
 
+  /** @type {HTMLElement | null} */
   let belowFoldMarker = $state(null);
   let isLoading = $state(false);
   
@@ -51,7 +52,6 @@
       ] = modules.map(m => m.default);
       
     } catch (error) {
-      console.error('Failed to load components:', error);
       isLoading = false;
     }
   }

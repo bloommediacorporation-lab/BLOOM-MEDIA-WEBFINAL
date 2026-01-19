@@ -1,6 +1,4 @@
 <script>
-  import { onMount } from 'svelte';
-  
   // Simple navigate function if passed as prop, or use window.history
   let { navigate } = $props();
 

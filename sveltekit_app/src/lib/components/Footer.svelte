@@ -4,9 +4,9 @@
   let { reveal = false } = $props();
   const currentYear = new Date().getFullYear();
   
-  let footerEl;
   let footerHeight = $state(0);
-  let bgEl;
+  /** @type {HTMLElement | null} */
+  let bgEl = null;
 
   onMount(() => {
     let destroyed = false;
@@ -55,7 +55,6 @@
 <footer 
   class="footer" 
   class:is-reveal={reveal}
-  bind:this={footerEl}
   bind:clientHeight={footerHeight}
 >
   <!-- Background Parallax Layer -->
@@ -74,7 +73,7 @@
       <!-- Links -->
       <div class="column">
         <h4 class="heading">Navigare</h4>
-        <nav class="links">
+        <nav class="links" aria-label="Navigare">
           <a href="/">Acasă</a>
           <a href="/despre">Despre</a>
           <a href="/configurator">Configurator</a>
@@ -95,7 +94,7 @@
       <!-- Legal -->
       <div class="column">
         <h4 class="heading">Legal</h4>
-        <nav class="links">
+        <nav class="links" aria-label="Legal">
           <a href="/privacy">Politica de confidențialitate</a>
           <a href="/terms">Termeni și condiții</a>
         </nav>

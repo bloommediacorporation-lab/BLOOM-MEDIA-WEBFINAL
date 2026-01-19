@@ -41,7 +41,7 @@ export async function POST({ request, url }) {
 
         return json({ success: true, id: session.id, url: session.url });
     } catch (err) {
-        console.error('Error creating checkout session:', err);
-        return json({ success: false, error: err.message || 'Internal Server Error' }, { status: 500 });
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return json({ success: false, error: message }, { status: 500 });
     }
 }

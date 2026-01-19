@@ -232,7 +232,6 @@
       tempContainer.remove();
       
     } catch (error) {
-      console.warn('Background capture failed, using fallback:', error);
       // Fallback: create a simple gradient background
       const canvas = document.createElement('canvas');
       canvas.width = 1;

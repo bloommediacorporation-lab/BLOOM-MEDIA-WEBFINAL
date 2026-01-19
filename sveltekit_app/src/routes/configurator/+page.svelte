@@ -260,13 +260,13 @@
                     
                     <div class="services-list">
                         {#each SERVICES.filter(s => s.category === category.id) as service}
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <!-- svelte-ignore a11y-no-static-element-interactions -->
-                            <div 
+                            <button 
+                                type="button"
                                 class="service-item {selectedServices.has(service.id) ? 'selected' : ''} {service.id === 'landing_page' && (selectedServices.has('meta_ads') || selectedServices.has('tiktok_ads')) ? 'recommended' : ''}"
                                 onclick={() => toggleService(service.id)}
                                 onmouseenter={() => handleServiceHover(service.id, true)}
                                 onmouseleave={() => handleServiceHover(service.id, false)}
+                                aria-pressed={selectedServices.has(service.id)}
                             >
                                 <div class="service-info">
                                     <h3 class="service-name">{service.name}</h3>
@@ -285,7 +285,7 @@
                                         {/if}
                                     </div>
                                 </div>
-                            </div>
+                            </button>
                         {/each}
                     </div>
                 </div>
@@ -592,9 +592,17 @@
         justify-content: space-between;
         align-items: flex-start;
         padding: 2.5rem 0;
+        width: 100%;
+        text-align: left;
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: none;
         border-bottom: 1px solid rgba(255,255,255,0.05);
         cursor: pointer;
         transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+        appearance: none;
+        -webkit-appearance: none;
     }
 
     .service-item:hover {

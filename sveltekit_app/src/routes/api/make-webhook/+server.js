@@ -21,7 +21,7 @@ export async function POST({ request }) {
             return json({ success: false, error: `Upstream status ${response.status}` }, { status: 502 });
         }
     } catch (err) {
-        console.error('Error proxying webhook:', err);
-        return json({ success: false, error: err.message || 'Internal Server Error' }, { status: 500 });
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return json({ success: false, error: message }, { status: 500 });
     }
 }

@@ -70,14 +70,13 @@
 
 <!-- Mobile Menu -->
 {#if isMenuOpen}
-  <div 
-    class="mobile-overlay" 
-    role="button"
-    tabindex="0"
-    aria-label="Închide meniul"
-    onclick={() => isMenuOpen = false}
-    onkeypress={(e) => e.key === 'Enter' || e.key === ' ' ? isMenuOpen = false : null}
-  >
+  <div class="mobile-overlay" role="presentation">
+    <button
+      type="button"
+      class="mobile-overlay-close"
+      aria-label="Închide meniul"
+      onclick={() => isMenuOpen = false}
+    ></button>
     <div 
       class="mobile-menu" 
       role="dialog"
@@ -290,6 +289,21 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mobile-overlay-close {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    appearance: none;
+    -webkit-appearance: none;
   }
 
   .mobile-menu {
@@ -297,6 +311,8 @@
     flex-direction: column;
     gap: 1.5rem;
     text-align: center;
+    position: relative;
+    z-index: 1;
   }
 
   .mobile-menu a {

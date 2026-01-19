@@ -37,7 +37,6 @@ export const actions = {
         selectedServices = JSON.parse(servicesJson);
       }
     } catch (e) {
-      console.error('Error parsing services JSON:', e);
       return fail(400, {
         error: true,
         message: 'Eroare la procesarea serviciilor selectate.'
@@ -53,7 +52,7 @@ export const actions = {
     try {
       const convex = new ConvexHttpClient(convexUrl);
 
-      const res = await convex.action(api.leads.submitWithEmail, {
+      const res = await convex.mutation(api.leads.create, {
         businessName: resolvedBusinessName,
         name: resolvedName,
         email: resolvedEmail,
@@ -62,9 +61,8 @@ export const actions = {
         totalPrice: resolvedTotal
       });
 
-      return { success: true, ...res };
+      return { success: true, ...(typeof res === 'object' && res !== null ? res : {}) };
     } catch (e) {
-      console.error('Convex error:', e);
       return fail(500, {
         error: true,
         message: 'Eroare la trimiterea cererii. Te rog încearcă din nou.'
