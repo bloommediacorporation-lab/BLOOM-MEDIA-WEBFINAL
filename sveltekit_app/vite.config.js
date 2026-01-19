@@ -37,12 +37,8 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: (id) => {
-					if (
-						id.includes('@splinetool') || 
-						id.includes('three') ||
-						id.includes('troika')
-					) {
-						return 'spline-vendor';
+					if (id.includes('three') || id.includes('troika')) {
+						return 'three-vendor';
 					}
 
 					if (id.includes('gsap')) {
@@ -88,7 +84,7 @@ export default defineConfig({
 
 	optimizeDeps: {
 		include: ['gsap', '@studio-freight/lenis'],
-		exclude: ['@sveltejs/kit', '@splinetool/runtime']
+		exclude: ['@sveltejs/kit']
 	},
 
 	esbuild: {

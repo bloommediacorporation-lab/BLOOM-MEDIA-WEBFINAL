@@ -1,16 +1,7 @@
 // Test script to check for common runtime errors
 console.log('=== Testing Bloom Media Website ===');
 
-// Test 1: Check if Spline assets are loading
-const splineTest = fetch('/scene.splinecode')
-  .then(response => {
-    console.log('✅ Spline file accessible:', response.ok);
-  })
-  .catch(err => {
-    console.error('❌ Spline file error:', err);
-  });
-
-// Test 2: Test API endpoints
+// Test 1: Test API endpoints
 const apiTest = fetch('/api/health')
   .then(response => response.json())
   .then(data => {
@@ -20,11 +11,11 @@ const apiTest = fetch('/api/health')
     console.error('❌ API health error:', err);
   });
 
-// Test 3: Check for critical JavaScript errors
+// Test 2: Check for critical JavaScript errors
 setTimeout(() => {
   console.log('✅ Page loaded without critical errors');
   
-  // Test 4: Check if main components are present
+  // Test 3: Check if main components are present
   const navbar = document.querySelector('.navbar-wrapper');
   const fluidCursor = document.querySelector('.fluid-canvas');
   const hero = document.querySelector('.hero-section');
@@ -40,7 +31,7 @@ setTimeout(() => {
   }
 }, 2000);
 
-// Test 5: Check WebGL support
+// Test 4: Check WebGL support
 const testWebGL = () => {
   const canvas = document.createElement('canvas');
   const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
@@ -55,6 +46,6 @@ const testWebGL = () => {
 
 testWebGL();
 
-Promise.all([splineTest, apiTest]).then(() => {
+Promise.all([apiTest]).then(() => {
   console.log('=== Test Complete ===');
 });

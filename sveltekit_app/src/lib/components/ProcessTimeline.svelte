@@ -109,13 +109,6 @@
         <!-- Content Container (Centered Vertical, Left Aligned) -->
         <div class="relative z-10 max-w-[600px] flex flex-col items-start">
           
-          <!-- Label: "STEP 01 • PHASE" -->
-          <div class="mb-8">
-            <span class="inline-block px-3 py-1 rounded-md border border-[#fca311]/20 bg-[#fca311]/10 text-[#fca311] font-['Inter'] font-semibold text-xs tracking-wider uppercase">
-              STEP {step.id} • {step.label}
-            </span>
-          </div>
-
           <!-- Number & Title Wrapper -->
           <div class="relative mb-8">
             <!-- Giant Number Behind Title -->

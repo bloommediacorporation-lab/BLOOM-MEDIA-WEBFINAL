@@ -1,10 +1,11 @@
 <script>
-  import { fly } from 'svelte/transition';
+  import { fly, slide } from 'svelte/transition';
   import { setCursorLabel, clearCursor } from '$lib/utils/cursorState.js';
   
   let { navigate } = $props();
   
   let visible = $state(false);
+  let isExpanded = $state(false);
   $effect(() => { visible = true; });
   
   const services = [
@@ -28,7 +29,15 @@
       <div class="pricing-card card" in:fly={{ y: 40, duration: 700, delay: 200 }}>
         <!-- LEFT: Price & Info -->
         <div class="left">
-          <div class="price-block">
+          <div class="md:hidden flex items-center justify-between gap-4">
+            <h3 class="text-white text-lg font-bold">SISTEM START</h3>
+            <div class="flex items-baseline gap-1">
+              <span class="text-[#FFA500] text-xl font-bold">249,99€/luna</span>
+            
+            </div>
+          </div>
+
+          <div class="price-block hidden md:block">
             <div class="prefix">Sistem de bază</div>
             <span class="price-amount value">249,99</span>
             <span class="currency">€</span>
@@ -40,7 +49,8 @@
             <p class="package-desc">Infrastructură completă pentru achiziție predictibilă de clienți. Lead-uri care se transformă în venit, nu metrici de vanitate.</p>
           </div>
 
-          <button class="configure-button cta-btn" onclick={() => navigate && navigate('/configurator')}>
+
+          <button class="hidden md:flex configure-button cta-btn" onclick={() => navigate && navigate('/configurator')}>
             Configurează Sistem
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -50,6 +60,33 @@
         
         <!-- RIGHT: Benefits List -->
         <div class="right">
+          <div class="md:hidden flex flex-col gap-3">
+            <button
+              class="text-gray-400 text-sm text-center w-full"
+              onclick={() => (isExpanded = !isExpanded)}
+            >
+              {isExpanded ? "Ascunde ce include sistemul ▴" : "Vezi ce include sistemul ▾"}
+            </button>
+
+            {#if isExpanded}
+              <div transition:slide>
+                <div class="flex flex-col gap-3">
+                  {#each services as s, i}
+                    <div class="flex items-start gap-3">
+                      <span class="text-gray-500 text-xs leading-6">0{i + 1}</span>
+                      <span class="text-white/90 text-sm">{s}</span>
+                    </div>
+                  {/each}
+                  <div class="flex items-start gap-3">
+                    <span class="text-gray-500 text-xs leading-6">06</span>
+                    <span class="text-white/60 text-sm italic">Tot ce trebuie pentru predictibilitate</span>
+                  </div>
+                </div>
+              </div>
+            {/if}
+          </div>
+
+          <div class="hidden md:flex md:flex-col">
           {#each services as s, i}
             <div class="item" in:fly={{ x: 20, duration: 500, delay: 300 + i * 100 }}>
               <span class="number">0{i + 1}</span>
@@ -59,6 +96,7 @@
           <div class="item more">
              <span class="number">06</span>
              <span class="text">Tot ce trebuie pentru predictibilitate</span>
+          </div>
           </div>
         </div>
       </div>
