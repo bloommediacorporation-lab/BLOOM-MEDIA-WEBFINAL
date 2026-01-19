@@ -24,22 +24,18 @@
   let splineReady = false;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // HELPERS & GUARDS
+  // HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
   function installClosestGuards() {
     if (typeof window === "undefined") return;
     const noopClosest = () => null;
-
     const win = /** @type {any} */ (Window.prototype);
     const doc = /** @type {any} */ (Document.prototype);
     const txt = /** @type {any} */ (Text.prototype);
-
     if (!("closest" in win)) win.closest = noopClosest;
     if (!("closest" in doc)) doc.closest = noopClosest;
     if (!("closest" in txt)) {
-      txt.closest = function (/** @type {any} */ s) { 
-        return this.parentElement?.closest?.(s) ?? null; 
-      };
+      txt.closest = function (/** @type {any} */ s) { return this.parentElement?.closest?.(s) ?? null; };
     }
   }
 
@@ -70,19 +66,21 @@
     if (!canvas || !splineWrapper) return false;
     
     const { width, height } = getWrapperDimensions();
-    
     if (width <= 0 || height <= 0) return false;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    // 🔥 FIX PERFORMANȚĂ MACBOOK: Forțăm DPR la 1.
+    // Pe Retina, DPR e 2. Asta înseamnă de 4x mai mulți pixeli de randat.
+    // Setând la 1, imaginea e puțin mai soft, dar FPS-ul zboară la 60.
+    const dpr = 1; 
+
     const w = Math.max(1, Math.floor(width * dpr));
     const h = Math.max(1, Math.floor(height * dpr));
 
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
-      
       if (splineReady && splineApp?.resize) {
-        try { splineApp.resize(); } catch (e) { }
+        try { splineApp.resize(); } catch (e) {}
       }
     }
     return true;
@@ -109,7 +107,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // LOGICA PRINCIPALĂ DE ÎNCĂRCARE
+  // LOGIC
   // ═══════════════════════════════════════════════════════════════════════════
   async function loadSpline() {
     if (destroyed || isMobile || splineReady) return;
@@ -124,11 +122,7 @@
 
         const hasValidSize = await waitForValidDimensions(50);
         if (destroyed) return;
-        
-        if (!hasValidSize) {
-             isLoading = false;
-             return; 
-        }
+        if (!hasValidSize) { isLoading = false; return; }
 
         await yieldToMain();
         const { Application } = await import("@splinetool/runtime");
@@ -170,7 +164,11 @@
 
         await yieldToMain();
         syncCanvasToWrapper();
-        splineApp.setZoom(0.35);
+        
+        // 🔍 FIX LAYOUT: Zoom ajustat pentru containerul full-screen
+        // 0.35 era pentru containerul mare (140vw). 
+        // Acum că suntem 100vw, mărim puțin zoom-ul să arate la fel.
+        splineApp.setZoom(0.45); 
 
         isSplineVisible = true;
         isLoading = false;
@@ -181,15 +179,10 @@
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // EFECTE
-  // ═══════════════════════════════════════════════════════════════════════════
-  
   $effect(() => {
     if (!browser) return;
     isMobile = detectMobile();
     setVh();
-    
     handleResize = () => {
       if (isMobile) return; 
       clearTimeout(resizeTimeout);
@@ -197,11 +190,7 @@
     };
     window.addEventListener('resize', handleResize, { passive: true });
     installClosestGuards();
-
-    if (!isMobile) {
-        fetch("/scene.splinecode", { priority: "low" }).catch(() => {});
-    }
-
+    if (!isMobile) fetch("/scene.splinecode", { priority: "low" }).catch(() => {});
     return () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(resizeTimeout);
@@ -210,13 +199,10 @@
 
   $effect(() => {
     if (!browser || isMobile || !splineWrapper || isSplineMounted) return;
-
     let interactionHandler;
-
     const triggerLoad = () => {
       if (isSplineMounted) return;
       isSplineMounted = true;
-      
       const start = () => {
          if ('requestIdleCallback' in window) {
             requestIdleCallback(() => loadSpline(), { timeout: 4000 });
@@ -226,25 +212,21 @@
       };
       start();
     };
-
     interactionHandler = () => {
       userHasInteracted = true;
       triggerLoad();
-      
       window.removeEventListener('mousemove', interactionHandler);
       window.removeEventListener('scroll', interactionHandler);
       window.removeEventListener('keydown', interactionHandler);
       window.removeEventListener('touchstart', interactionHandler);
       window.removeEventListener('click', interactionHandler);
     };
-
     const opts = { once: true, passive: true };
     window.addEventListener('mousemove', interactionHandler, opts);
     window.addEventListener('scroll', interactionHandler, opts);
     window.addEventListener('keydown', interactionHandler, opts);
     window.addEventListener('touchstart', interactionHandler, opts);
     window.addEventListener('click', interactionHandler, opts);
-
     return () => {
       window.removeEventListener('mousemove', interactionHandler);
       window.removeEventListener('scroll', interactionHandler);
@@ -260,13 +242,7 @@
     clearTimeout(resizeTimeout);
     resizeObserver?.disconnect();
     visibilityObserver?.disconnect();
-    
-    if (splineApp) {
-        try { 
-            splineApp.setGlobalEvents?.(false); 
-            splineApp.dispose?.(); 
-        } catch {}
-    }
+    if (splineApp) { try { splineApp.setGlobalEvents?.(false); splineApp.dispose?.(); } catch {} }
   });
 </script>
 
@@ -285,15 +261,7 @@
 
   {#if isMobile}
     <div class="absolute inset-0 z-0 pointer-events-none w-full bg-[#0A0A0A]">
-      <img
-        src="/images/hero-mobile-fallback.webp"
-        alt="Bloom Media"
-        class="w-full h-full object-cover opacity-80"
-        style="object-position: 56% center;"
-        loading="eager"
-        fetchpriority="high"
-        decoding="async"
-      />
+      <img src="/images/hero-mobile-fallback.webp" alt="Bloom Media" class="w-full h-full object-cover opacity-80" style="object-position: 56% center;" loading="eager" fetchpriority="high" decoding="async"/>
       <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80"></div>
     </div>
   {/if}
@@ -301,23 +269,25 @@
   {#if !isMobile && isLoading}
     <div class="absolute inset-0 z-0 hidden md:block pointer-events-none">
       <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute -top-24 -left-24 h-[520px] w-[520px] opacity-70 will-change-transform" 
-             style="background: radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.55) 0%, rgba(168, 85, 247, 0.22) 35%, rgba(0,0,0,0) 70%); animation: heroFloat 9s ease-in-out infinite;"></div>
-        <div class="absolute -bottom-28 -right-28 h-[560px] w-[560px] opacity-65 will-change-transform" 
-             style="background: radial-gradient(circle at 60% 55%, rgba(252, 163, 17, 0.55) 0%, rgba(252, 163, 17, 0.2) 35%, rgba(0,0,0,0) 72%); animation: heroFloat2 12s ease-in-out infinite;"></div>
+        <div class="absolute -top-24 -left-24 h-[520px] w-[520px] opacity-70 will-change-transform" style="background: radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.55) 0%, rgba(168, 85, 247, 0.22) 35%, rgba(0,0,0,0) 70%); animation: heroFloat 9s ease-in-out infinite;"></div>
+        <div class="absolute -bottom-28 -right-28 h-[560px] w-[560px] opacity-65 will-change-transform" style="background: radial-gradient(circle at 60% 55%, rgba(252, 163, 17, 0.55) 0%, rgba(252, 163, 17, 0.2) 35%, rgba(0,0,0,0) 72%); animation: heroFloat2 12s ease-in-out infinite;"></div>
       </div>
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/30 to-black"></div>
     </div>
   {/if}
 
-   <!-- Spline Background (Only on Desktop) -->
+   <!-- 
+      🔥 FIX LAYOUT: 
+      1. Folosim 'inset-0' (top:0, left:0, w:100%, h:100%) în loc de positioning ciudat.
+      2. Asta centrează perfect canvas-ul pe orice ecran.
+   -->
   {#if !isMobile}
     <div
       bind:this={splineWrapper}
-      class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vh] hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
+      class="absolute inset-0 w-full h-full hidden md:block transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
       class:opacity-0={!isSplineVisible}
       class:opacity-100={isSplineVisible}
-      style="z-index: 2; backface-visibility: hidden;"
+      style="z-index: 2;"
     >
       {#if isSplineMounted}
         <canvas
@@ -335,7 +305,7 @@
     bind:this={heroContainer}
     class="hero-container relative z-10 px-4 text-center max-w-full mx-auto flex flex-col items-center justify-between w-full pointer-events-none pb-10 pt-28 md:pt-32 lg:pt-40"
     style="height: calc(var(--vh, 1vh) * 100);"
-    aria-label="Bloom Media - Soluția ta pentru a deveni un magnet pentru clienți"
+    aria-label="Bloom Media"
   >
     <div class="flex flex-col items-center w-full">
       <div class="hero-label mb-4 md:mb-6 text-[11px] md:text-xs font-bold tracking-[0.2em] text-white/90 uppercase font-['Inter'] pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2 text-center">
