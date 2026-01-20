@@ -68,7 +68,7 @@
   });
 </script>
 
-<section class="relative w-full h-screen overflow-hidden bg-black">
+<section class="relative w-full min-h-[100svh] overflow-hidden bg-black">
   <video
     bind:this={videoEl}
     class="video-bg absolute inset-0 w-full h-full object-cover opacity-0"
