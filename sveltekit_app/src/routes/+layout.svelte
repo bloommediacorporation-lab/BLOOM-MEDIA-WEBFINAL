@@ -8,7 +8,9 @@
     import { page } from "$app/stores";
     import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 
-    injectSpeedInsights();
+    if (browser) {
+        injectSpeedInsights();
+    }
 
     let { children } = $props();
 
@@ -38,6 +40,7 @@
     let isPerfBot = $state(false);
     let isInitialized = $state(false);
     let destroyed = false;
+    const forceNativeScroll = false;
 
     // ═══════════════════════════════════════════════════════════════════════════
     // DERIVED
@@ -118,7 +121,7 @@
     // LENIS INITIALIZATION
     // ═══════════════════════════════════════════════════════════════════════════
     async function initScrolling() {
-        if (destroyed || !browser) return;
+        if (destroyed || !browser || forceNativeScroll || lenis) return;
 
         // ✅ Respectă prefers-reduced-motion
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -206,6 +209,11 @@
         };
     });
 
+    $effect(() => {
+        if (!browser || destroyed || !isInitialized || isPerfBot) return;
+        initScrolling();
+    });
+
     // Effect 2: Heavy effects (doar desktop, non-bot)
     $effect(() => {
         if (!browser || !enableHeavyEffects || destroyed) return;
@@ -235,6 +243,39 @@
         };
     });
 
+    $effect(() => {
+        if (!browser) return;
+        let timeoutA = null;
+        let timeoutB = null;
+        let timeoutC = null;
+
+        const applyScrollState = () => {
+            if (isMenuOpen) {
+                document.body.style.overflow = "hidden";
+                document.body.style.height = "100vh";
+                document.documentElement.style.overflow = "hidden";
+                return;
+            }
+            document.body.style.overflow = "";
+            document.body.style.height = "";
+            document.documentElement.style.overflow = "";
+        };
+
+        applyScrollState();
+
+        if (!isMenuOpen) {
+            timeoutA = setTimeout(applyScrollState, 0);
+            timeoutB = setTimeout(applyScrollState, 300);
+            timeoutC = setTimeout(applyScrollState, 1200);
+        }
+
+        return () => {
+            if (timeoutA) clearTimeout(timeoutA);
+            if (timeoutB) clearTimeout(timeoutB);
+            if (timeoutC) clearTimeout(timeoutC);
+        };
+    });
+
     // Effect 3: Reset scroll on navigation
     $effect(() => {
         if (lenis && $page.url.pathname) {
@@ -260,6 +301,11 @@
             if (browser) {
                 window["lenis"] = null;
             }
+        }
+        if (browser) {
+            document.body.style.overflow = "";
+            document.body.style.height = "";
+            document.documentElement.style.overflow = "";
         }
     });
 </script>

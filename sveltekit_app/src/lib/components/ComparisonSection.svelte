@@ -7,10 +7,10 @@
   ];
 
   const revenueEngineering = [
-    "Sisteme lead-gen n8n",
+    "Sisteme lead-gen",
     "Revenue Engineering",
-    "UX pentru performanță",
-    "Sisteme vânzare 24/7",
+    "UX construit pentru performanță",
+    "Sisteme automate de vânzare care rulează 24/7",
   ];
 </script>
 
@@ -36,7 +36,7 @@
       <!-- BLOOM MEDIA – appears first on mobile -->
       <div class="order-first md:order-none flex flex-col gap-8 text-left md:pl-20">
         <div class="flex min-h-[2rem] items-end">
-          <span class="font-serif italic text-2xl text-white tracking-tight">
+          <span class="text-2xl text-white tracking-tight" style="font-family: 'Montserrat', sans-serif; font-weight: 900; letter-spacing: -0.05em;">
             Bloom Media
           </span>
         </div>

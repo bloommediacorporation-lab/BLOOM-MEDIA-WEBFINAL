@@ -78,6 +78,14 @@
     observer.observe(belowFoldMarker);
     return () => observer.disconnect();
   });
+
+  $effect(() => {
+    if (!browser || restReady) return;
+    const timeout = setTimeout(() => {
+      loadBelowFold();
+    }, 400);
+    return () => clearTimeout(timeout);
+  });
 </script>
 
 <div class="relative z-10 bg-[#050505] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">

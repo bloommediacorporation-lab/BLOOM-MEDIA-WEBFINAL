@@ -3,11 +3,7 @@
   import { fade, slide, scale } from 'svelte/transition';
   import { tweened, spring } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
   import { enhance } from '$app/forms';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   // --- Constants & Data ---
   const BASE_STRATEGY_FEE = 249.99;

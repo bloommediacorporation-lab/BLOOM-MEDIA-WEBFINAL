@@ -92,6 +92,17 @@ html {
   background: var(--primary);
 }
 
+@media (max-width: 768px) {
+  html {
+    scrollbar-width: none;
+  }
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}
+
 * {
   max-width: 100%;
   box-sizing: border-box;
