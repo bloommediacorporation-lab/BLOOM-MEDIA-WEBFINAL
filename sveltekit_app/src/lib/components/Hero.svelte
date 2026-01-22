@@ -83,8 +83,10 @@
       }, 2000);
     };
 
+    const handleFocus = () => forcePlay(false);
+    
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", () => forcePlay(false));
+    window.addEventListener("focus", handleFocus);
     window.addEventListener("touchstart", handleInteraction, { passive: true, capture: true });
     window.addEventListener("click", handleInteraction, { passive: true, capture: true });
     
@@ -155,7 +157,7 @@
     return () => {
         window.removeEventListener("resize", handleResize);
         document.removeEventListener("visibilitychange", handleVisibilityChange);
-        window.removeEventListener("focus", forcePlay);
+        window.removeEventListener("focus", handleFocus);
         window.removeEventListener("touchstart", handleInteraction);
         window.removeEventListener("click", handleInteraction);
         if (watchdogInterval) clearInterval(watchdogInterval);
