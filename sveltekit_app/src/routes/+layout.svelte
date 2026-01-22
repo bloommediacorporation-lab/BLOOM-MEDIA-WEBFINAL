@@ -251,14 +251,16 @@
 
         const applyScrollState = () => {
             if (isMenuOpen) {
-                document.body.style.overflow = "hidden";
-                document.body.style.height = "100vh";
-                document.documentElement.style.overflow = "hidden";
+                // document.body.style.overflow = "hidden";
+                // document.body.style.height = "100vh";
+                // document.documentElement.style.overflow = "hidden";
+                if (lenis) lenis.stop();
                 return;
             }
-            document.body.style.overflow = "";
-            document.body.style.height = "";
-            document.documentElement.style.overflow = "";
+            // document.body.style.overflow = "";
+            // document.body.style.height = "";
+            // document.documentElement.style.overflow = "";
+            if (lenis) lenis.start();
         };
 
         applyScrollState();
