@@ -5,7 +5,7 @@
       <p>Ultima actualizare: {new Date().toLocaleDateString('ro-RO')}</p>
       
       <h2>1. Colectarea Datelor</h2>
-      <p>Colectăm informații pe care ni le furnizați direct, cum ar fi numele, adresa de email și numărul de telefon atunci când completați formularul de contact.</p>
+      <p>Prelucrarea datelor cu caracter personal se realizează în conformitate cu prevederile Regulamentului General privind Protecția Datelor (UE) 2016/679 ("GDPR"). Colectăm informații pe care ni le furnizați direct, cum ar fi numele, adresa de email și numărul de telefon atunci când completați formularul de contact.</p>
 
       <h2>2. Utilizarea Informațiilor</h2>
       <p>Folosim informațiile colectate pentru a răspunde solicitărilor dumneavoastră și pentru a vă oferi serviciile noastre.</p>

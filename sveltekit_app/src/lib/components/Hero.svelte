@@ -206,7 +206,7 @@
 
       <p bind:this={subtext} class="subtext">
         Construit pentru performanță: trafic,<br />
-        conversii, retenție.
+        conversii și retenție.
       </p>
     </div>
   </div>
