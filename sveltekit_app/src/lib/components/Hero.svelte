@@ -28,6 +28,33 @@
 
     window.addEventListener("resize", handleResize);
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // FIX VIDEO FREEZE: Resume playback on visibility change/focus
+    // ══════════════════════════════════════════════════════════════════════════
+    const handleVisibilityChange = async () => {
+      if (!videoEl) return;
+      
+      if (!document.hidden) {
+        try {
+          await videoEl.play();
+        } catch (e) {
+          console.error("Video resume failed:", e);
+        }
+      }
+    };
+
+    const handleFocus = async () => {
+      if (!videoEl) return;
+      try {
+        await videoEl.play();
+      } catch (e) {
+        console.error("Video resume on focus failed:", e);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
     let destroyed = false;
     let timeline: gsap.core.Timeline | undefined;
 
@@ -91,6 +118,8 @@
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
       destroyed = true;
       timeline?.kill();
     };
@@ -218,7 +247,7 @@
 
   .text-wrapper {
     overflow: hidden;
-    padding: 1.5rem 1rem 0; /* Reduced padding to prevent wrapping on small screens */
+    padding: 1.5rem 0.2rem 0; /* Reduced padding further to prevent clipping on small screens */
     display: flex;
     justify-content: center;
     width: 100%;
@@ -226,7 +255,7 @@
 
   .hero-text {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: clamp(64px, 15vw, 180px);
+    font-size: clamp(42px, 15vw, 180px); /* Lowered min size from 64px to 42px */
     font-weight: 800;
     line-height: 1.2;
     letter-spacing: -0.04em;
@@ -237,7 +266,7 @@
     will-change: transform, opacity;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    padding: 0.2em 0; /* Balanced padding */
+    padding: 0.2em 0.1em; /* Added horizontal padding to prevent dot clipping */
     white-space: nowrap; /* Prevents dot from wrapping */
   }
 
