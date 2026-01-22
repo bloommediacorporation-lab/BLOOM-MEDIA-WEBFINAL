@@ -29,28 +29,51 @@
       <div class="pricing-card card" in:fly={{ y: 40, duration: 700, delay: 200 }}>
         <!-- LEFT: Price & Info -->
         <div class="left">
-          <div class="md:hidden flex items-center justify-between gap-4">
-            <h3 class="text-white text-lg font-bold">SISTEM START</h3>
-            <div class="flex items-baseline gap-1">
-              <span class="text-[#FFA500] text-xl font-bold">249,99€/luna</span>
-            
+          <!-- MOBILE REDESIGN -->
+          <div class="md:hidden flex flex-col items-start w-full">
+            <h3 class="text-white text-2xl font-bold uppercase tracking-wide mb-4 w-full text-left">SISTEM START</h3>
+
+            <div class="flex flex-col items-start w-full mb-6">
+               <span class="text-[#FFA500] text-sm font-medium mb-1">De la</span>
+               <div class="flex items-start">
+                 <span class="text-[#FFA500] text-5xl font-black font-['Montserrat'] tracking-tight leading-none">249,99</span>
+                 <div class="flex flex-col items-start ml-1 mt-2">
+                   <span class="text-[#FFA500] text-2xl font-bold leading-none">€</span>
+                   <span class="text-white/40 text-xs font-medium mt-1">/lună</span>
+                 </div>
+               </div>
             </div>
+            
+            <p class="text-gray-400 text-base leading-relaxed mb-12 w-full text-left">
+              Infrastructură completă pentru achiziție predictibilă de clienți. Lead-uri care se transformă în venit, nu metrici de vanitate.
+            </p>
+
+            <button 
+              class="w-full bg-[#FFA500] text-black py-4 rounded-full font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2 hover:bg-[#ff8c00] transition-colors" 
+              onclick={() => navigate && navigate('/configurator')}
+            >
+              Configurează Sistem
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
           </div>
 
+          <!-- DESKTOP LAYOUT -->
           <div class="price-block hidden md:block">
-            <div class="prefix">Sistem de bază</div>
+            <div class="prefix">De la</div>
             <span class="price-amount value">249,99</span>
             <span class="currency">€</span>
             <span class="period">/lună</span>
           </div>
           
-          <div class="meta">
+          <div class="meta hidden md:flex flex-col gap-4">
             <h3 class="package-title package-name">SISTEM START</h3>
             <p class="package-desc">Infrastructură completă pentru achiziție predictibilă de clienți. Lead-uri care se transformă în venit, nu metrici de vanitate.</p>
           </div>
 
 
-          <button class="hidden md:flex configure-button cta-btn" onclick={() => navigate && navigate('/configurator')}>
+          <button class="hidden md:flex items-center gap-4 configure-button cta-btn" onclick={() => navigate && navigate('/configurator')}>
             Configurează Sistem
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -221,9 +244,7 @@
   }
   
   .meta {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    /* Layout handled by utility classes */
   }
 
   .package-name {
@@ -256,9 +277,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    /* Layout handled by utility classes */
     transition: all 0.3s ease;
   }
   
@@ -333,8 +352,10 @@
   @media (max-width: 1024px) {
     .card { 
       grid-template-columns: 1fr; 
-      border-radius: 0;
+      border-radius: 24px;
       border: 1px solid rgba(255,255,255,0.1);
+      background: #1A1A1A; /* Very Dark Gray background */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     
     .card::after {
@@ -343,12 +364,16 @@
 
     /* Add horizontal divider instead */
     .left {
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
       padding: 3rem 2rem;
     }
 
     .right {
       padding: 3rem 2rem;
+    }
+    
+    .config-cta-wrapper {
+      display: none;
     }
   }
 </style>

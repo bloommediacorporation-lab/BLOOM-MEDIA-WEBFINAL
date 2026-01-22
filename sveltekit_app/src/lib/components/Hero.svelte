@@ -4,40 +4,63 @@
   let videoEl: HTMLVideoElement | null = null;
   let heroText: HTMLHeadingElement | null = null;
   let subtext: HTMLParagraphElement | null = null;
+  let heroHeight = "100svh"; // Default start
 
   onMount(() => {
+    // ══════════════════════════════════════════════════════════════════════════
+    // FIX MOBILE STABILITY: Calculate fixed height to prevent resize jumps
+    // ══════════════════════════════════════════════════════════════════════════
+    const setHeight = () => {
+      heroHeight = `${window.innerHeight}px`;
+    };
+    
+    // Set initial height
+    setHeight();
+
+    // Only update on width change (orientation) to avoid address bar resize issues
+    let lastWidth = window.innerWidth;
+    const handleResize = () => {
+      if (window.innerWidth !== lastWidth) {
+        lastWidth = window.innerWidth;
+        setHeight();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
     let destroyed = false;
-    let timeline;
+    let timeline: gsap.core.Timeline | undefined;
 
     (async () => {
       const { default: gsap } = await import("gsap");
       if (destroyed) return;
 
-      // Setări inițiale
       if (videoEl) {
-        // Pornim de la 1.15 (zoom mare)
         gsap.set(videoEl, { scale: 1.15, opacity: 0 });
       }
       if (heroText) {
-        gsap.set(heroText, { yPercent: 100, opacity: 0, scaleX: 1.4, transformOrigin: "50% 50%" });
+        gsap.set(heroText, { 
+          yPercent: 100, 
+          opacity: 0, 
+          scaleX: 1.4, 
+          transformOrigin: "50% 50%" 
+        });
       }
       if (subtext) {
         gsap.set(subtext, { opacity: 0, y: 16 });
       }
 
       timeline = gsap.timeline();
-      
-      // Animația Video
+
       if (videoEl) {
         timeline.to(videoEl, {
-          scale: 1.05, // <--- CRITIC: Ne oprim la 1.05, nu la 1. Asta previne apariția barei negre la final.
+          scale: 1.05,
           opacity: 1,
           duration: 2,
           ease: "power2.out"
         });
       }
 
-      // Animația Text (Bloom)
       if (heroText) {
         timeline.to(
           heroText,
@@ -52,7 +75,6 @@
         );
       }
 
-      // Animația Subtext
       if (subtext) {
         timeline.to(
           subtext,
@@ -68,6 +90,7 @@
     })();
 
     return () => {
+      window.removeEventListener("resize", handleResize);
       destroyed = true;
       timeline?.kill();
     };
@@ -75,84 +98,182 @@
 </script>
 
 <svelte:head>
-  <link href="https://db.onlinewebfonts.com/c/0a0cbbd2ee416efdde8260f3aafa0d14?family=Morion+Bold" rel="stylesheet" type="text/css" />
+  <link 
+    href="https://db.onlinewebfonts.com/c/0a0cbbd2ee416efdde8260f3aafa0d14?family=Morion+Bold" 
+    rel="stylesheet" 
+    type="text/css" 
+  />
 </svelte:head>
 
-<!-- Folosim 100dvh pentru stabilitate mai bună pe mobil -->
-<section class="relative w-full h-[100dvh] overflow-hidden bg-black">
+<!-- Hero Section: Standard Layout -->
+<section class="hero-section" style:height={heroHeight}>
   
-  <!-- 
-    MODIFICĂRI VIDEO:
-    1. height: 115% și top: -7.5% -> Videoul este fizic mai înalt decât ecranul.
-    2. pointer-events-none -> Previne interacțiuni accidentale.
-    3. object-center -> Asigură centrarea imaginii.
-  -->
-  <video
-    bind:this={videoEl}
-    class="video-bg absolute left-0 w-full object-cover object-center opacity-0 pointer-events-none"
-    style="height: 115%; top: -7.5%;"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="metadata"
-  >
-    <source src="/0119.webm" type="video/webm" />
-  </video>
-
-  <!-- Overlay întunecat -->
-  <div class="absolute inset-0 bg-black/20 z-[1] pointer-events-none"></div>
-
-  <!-- Conținut Text -->
-  <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-    <div class="overflow-hidden px-20 w-full flex justify-center">
-      <h1
-        bind:this={heroText}
-        class="hero-text text-[#F2F0EF] opacity-0 origin-center mx-auto"
-      >
-        bloom<span class="dot text-[#FFA500] inline-block">.</span>
-      </h1>
-    </div>
-
-    <p
-      bind:this={subtext}
-      class="subtext text-white/90 -mt-2 md:-mt-24 opacity-0 translate-y-4"
+  <!-- Video - FIX: wrapper centrat corect -->
+  <div class="video-wrapper">
+    <video
+      bind:this={videoEl}
+      class="video-element"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      disablePictureInPicture
     >
-      Construit pentru performanță: trafic,<br />
-      conversii, retenție.
-    </p>
+      <source src="/0119.webm" type="video/webm" />
+    </video>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Content - FIX: layout corect cu gap -->
+  <div class="content">
+    <div class="hero-content-inner">
+      <div class="text-wrapper">
+        <h1 bind:this={heroText} class="hero-text">
+          bloom<span class="dot">.</span>
+        </h1>
+      </div>
+
+      <p bind:this={subtext} class="subtext">
+        Construit pentru performanță: trafic,<br />
+        conversii, retenție.
+      </p>
+    </div>
   </div>
 </section>
 
 <style>
+  .hero-section {
+    position: relative;
+    width: 100%;
+    /* Height handled by JS for mobile stability */
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     FIX #1: Video wrapper - centrat corect fără offset
+     ═══════════════════════════════════════════════════════════════════ */
+  .video-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .video-element {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    object-position: center center;
+    opacity: 0;
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     FIX #2: Content layout - text și subtext separate corect
+     ═══════════════════════════════════════════════════════════════════ */
+  .content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 1rem;
+  }
+
+  .hero-content-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0; /* Eliminat complet gap-ul */
+    transform: translateY(4vh); /* Coboară întreg grupul de conținut */
+  }
+
+  .text-wrapper {
+    overflow: hidden;
+    padding: 1.5rem 6rem 0; /* Removed bottom padding to bring subtext closer */
+    display: flex;
+    justify-content: center;
+  }
+
   .hero-text {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: clamp(64px, 15vw, 180px);
     font-weight: 800;
-    line-height: 0.9;
+    line-height: 1.2;
     letter-spacing: -0.04em;
     text-transform: lowercase;
+    color: #F2F0EF;
+    opacity: 0;
+    margin: 0;
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    padding: 0.2em 0; /* Balanced padding */
   }
 
-  .subtext {
-    font-family: "Morion Bold", "Cormorant Garamond", "Times New Roman", serif;
-    font-size: clamp(20px, 3vw, 32px);
-    font-weight: 400;
-    line-height: 1.5;
-    letter-spacing: 0.01em;
-    font-style: normal;
-  }
-
-  .hero-text .dot {
+  .dot {
+    color: #FFA500;
     display: inline-block;
     transform: scaleX(0.7142857);
     transform-origin: center;
   }
 
-  /* Asigurăm centrarea pe mobil */
-  @media (max-width: 768px) {
-    .video-bg {
-      object-position: center center;
+  /* ═══════════════════════════════════════════════════════════════════
+     FIX #3: Subtext - fără margin negativ
+     ═══════════════════════════════════════════════════════════════════ */
+  .subtext {
+    font-family: "Morion Bold", "Cormorant Garamond", "Times New Roman", serif;
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    margin-top: -0.5rem; /* Ușor ridicat pe mobile, dar safe */
+    text-align: center;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  @media (min-width: 768px) {
+    .hero-content-inner {
+      gap: 0;
+    }
+    
+    .subtext {
+      margin-top: -1rem;
+    }
+
+    .text-wrapper {
+      padding: 2rem 12rem 0;
     }
   }
 </style>

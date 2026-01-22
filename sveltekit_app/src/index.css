@@ -32,33 +32,14 @@ body {
   font-family: 'Montserrat', 'Inter', sans-serif;
   overflow-x: hidden !important;
   overflow-y: auto !important;
-  overscroll-behavior-y: none; /* Disable mobile rubber-banding */
+  overscroll-behavior-y: none;
   overscroll-behavior-x: none;
   width: 100%;
   max-width: 100vw;
   scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  touch-action: pan-y; /* Optimization: Improve touch scrolling performance */
-}
-
-/* Prevent rubber-banding on hero section specifically for Brave/iOS */
-.hero-section {
-  overscroll-behavior: none !important;
-  -webkit-overflow-scrolling: touch !important;
-  touch-action: pan-y !important;
-}
-
-/* Additional prevention for mobile browsers */
-.hero-section > * {
-  overscroll-behavior: contain !important;
-}
-
-/* Specific fix for Spline canvas in hero section */
-.hero-section canvas {
-  overscroll-behavior: none !important;
-  -webkit-overflow-scrolling: auto !important;
-  touch-action: manipulation !important;
+  touch-action: pan-y;
 }
 
 html.lenis {
@@ -339,9 +320,6 @@ h1, h2, h3, h4, h5, h6 {
 p, span, div {
   line-height: 1.6;
 }
-/* ========================================
-   ANIMATION SYSTEM - GLOBAL STYLES
-   ======================================== */
 
 /* Smooth scroll */
 html {
@@ -361,13 +339,17 @@ html {
     transform-origin: center;
     transition: none;
   }
-  /* src/index.css - Adaugă asta la finalul fișierului */
 
-/* FIX: Lighthouse User Agent Warning */
-/* Această regulă îi spune browserului că noi controlăm mărimea, nu el. */
-:where(section, article, aside, nav) h1 {
-  font-size: 2em;
-  margin-block-start: 0.67em;
-  margin-block-end: 0.67em;
+  :where(section, article, aside, nav) h1 {
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+  }
 }
-}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   iOS CHROME/SAFARI FIX - Viewport Stability
+   Previne resize și snap când bara de browser apare/dispare
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Old Hero Fixes Removed */
