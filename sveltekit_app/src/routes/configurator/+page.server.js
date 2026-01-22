@@ -52,7 +52,7 @@ export const actions = {
     try {
       const convex = new ConvexHttpClient(convexUrl);
 
-      const res = await convex.mutation(api.leads.create, {
+      const res = await convex.action(api.leads.submitWithEmail, {
         businessName: resolvedBusinessName,
         name: resolvedName,
         email: resolvedEmail,
