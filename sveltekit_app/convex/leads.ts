@@ -59,7 +59,7 @@ export const submitWithEmail = action({
     // 2. Email către agenție (notificare lead nou)
     try {
       await resend.emails.send({
-        from: "Bloom Media <no-reply@bloommedia.ro>", // schimbă după ce îți verifici domeniul în Resend
+        from: "Bloom Media <contact@bloommedia.ro>",
         to: "bloommediacorporation@gmail.com",                 // adresa ta de notificare
         subject: "Lead nou Bloom Media",
         text: [
@@ -79,7 +79,7 @@ export const submitWithEmail = action({
     // 3. Email către client (confirmare)
     try {
       await resend.emails.send({
-        from: "Bloom Media <onboarding@resend.dev>", // la fel, schimbă după setup domeniu
+        from: "Bloom Media <contact@bloommedia.ro>",
         to: args.email,
         subject: "Am primit solicitarea ta – Bloom Media",
         text: [
