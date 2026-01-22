@@ -29,35 +29,67 @@
     window.addEventListener("resize", handleResize);
 
     // ══════════════════════════════════════════════════════════════════════════
-    // FIX VIDEO FREEZE: ROBUST RESUME STRATEGY
+    // FIX VIDEO FREEZE: ULTIMATE WATCHDOG STRATEGY
     // ══════════════════════════════════════════════════════════════════════════
-    const attemptPlay = async () => {
+    let watchdogInterval;
+
+    const forcePlay = async (reload = false) => {
       if (!videoEl) return;
       try {
-        videoEl.muted = true; // Ensure muted (browser requirement for autoplay)
+        if (reload) {
+          console.log("Force reloading video source...");
+          videoEl.load();
+        }
+        videoEl.muted = true;
+        videoEl.playsInline = true; // Ensure property is set
         await videoEl.play();
+        console.log("Video playback started successfully.");
       } catch (e) {
-        console.warn("Video resume failed:", e);
+        console.warn("Play attempt failed:", e);
+        // If simple play failed and we haven't reloaded yet, try reloading
+        if (!reload) {
+          forcePlay(true);
+        }
       }
     };
 
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        setTimeout(attemptPlay, 100); // Slight delay for browser wake-up
+        // Aggressive restart on visibility
+        setTimeout(() => forcePlay(false), 100);
       }
     };
 
-    // Backup: Resume on any user interaction if stuck
     const handleInteraction = () => {
       if (videoEl && videoEl.paused) {
-        attemptPlay();
+        forcePlay(false);
       }
+    };
+
+    const startWatchdog = () => {
+      // Check every 2 seconds if video should be playing but isn't
+      watchdogInterval = setInterval(() => {
+        if (!videoEl) return;
+        
+        const isVisible = !document.hidden;
+        const isPaused = videoEl.paused;
+        const isEnded = videoEl.ended;
+        const isReady = videoEl.readyState >= 2; // HAVE_CURRENT_DATA
+
+        if (isVisible && (isPaused || isEnded)) {
+          console.log(`Watchdog: Video stuck (paused:${isPaused}, ended:${isEnded}). Forcing play...`);
+          forcePlay(videoEl.readyState < 2); // Reload if not ready
+        }
+      }, 2000);
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", attemptPlay);
+    window.addEventListener("focus", () => forcePlay(false));
     window.addEventListener("touchstart", handleInteraction, { passive: true, capture: true });
     window.addEventListener("click", handleInteraction, { passive: true, capture: true });
+    
+    // Start watchdog
+    startWatchdog();
 
     let destroyed = false;
     let timeline: gsap.core.Timeline | undefined;
@@ -123,9 +155,10 @@
     return () => {
         window.removeEventListener("resize", handleResize);
         document.removeEventListener("visibilitychange", handleVisibilityChange);
-        window.removeEventListener("focus", attemptPlay);
+        window.removeEventListener("focus", forcePlay);
         window.removeEventListener("touchstart", handleInteraction);
         window.removeEventListener("click", handleInteraction);
+        if (watchdogInterval) clearInterval(watchdogInterval);
         destroyed = true;
         timeline?.kill();
       };
