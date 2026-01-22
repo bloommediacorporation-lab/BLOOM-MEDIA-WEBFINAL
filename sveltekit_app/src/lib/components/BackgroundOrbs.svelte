@@ -5,15 +5,15 @@
   let isMobile = $state(false);
   
   onMount(() => {
-    // Only show orbs on desktop
-    isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (!isMobile) {
+    // Only show orbs on desktop - ACTIVAT SI PE MOBIL LA CERERE
+    // isMobile = window.matchMedia('(max-width: 768px)').matches;
+    // if (!isMobile) {
       visible = true;
-    }
+    // }
   });
 </script>
 
-{#if visible && !isMobile}
+{#if visible}
   <div class="orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>

@@ -45,7 +45,7 @@
     // ═══════════════════════════════════════════════════════════════════════════
     // DERIVED
     // ═══════════════════════════════════════════════════════════════════════════
-    let enableHeavyEffects = $derived(browser && !isMobile && !isPerfBot);
+    let enableHeavyEffects = $derived(browser && !isPerfBot);
     let showEffects = $derived(
         enableHeavyEffects && 
         CursorComp && 

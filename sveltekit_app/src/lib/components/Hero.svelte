@@ -213,14 +213,15 @@
     flex-direction: column;
     align-items: center;
     gap: 0; /* Eliminat complet gap-ul */
-    transform: translateY(4vh); /* Coboară întreg grupul de conținut */
+    transform: translateY(-5vh); /* Move up specifically on mobile */
   }
 
   .text-wrapper {
     overflow: hidden;
-    padding: 1.5rem 6rem 0; /* Removed bottom padding to bring subtext closer */
+    padding: 1.5rem 1rem 0; /* Reduced padding to prevent wrapping on small screens */
     display: flex;
     justify-content: center;
+    width: 100%;
   }
 
   .hero-text {
@@ -237,6 +238,7 @@
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     padding: 0.2em 0; /* Balanced padding */
+    white-space: nowrap; /* Prevents dot from wrapping */
   }
 
   .dot {
@@ -266,6 +268,7 @@
   @media (min-width: 768px) {
     .hero-content-inner {
       gap: 0;
+      transform: translateY(4vh); /* Keep slightly lower on desktop */
     }
     
     .subtext {
