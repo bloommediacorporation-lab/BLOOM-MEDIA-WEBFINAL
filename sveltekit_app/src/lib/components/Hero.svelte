@@ -54,8 +54,9 @@
     };
 
     const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // Aggressive restart on visibility
+      // Logic requested: Check if visible AND paused, then force play
+      if (!document.hidden && videoEl && videoEl.paused) {
+        console.log("Visibility change detected: Resuming video...");
         setTimeout(() => forcePlay(false), 100);
       }
     };
@@ -187,6 +188,7 @@
       muted
       loop
       playsinline
+      webkit-playsinline
       preload="auto"
       disablePictureInPicture
     >
