@@ -29,31 +29,35 @@
     window.addEventListener("resize", handleResize);
 
     // ══════════════════════════════════════════════════════════════════════════
-    // FIX VIDEO FREEZE: Resume playback on visibility change/focus
+    // FIX VIDEO FREEZE: ROBUST RESUME STRATEGY
     // ══════════════════════════════════════════════════════════════════════════
-    const handleVisibilityChange = async () => {
+    const attemptPlay = async () => {
       if (!videoEl) return;
-      
-      if (!document.hidden) {
-        try {
-          await videoEl.play();
-        } catch (e) {
-          console.error("Video resume failed:", e);
-        }
+      try {
+        videoEl.muted = true; // Ensure muted (browser requirement for autoplay)
+        await videoEl.play();
+      } catch (e) {
+        console.warn("Video resume failed:", e);
       }
     };
 
-    const handleFocus = async () => {
-      if (!videoEl) return;
-      try {
-        await videoEl.play();
-      } catch (e) {
-        console.error("Video resume on focus failed:", e);
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        setTimeout(attemptPlay, 100); // Slight delay for browser wake-up
+      }
+    };
+
+    // Backup: Resume on any user interaction if stuck
+    const handleInteraction = () => {
+      if (videoEl && videoEl.paused) {
+        attemptPlay();
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", handleFocus);
+    window.addEventListener("focus", attemptPlay);
+    window.addEventListener("touchstart", handleInteraction, { passive: true, capture: true });
+    window.addEventListener("click", handleInteraction, { passive: true, capture: true });
 
     let destroyed = false;
     let timeline: gsap.core.Timeline | undefined;
@@ -117,12 +121,14 @@
     })();
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleFocus);
-      destroyed = true;
-      timeline?.kill();
-    };
+        window.removeEventListener("resize", handleResize);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        window.removeEventListener("focus", attemptPlay);
+        window.removeEventListener("touchstart", handleInteraction);
+        window.removeEventListener("click", handleInteraction);
+        destroyed = true;
+        timeline?.kill();
+      };
   });
 </script>
 
@@ -146,7 +152,7 @@
       muted
       loop
       playsinline
-      preload="metadata"
+      preload="auto"
       disablePictureInPicture
     >
       <source src="/0119.webm" type="video/webm" />
