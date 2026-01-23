@@ -506,7 +506,7 @@
         font-size: clamp(3rem, 8vw, 6.5rem);
         color: #FFFFFF;
         text-transform: uppercase;
-        line-height: 1;
+        line-height: 1.2;
         letter-spacing: -0.02em;
         margin-bottom: 2rem;
     }
