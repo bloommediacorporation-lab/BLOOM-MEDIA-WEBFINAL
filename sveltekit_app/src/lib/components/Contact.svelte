@@ -41,6 +41,24 @@
     <div class="content-grid">
       <!-- Left Column: Giant Title -->
       <div class="title-column">
+        <div class="mascot-wrapper" class:visible={isVisible}>
+          {#if isVisible}
+            <video 
+              autoplay 
+              muted 
+              loop 
+              playsinline 
+              webkit-playsinline
+              class="mascot-video"
+            >
+              <!-- HEVC for Safari (Alpha Channel) - Check if .mp4 or .mov exists -->
+              <source src="/monstru_2.mp4" type='video/mp4; codecs="hvc1"'>
+              <source src="/monstru_2.mov" type='video/quicktime; codecs="hvc1"'>
+              <!-- VP9 for Chrome/Edge (Alpha Channel) -->
+              <source src="/monstru_2.webm" type="video/webm">
+            </video>
+          {/if}
+        </div>
         <div class="mask-container">
           <h1 class="giant-title" class:reveal={isVisible} bind:this={titleRef}>
             SALUT.
@@ -156,6 +174,10 @@
   }
 
   /* --- Left Column: Giant Title --- */
+  .title-column {
+    position: relative;
+  }
+
   .mask-container {
     overflow: hidden;
   }
@@ -174,6 +196,24 @@
   }
 
   .giant-title.reveal {
+    transform: translateY(0);
+  }
+
+  .mascot-wrapper {
+    position: absolute;
+    bottom: 62%; /* Mai jos */
+    right: -15%; /* Mai în dreapta */
+    width: 500px;
+    height: auto;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .mascot-wrapper.visible {
+    opacity: 1;
     transform: translateY(0);
   }
 
@@ -294,6 +334,18 @@
     .giant-title {
       font-size: clamp(4rem, 15vw, 10rem);
       margin-bottom: 2rem;
+    }
+    
+    .mascot-wrapper {
+      width: 300px;
+      bottom: 85%; /* Mai aproape de text */
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%) translateY(20px); /* Centrat pe mobil */
+    }
+
+    .mascot-wrapper.visible {
+      transform: translateX(-50%) translateY(0);
     }
 
     .info-column {
