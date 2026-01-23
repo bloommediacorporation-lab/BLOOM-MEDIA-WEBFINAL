@@ -5,52 +5,48 @@
   
   const faqs = [
     {
-      question: 'CÂT COSTĂ SISTEMUL?',
-      answer: 'Fee consultanță €249.99/lună + componente sistem selectate în configurator. Majoritatea clienților: €400-800/lună pentru infrastructură completă lead-to-revenue. Rapoarte transparente, zero costuri ascunse.'
+      question: 'CARE SUNT COSTURILE?',
+      answer: 'Taxa de management și strategie: €249/lună. Serviciile suplimentare (ads, design, development) se configurează separat în funcție de nevoi. Prețuri clare de la început, fără costuri ascunse sau surprize la factură.'
     },
     {
-      question: 'CÂT TIMP PÂNĂ VĂD REZULTATE?',
-      answer: 'Capturare organic: 4-6 săptămâni. Achiziție plătită: lead-uri în 1-2 săptămâni, optimizare cost/lead 2-3 luni. SEO: 3-6 luni. Sisteme website: impact imediat. Nu promitem quick wins—construim fundație predictibilă. Tracking transparent de la zi 1.'
+      question: 'ÎN CÂT TIMP VOI VEDEA REZULTATE?',
+      answer: 'Depinde de canal. Standardele din industrie: campaniile plătite generează primele lead-uri în 1-2 săptămâni, content organic în 4-6 săptămâni, SEO în 3-6 luni. Stabilim împreună așteptări realiste și urmărim progresul săptămânal.'
     },
     {
-      question: 'ECHIPĂ SAU FREELANCERI?',
-      answer: 'Echipă internă dedicată: strategist, designer, copywriter, developer, ads specialist. Zero subcontractare. Project Manager dedicat ca punct central contact. Consistență și calitate 100% controlată.'
-    },
-    {
-      question: 'POT OPRI COLABORAREA?',
-      answer: 'Da, oricând cu 30 zile preaviz. Fără contracte pe ani. Tot ce-am creat rămâne al tău. Credem în rezultate care te fac să continui, nu contracte care obligă.'
-    },
-    {
-      question: 'AVEȚI EXPERIENȚĂ ÎN INDUSTRIA MEA?',
-      answer: 'Probabil da: e-commerce, servicii, HoReCa, real estate, SaaS, wellness, educație. Dar experiența narrow contează mai puțin decât principii universale de conversie. Metodologie solidă > povești din nișă. La consultanță vedem compatibilitate.'
-    },
-    {
-      question: 'TREBUIE PREZENȚĂ ONLINE EXISTENTĂ?',
-      answer: 'Nu. Construim de la zero sau optimizăm existent. Audit gratuit identifică ce funcționează. Startup sau business matur - adaptăm abordarea.'
-    },
-    {
-      question: 'CUM MĂSURAȚI SUCCESUL?',
-      answer: 'Metrici concrete: lead-uri generate, cost/lead, rate conversie, revenue atribuit. Zero focus pe followers, likes, brand awareness fără conversie. Dashboard real-time + rapoarte lunare. KPI-uri stabilite la start. Dacă numerele stagnează, ajustăm rapid sau ne despărțim.'
-    },
-    {
-      question: 'POT ALEGE DOAR ANUMITE COMPONENTE?',
-      answer: 'Absolut. Configurator flexibil—iei ce ai nevoie. Fee bază (€249.99) include consultanță, rapoarte, coordonare. Recomandam sisteme integrate pentru predictibilitate maximă, dar decizia e a ta.'
-    },
-    {
-      question: 'CREAȚI VOI CONȚINUTUL?',
-      answer: 'Da, tot: copywriting, design, video editing, photography. Tu oferi brief + acces + feedback. Poți fi implicat sau hands-off. Conținut optimizat pentru conversie, nu pentru premii creative.'
-    },
-    {
-      question: 'CE CANALE RECOMANDAȚI?',
-      answer: 'Depinde unde e audiența ta și ce conversie urmărim. Poate fi social, search, video, email. Focusare 2-3 canale strategice unde ai cel mai bun cost/lead. Nu spam pe toate platformele. Calitate conversie > prezență universală.'
+      question: 'CU CINE VOI LUCRA?',
+      answer: 'Cu o echipă dedicată de 3 specialiști: strategie, design și implementare tehnică. Comunicare directă, fără intermediari. Dimensiunea echipei înseamnă atenție completă pentru fiecare proiect, nu jonglare între zeci de clienți.'
     },
     {
       question: 'CUM FUNCȚIONEAZĂ PROCESUL?',
-      answer: '1) Consultanță 30 min - verificăm compatibilitate. 2) Propunere sistem personalizat. 3) Onboarding 1-2 săpt - acces + brief + trackere. 4) Execuție - implementare + rapoarte. 5) Optimizare continuă bazată pe date. Manager dedicat coordonează tot.'
+      answer: 'Patru pași: 1) Consultanță inițială gratuită de 30 minute. 2) Propunere personalizată cu strategie și buget clar. 3) Onboarding pentru acces la conturi și stabilire obiective. 4) Execuție cu rapoarte săptămânale și comunicare constantă.'
     },
     {
-      question: 'GARANȚIE REZULTATE?',
-      answer: 'Nu garantăm "X lead-uri în Y zile". Garantăm: efort maxim, transparență brutală, best practices dovedite, rapoarte oneste. Strategie pe date + implementare profesională. Majoritatea: ROI pozitiv în 3-6 luni. Dacă după 3 luni zero progres măsurabil: analiză gratuită + ajustări radicale sau încheiem colaborarea fără dramă.'
+      question: 'POT OPRI COLABORAREA ORICÂND?',
+      answer: 'Da. Preaviz de 30 de zile, fără penalizări. Nu lucrăm cu contracte pe termen lung obligatorii. Tot ce creăm pentru tine rămâne proprietatea ta. Vrem să continui pentru că vezi valoare, nu pentru că ești blocat contractual.'
+    },
+    {
+      question: 'CUM MĂSURAȚI SUCCESUL?',
+      answer: 'Prin metrici cu impact direct: lead-uri generate, cost per lead, rată de conversie. Nu raportăm likes și followers ca rezultate finale. Ai acces la toate datele în timp real — transparență completă.'
+    },
+    {
+      question: 'POT ALEGE DOAR ANUMITE SERVICII?',
+      answer: 'Absolut. Configuratorul permite selecție modulară — iei doar ce ai nevoie. Taxa de bază include consultanța și coordonarea strategică. Fără pachete forțate.'
+    },
+    {
+      question: 'CINE SE OCUPĂ DE CONȚINUT?',
+      answer: 'Noi. Producem copywriting, design și materiale vizuale. Tu oferi brief-ul, informațiile despre business și feedback. Poți fi implicat în fiecare detaliu sau poți delega complet — adaptăm stilul de lucru.'
+    },
+    {
+      question: 'AM NEVOIE DE PREZENȚĂ ONLINE EXISTENTĂ?',
+      answer: 'Nu. Construim de la zero sau optimizăm ce ai deja. În consultanța inițială evaluăm situația actuală și stabilim cel mai bun punct de plecare pentru tine.'
+    },
+    {
+      question: 'DE CE SĂ LUCREZ CU VOI?',
+      answer: 'Pentru că primești atenție dedicată, nu ești "încă un cont" într-un portofoliu de 50 de clienți. Echipă mică înseamnă implicare directă, răspunsuri rapide și flexibilitate reală. Plus transparență totală — vezi exact ce facem și de ce.'
+    },
+    {
+      question: 'OFERIȚI GARANȚII?',
+      answer: 'Nu promitem cifre exacte în termene fixe — oricine face asta minte. Garantăm: muncă serioasă, transparență completă, rapoarte oneste și ajustări rapide când ceva nu funcționează. Dacă nu vezi valoare, poți pleca oricând.'
     }
   ];
   
@@ -102,10 +98,8 @@
 
   .section-header {
     margin-bottom: 6rem;
-    /* text-align: center; Removed to match What We Do left alignment */
   }
 
-  /* Matching ServicesShowcase UI */
   .section-label {
     display: block;
     font-family: 'Inter', sans-serif;
@@ -126,7 +120,7 @@
   .section-title {
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;
-    font-size: clamp(3rem, 8vw, 6rem); /* Adjusted slightly for FAQ length */
+    font-size: clamp(3rem, 8vw, 6rem);
     color: #FFFFFF;
     text-transform: uppercase;
     line-height: 0.9;
@@ -146,10 +140,6 @@
     overflow: hidden;
     transition: border-color 0.3s;
   }
-  
-  /* Remove top/side borders by not setting them */
-  /* Ensure last item also has border or adjust as needed. 
-     Usually minimal designs have lines between items. */
   
   .item.open {
     border-color: rgba(255, 255, 255, 0.1);

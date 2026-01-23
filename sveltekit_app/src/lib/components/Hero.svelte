@@ -4,20 +4,15 @@
   let videoEl: HTMLVideoElement | null = null;
   let heroText: HTMLHeadingElement | null = null;
   let subtext: HTMLParagraphElement | null = null;
-  let heroHeight = "100svh"; // Default start
+  let heroHeight = "100svh";
 
   onMount(() => {
-    // ══════════════════════════════════════════════════════════════════════════
-    // FIX MOBILE STABILITY: Calculate fixed height to prevent resize jumps
-    // ══════════════════════════════════════════════════════════════════════════
     const setHeight = () => {
       heroHeight = `${window.innerHeight}px`;
     };
     
-    // Set initial height
     setHeight();
 
-    // Only update on width change (orientation) to avoid address bar resize issues
     let lastWidth = window.innerWidth;
     const handleResize = () => {
       if (window.innerWidth !== lastWidth) {
@@ -29,71 +24,106 @@
     window.addEventListener("resize", handleResize);
 
     // ══════════════════════════════════════════════════════════════════════════
-    // FIX VIDEO FREEZE: ULTIMATE WATCHDOG STRATEGY
+    // FIX VIDEO FREEZE: iOS WEBKIT SPECIFIC SOLUTION
     // ══════════════════════════════════════════════════════════════════════════
-    let watchdogInterval;
+    let watchdogInterval: ReturnType<typeof setInterval>;
+    let isResuming = false;
 
-    const forcePlay = async (reload = false) => {
-      if (!videoEl) return;
+    const forcePlay = async () => {
+      if (!videoEl || isResuming) return;
+      
+      isResuming = true;
+      
       try {
-        if (reload) {
-          console.log("Force reloading video source...");
-          videoEl.load();
-        }
+        // iOS WebKit fix: trebuie să "lovim" currentTime pentru a trezi video-ul
+        const currentTime = videoEl.currentTime;
+        
+        // Trick 1: Seek minim pentru a forța iOS să reactiveze video-ul
+        videoEl.currentTime = currentTime + 0.001;
+        
+        // Trick 2: Asigură proprietățile
         videoEl.muted = true;
-        videoEl.playsInline = true; // Ensure property is set
+        videoEl.playsInline = true;
+        
+        // Trick 3: Așteaptă puțin înainte de play
+        await new Promise(resolve => setTimeout(resolve, 50));
+        
         await videoEl.play();
-        console.log("Video playback started successfully.");
       } catch (e) {
-        console.warn("Play attempt failed:", e);
-        // If simple play failed and we haven't reloaded yet, try reloading
-        if (!reload) {
-          forcePlay(true);
+        // Fallback: reload complet dacă seek nu a funcționat
+        try {
+          const time = videoEl.currentTime;
+          videoEl.load();
+          videoEl.currentTime = time;
+          videoEl.muted = true;
+          await videoEl.play();
+        } catch (e2) {
+          // Silent fail - userul va trebui să atingă ecranul
         }
+      } finally {
+        isResuming = false;
       }
     };
 
+    // Detectează iOS pentru handling special
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
     const handleVisibilityChange = () => {
-      // Logic requested: Check if visible AND paused, then force play
-      if (!document.hidden && videoEl && videoEl.paused) {
-        console.log("Visibility change detected: Resuming video...");
-        setTimeout(() => forcePlay(false), 100);
+      if (!document.hidden && videoEl?.paused) {
+        // iOS are nevoie de delay mai mare
+        setTimeout(forcePlay, isIOS ? 300 : 150);
+      }
+    };
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted || (videoEl?.paused && !document.hidden)) {
+        setTimeout(forcePlay, isIOS ? 300 : 150);
+      }
+    };
+
+    const handleFocus = () => {
+      if (videoEl?.paused) {
+        setTimeout(forcePlay, isIOS ? 200 : 100);
       }
     };
 
     const handleInteraction = () => {
-      if (videoEl && videoEl.paused) {
-        forcePlay(false);
+      if (videoEl?.paused) {
+        forcePlay();
+      }
+    };
+
+    // iOS specific: resume pe orice gest
+    const handleTouchEnd = () => {
+      if (videoEl?.paused) {
+        forcePlay();
       }
     };
 
     const startWatchdog = () => {
-      // Check every 2 seconds if video should be playing but isn't
       watchdogInterval = setInterval(() => {
-        if (!videoEl) return;
+        if (!videoEl || document.hidden) return;
         
-        const isVisible = !document.hidden;
-        const isPaused = videoEl.paused;
-        const isEnded = videoEl.ended;
-        const isReady = videoEl.readyState >= 2; // HAVE_CURRENT_DATA
-
-        if (isVisible && (isPaused || isEnded)) {
-          console.log(`Watchdog: Video stuck (paused:${isPaused}, ended:${isEnded}). Forcing play...`);
-          forcePlay(videoEl.readyState < 2); // Reload if not ready
+        if (videoEl.paused || videoEl.ended) {
+          forcePlay();
         }
-      }, 2000);
+      }, 1500);
     };
 
-    const handleFocus = () => forcePlay(false);
-    
+    // Event listeners
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pageshow", handlePageShow);
     window.addEventListener("focus", handleFocus);
-    window.addEventListener("touchstart", handleInteraction, { passive: true, capture: true });
-    window.addEventListener("click", handleInteraction, { passive: true, capture: true });
-    
-    // Start watchdog
+    window.addEventListener("touchstart", handleInteraction, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("click", handleInteraction, { passive: true });
+    window.addEventListener("scroll", handleInteraction, { passive: true });
+
     startWatchdog();
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // GSAP ANIMATIONS
+    // ══════════════════════════════════════════════════════════════════════════
     let destroyed = false;
     let timeline: gsap.core.Timeline | undefined;
 
@@ -156,15 +186,18 @@
     })();
 
     return () => {
-        window.removeEventListener("resize", handleResize);
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
-        window.removeEventListener("focus", handleFocus);
-        window.removeEventListener("touchstart", handleInteraction);
-        window.removeEventListener("click", handleInteraction);
-        if (watchdogInterval) clearInterval(watchdogInterval);
-        destroyed = true;
-        timeline?.kill();
-      };
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("touchstart", handleInteraction);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("scroll", handleInteraction);
+      if (watchdogInterval) clearInterval(watchdogInterval);
+      destroyed = true;
+      timeline?.kill();
+    };
   });
 </script>
 
@@ -176,10 +209,8 @@
   />
 </svelte:head>
 
-<!-- Hero Section: Standard Layout -->
 <section class="hero-section" style:height={heroHeight}>
   
-  <!-- Video - FIX: wrapper centrat corect -->
   <div class="video-wrapper">
     <video
       bind:this={videoEl}
@@ -193,13 +224,12 @@
       disablePictureInPicture
     >
       <source src="/0119.webm" type="video/webm" />
+      <source src="/0119.mp4" type="video/mp4" />
     </video>
   </div>
 
-  <!-- Overlay -->
   <div class="overlay"></div>
 
-  <!-- Content - FIX: layout corect cu gap -->
   <div class="content">
     <div class="hero-content-inner">
       <div class="text-wrapper">
@@ -220,14 +250,10 @@
   .hero-section {
     position: relative;
     width: 100%;
-    /* Height handled by JS for mobile stability */
     overflow: hidden;
     background: #000;
   }
 
-  /* ═══════════════════════════════════════════════════════════════════
-     FIX #1: Video wrapper - centrat corect fără offset
-     ═══════════════════════════════════════════════════════════════════ */
   .video-wrapper {
     position: absolute;
     top: 0;
@@ -266,9 +292,6 @@
     z-index: 1;
   }
 
-  /* ═══════════════════════════════════════════════════════════════════
-     FIX #2: Content layout - text și subtext separate corect
-     ═══════════════════════════════════════════════════════════════════ */
   .content {
     position: relative;
     z-index: 10;
@@ -284,13 +307,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0; /* Eliminat complet gap-ul */
-    transform: translateY(-5vh); /* Move up specifically on mobile */
+    gap: 0;
+    transform: translateY(-5vh);
   }
 
   .text-wrapper {
     overflow: hidden;
-    padding: 1.5rem 0.2rem 0; /* Reduced padding further to prevent clipping on small screens */
+    padding: 1.5rem 0.2rem 0;
     display: flex;
     justify-content: center;
     width: 100%;
@@ -298,7 +321,7 @@
 
   .hero-text {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: clamp(42px, 15vw, 180px); /* Lowered min size from 64px to 42px */
+    font-size: clamp(42px, 15vw, 180px);
     font-weight: 800;
     line-height: 1.2;
     letter-spacing: -0.04em;
@@ -309,8 +332,8 @@
     will-change: transform, opacity;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    padding: 0.2em 0.1em; /* Added horizontal padding to prevent dot clipping */
-    white-space: nowrap; /* Prevents dot from wrapping */
+    padding: 0.2em 0.1em;
+    white-space: nowrap;
   }
 
   .dot {
@@ -320,9 +343,6 @@
     transform-origin: center;
   }
 
-  /* ═══════════════════════════════════════════════════════════════════
-     FIX #3: Subtext - fără margin negativ
-     ═══════════════════════════════════════════════════════════════════ */
   .subtext {
     font-family: "Morion Bold", "Cormorant Garamond", "Times New Roman", serif;
     font-size: clamp(18px, 2.5vw, 28px);
@@ -331,7 +351,7 @@
     letter-spacing: 0.01em;
     color: rgba(255, 255, 255, 0.9);
     margin: 0;
-    margin-top: -0.5rem; /* Ușor ridicat pe mobile, dar safe */
+    margin-top: -0.5rem;
     text-align: center;
     opacity: 0;
     will-change: transform, opacity;
@@ -340,7 +360,7 @@
   @media (min-width: 768px) {
     .hero-content-inner {
       gap: 0;
-      transform: translateY(4vh); /* Keep slightly lower on desktop */
+      transform: translateY(4vh);
     }
     
     .subtext {
