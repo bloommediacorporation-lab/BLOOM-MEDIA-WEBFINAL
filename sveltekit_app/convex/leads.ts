@@ -62,12 +62,32 @@ export const submitWithEmail = action({
         from: "Bloom Media <contact@bloommedia.ro>",
         to: "bloommediacorporation@gmail.com",                 // adresa ta de notificare
         subject: "Lead nou Bloom Media",
+        html: `
+          <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #d97706;">Lead Nou Primit</h2>
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <ul style="padding-left: 20px; margin-bottom: 0;">
+                <li><strong>Business:</strong> ${args.businessName}</li>
+                <li><strong>Nume Contact:</strong> ${args.name}</li>
+                <li><strong>Email:</strong> ${args.email}</li>
+                <li><strong>Telefon:</strong> ${args.phone}</li>
+                <li><strong>Servicii:</strong>
+                  <ul style="margin-top: 5px; padding-left: 20px;">
+                    ${Array.isArray(args.selectedServices) ? args.selectedServices.map((s: any) => `<li style="margin-bottom: 5px;">${s.name}</li>`).join("") : JSON.stringify(args.selectedServices)}
+                  </ul>
+                </li>
+                <li><strong>Total estimat:</strong> ${args.totalPrice} EUR</li>
+              </ul>
+            </div>
+          </div>
+        `,
         text: [
           `Business: ${args.businessName}`,
           `Nume: ${args.name}`,
           `Email: ${args.email}`,
           `Telefon: ${args.phone}`,
-          `Servicii selectate: ${JSON.stringify(args.selectedServices)}`,
+          `Servicii selectate:`,
+          ...(Array.isArray(args.selectedServices) ? args.selectedServices.map((s: any) => `  - ${s.name}`) : [JSON.stringify(args.selectedServices)]),
           `Total estimat: ${args.totalPrice} EUR`
         ].join("\n")
       });
@@ -81,7 +101,31 @@ export const submitWithEmail = action({
       await resend.emails.send({
         from: "Bloom Media <contact@bloommedia.ro>",
         to: args.email,
+        replyTo: "contact@bloommedia.ro",
         subject: "Am primit solicitarea ta – Bloom Media",
+        html: `
+          <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+            <h2>Salut, ${args.name},</h2>
+            <p>Îți mulțumim pentru interesul față de serviciile <strong>Bloom Media</strong>.</p>
+            <p>Am primit solicitarea ta și te vom contacta în curând pentru a discuta următorii pași.</p>
+            
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #555;">Rezumat solicitare:</h3>
+              <ul style="padding-left: 20px; margin-bottom: 0;">
+                <li><strong>Business:</strong> ${args.businessName}</li>
+                <li><strong>Telefon:</strong> ${args.phone}</li>
+                <li><strong>Servicii:</strong>
+                  <ul style="margin-top: 5px; padding-left: 20px;">
+                    ${Array.isArray(args.selectedServices) ? args.selectedServices.map((s: any) => `<li style="margin-bottom: 5px;">${s.name}</li>`).join("") : JSON.stringify(args.selectedServices)}
+                  </ul>
+                </li>
+                <li><strong>Buget estimat:</strong> ${args.totalPrice} EUR</li>
+              </ul>
+            </div>
+
+            <p>Cu drag,<br><strong>Echipa Bloom Media</strong></p>
+          </div>
+        `,
         text: [
           `Salut, ${args.name},`,
           "",
@@ -91,7 +135,8 @@ export const submitWithEmail = action({
           "Rezumat solicitare:",
           `- Business: ${args.businessName}`,
           `- Telefon: ${args.phone}`,
-          `- Servicii selectate: ${JSON.stringify(args.selectedServices)}`,
+          `- Servicii selectate:`,
+          ...(Array.isArray(args.selectedServices) ? args.selectedServices.map((s: any) => `  * ${s.name}`) : [JSON.stringify(args.selectedServices)]),
           `- Buget estimat: ${args.totalPrice} EUR`,
           "",
           "Cu drag,",
