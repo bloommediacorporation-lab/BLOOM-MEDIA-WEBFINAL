@@ -85,7 +85,7 @@
       <div class="column">
         <h4 class="heading">Contact</h4>
         <div class="contact">
-          <a href="mailto:bloommediacorporation@gmail.com">bloommediacorporation@gmail.com</a>
+          <a href="mailto:contact@bloommedia.ro">contact@bloommedia.ro</a>
           <a href="tel:+40750269259">+40 750 269 259 (Darius)</a>
           <a href="tel:+40734270188">+40 734 270 188 (Vlad)</a>
         </div>

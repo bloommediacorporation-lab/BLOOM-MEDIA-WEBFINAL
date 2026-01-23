@@ -70,9 +70,9 @@
       <div class="info-column">
         <div class="links-wrapper">
           <!-- Email -->
-          <a href="mailto:bloommediacorporation@gmail.com" class="contact-link">
+          <a href="mailto:contact@bloommedia.ro" class="contact-link">
             <span class="link-label">EMAIL</span>
-            <span class="link-text">bloommediacorporation@gmail.com</span>
+            <span class="link-text">contact@bloommedia.ro</span>
             <div class="link-line"></div>
           </a>
           
@@ -338,7 +338,7 @@
     
     .mascot-wrapper {
       width: 300px;
-      bottom: 85%; /* Mai aproape de text */
+      bottom: 61%; /* Mai jos pe mobil */
       left: 50%;
       right: auto;
       transform: translateX(-50%) translateY(20px); /* Centrat pe mobil */
