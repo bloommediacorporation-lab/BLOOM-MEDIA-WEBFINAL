@@ -193,14 +193,14 @@
         >Servicii</a
       >
       <a
-        href="/configurator"
+        href="/audit"
         onclick={(e) => {
           e.preventDefault();
-          handleNavigate("/configurator");
+          handleNavigate("/audit");
         }}
         class="active-dot-link"
       >
-        Configurator <span class="nav-dot"></span>
+        Audit Gratuit <span class="nav-dot"></span>
       </a>
       <a
         href="/despre"
@@ -229,7 +229,7 @@
     </div>
 
     <div id="desktop-cta" class="hidden lg:block">
-      <button class="cta" onclick={() => handleNavigate("/")}
+      <button class="cta" onclick={() => handleNavigate("/configurator")}
         >Începe un proiect</button
       >
     </div>
@@ -252,11 +252,11 @@
       >Servicii</a
     >
     <a
-      href="/configurator"
+      href="/audit"
       onclick={(e) => {
         e.preventDefault();
-        handleNavigate("/configurator");
-      }}>Configurator</a
+        handleNavigate("/audit");
+      }}>Audit Gratuit</a
     >
     <a
       href="/despre"
@@ -282,7 +282,7 @@
     <a href="/#contact" onclick={(e) => handleScrollTo(e, "contact")}
       >Contact</a
     >
-    <button class="mobile-cta" onclick={() => handleNavigate("/")}
+    <button class="mobile-cta" onclick={() => handleNavigate("/configurator")}
       >Începe un proiect</button
     >
   </div>

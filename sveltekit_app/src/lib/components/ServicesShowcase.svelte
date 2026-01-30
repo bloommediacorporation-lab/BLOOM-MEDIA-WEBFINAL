@@ -8,22 +8,22 @@
         {
             id: 'intro',
             title: 'WHAT WE DO',
-            description: 'SOLUȚII DIGITALE INTEGRATE PENTRU BRANDURI CARE VOR SĂ DOMINE PIAȚA.'
+            description: 'Soluții digitale integrate pentru branduri care vor să domine piața.'
         },
         {
             id: 'branding',
             title: 'BRANDING',
-            description: 'Identitate vizuală care definește și diferențiază. Construim branduri memorabile care rezonează profund cu audiența ta.'
+            description: 'Construim identități vizuale puternice care definesc și diferențiază. De la logo și paletă cromatică până la tonul vocii, creăm branduri memorabile care rezonează profund cu audiența ta și rezistă în timp.'
         },
         {
             id: 'digital',
             title: 'DIGITAL',
-            description: 'Experiențe web imersive și performante. Dezvoltăm site-uri și aplicații rapide, securizate și scalabile pentru era digitală.'
+            description: 'Dezvoltăm experiențe web imersive și performante, optimizate pentru conversie. Site-uri și aplicații rapide, securizate și scalabile, construite pe cele mai noi tehnologii pentru a asigura dominanța în era digitală.'
         },
         {
             id: 'strategie',
             title: 'STRATEGIE',
-            description: 'Planificare orientată spre rezultate măsurabile. Transformăm datele în decizii de business profitabile și campanii de impact.'
+            description: 'Planificare meticuloasă orientată spre rezultate măsurabile și creștere sustenabilă. Transformăm datele analitice în decizii de business profitabile, campanii de impact și sisteme automatizate de achiziție a clienților.'
         }
     ];
 
