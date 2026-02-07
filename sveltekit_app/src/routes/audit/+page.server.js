@@ -65,7 +65,7 @@ TikTok: ${resolvedTiktok || '-'}`;
 
       const convex = new ConvexHttpClient(convexUrl);
 
-      const res = await convex.action(api.audits.submit, {
+      const auditId = await convex.mutation(api.audits.create, {
         businessName: resolvedBusinessName,
         name: resolvedName,
         email: resolvedEmail,
@@ -74,10 +74,10 @@ TikTok: ${resolvedTiktok || '-'}`;
         socialPlatforms: socialPlatforms
       });
 
-      console.log('Convex submission result:', res);
+      console.log('Convex submission result:', { auditId });
 
       // 5. Return Success
-      return { success: true, ...(typeof res === 'object' && res !== null ? res : {}) };
+      return { success: true, auditId };
 
     } catch (e) {
       console.error('Convex Submission Error:', e);

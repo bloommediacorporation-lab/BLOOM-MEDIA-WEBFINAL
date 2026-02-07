@@ -8,8 +8,8 @@
  * @module
  */
 
-import type * as leads from "../leads.js";
 import type * as audits from "../audits.js";
+import type * as leads from "../leads.js";
 
 import type {
   ApiFromModules,
@@ -18,8 +18,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  leads: typeof leads;
   audits: typeof audits;
+  leads: typeof leads;
 }>;
 
 /**
