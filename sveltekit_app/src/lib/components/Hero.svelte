@@ -291,6 +291,19 @@
   @media (max-width: 768px) {
     .video-element {
       opacity: 1 !important; /* Ensure video is visible on mobile */
+      min-width: 100vw;
+      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      top: 0;
+      left: 0;
+      transform: none;
+    }
+    
+    .hero-section {
+      height: 100vh !important;
+      height: 100dvh !important;
     }
   }
 
