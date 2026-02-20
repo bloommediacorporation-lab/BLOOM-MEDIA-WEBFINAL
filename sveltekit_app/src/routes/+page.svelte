@@ -81,9 +81,18 @@
 
   $effect(() => {
     if (!browser || restReady) return;
+    
+    // Delay loading below-fold content significantly to prioritize LCP and TBT
+    // 2500ms gives enough time for Hero to paint and main thread to settle
     const timeout = setTimeout(() => {
-      loadBelowFold();
-    }, 400);
+      // Use requestIdleCallback if available to further reduce main thread blocking
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => loadBelowFold());
+      } else {
+        loadBelowFold();
+      }
+    }, 2500);
+    
     return () => clearTimeout(timeout);
   });
 </script>

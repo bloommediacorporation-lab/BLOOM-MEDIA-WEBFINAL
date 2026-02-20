@@ -202,11 +202,7 @@
 </script>
 
 <svelte:head>
-  <link 
-    href="https://db.onlinewebfonts.com/c/0a0cbbd2ee416efdde8260f3aafa0d14?family=Morion+Bold" 
-    rel="stylesheet" 
-    type="text/css" 
-  />
+  <!-- Font loading moved to app.html for performance -->
 </svelte:head>
 
 <section class="hero-section" style:height={heroHeight}>
@@ -220,7 +216,8 @@
       loop
       playsinline
       webkit-playsinline
-      preload="auto"
+      preload="metadata"
+      poster="/images/hero-mobile-fallback.webp"
       disablePictureInPicture
     >
       <source src="/0119.webm" type="video/webm" />
@@ -262,6 +259,9 @@
     bottom: 0;
     overflow: hidden;
     pointer-events: none;
+    background-image: url('/images/hero-mobile-fallback.webp');
+    background-size: cover;
+    background-position: center;
   }
 
   .video-element {
