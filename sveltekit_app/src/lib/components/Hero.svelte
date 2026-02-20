@@ -7,6 +7,18 @@
   let heroHeight = "100svh";
 
   onMount(() => {
+    // ══════════════════════════════════════════════════════════════════════════
+    // MOBILE OPTIMIZATION: Disable ALL JS logic on mobile
+    // ══════════════════════════════════════════════════════════════════════════
+    const isMobileCheck =
+      window.matchMedia("(max-width: 768px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches;
+
+    if (isMobileCheck) {
+      if (videoEl) videoEl.remove(); // Ensure video is removed from DOM to prevent loading
+      return; // Stop execution
+    }
+
     const setHeight = () => {
       heroHeight = `${window.innerHeight}px`;
     };
@@ -23,9 +35,7 @@
 
     window.addEventListener("resize", handleResize);
 
-    const isMobile =
-      window.matchMedia("(max-width: 768px)").matches ||
-      window.matchMedia("(pointer: coarse)").matches;
+    const isMobile = false; // We already returned if true
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     let watchdogInterval: ReturnType<typeof setInterval>;
