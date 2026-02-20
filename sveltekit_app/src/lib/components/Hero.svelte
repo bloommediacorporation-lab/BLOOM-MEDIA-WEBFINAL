@@ -7,18 +7,6 @@
   let heroHeight = "100svh";
 
   onMount(() => {
-    // ══════════════════════════════════════════════════════════════════════════
-    // MOBILE OPTIMIZATION: Disable ALL JS logic on mobile
-    // ══════════════════════════════════════════════════════════════════════════
-    const isMobileCheck =
-      window.matchMedia("(max-width: 768px)").matches ||
-      window.matchMedia("(pointer: coarse)").matches;
-
-    if (isMobileCheck) {
-      if (videoEl) videoEl.remove(); // Ensure video is removed from DOM to prevent loading
-      return; // Stop execution
-    }
-
     const setHeight = () => {
       heroHeight = `${window.innerHeight}px`;
     };
@@ -35,7 +23,9 @@
 
     window.addEventListener("resize", handleResize);
 
-    const isMobile = false; // We already returned if true
+    const isMobile =
+      window.matchMedia("(max-width: 768px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     let watchdogInterval: ReturnType<typeof setInterval>;
@@ -240,16 +230,6 @@
 <section class="hero-section" style:height={heroHeight}>
   
   <div class="video-wrapper">
-    <!-- LCP Image for Mobile -->
-    <img 
-      src="/images/hero-poster.webp" 
-      alt="Bloom Media Hero" 
-      class="poster-image" 
-      fetchpriority="high"
-      width="1920"
-      height="1080"
-    />
-
     <video
       bind:this={videoEl}
       class="video-element"
@@ -259,7 +239,6 @@
       playsinline
       webkit-playsinline
       preload="none"
-      poster="/images/hero-poster.webp"
       disablePictureInPicture
     >
       <source src="/0119.webm" type="video/webm" media="(min-width: 769px)" />
@@ -302,17 +281,6 @@
     overflow: hidden;
     pointer-events: none;
     /* Removed background-image to rely on img tag for LCP */
-  }
-
-  .poster-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    z-index: 0;
   }
 
   .video-element {

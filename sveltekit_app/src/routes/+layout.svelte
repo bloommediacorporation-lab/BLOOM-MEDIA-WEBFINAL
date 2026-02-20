@@ -121,7 +121,7 @@
     // LENIS INITIALIZATION
     // ═══════════════════════════════════════════════════════════════════════════
     async function initScrolling() {
-        if (destroyed || !browser || forceNativeScroll || lenis || isMobile) return;
+        if (destroyed || !browser || forceNativeScroll || lenis) return;
 
         // ✅ Respectă prefers-reduced-motion
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
