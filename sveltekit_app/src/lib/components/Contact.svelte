@@ -103,9 +103,9 @@
         </div>
 
         <div class="socials">
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href="https://www.instagram.com/bloom_media_marketing/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://www.linkedin.com/in/bloom-media-02506139a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="https://www.facebook.com/profile.php?id=61587068890787" target="_blank" rel="noopener noreferrer">Facebook</a>
         </div>
       </div>
     </div>

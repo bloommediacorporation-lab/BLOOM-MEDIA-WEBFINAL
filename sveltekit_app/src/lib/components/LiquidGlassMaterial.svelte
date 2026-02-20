@@ -44,9 +44,9 @@
     if (typeof window === "undefined") return;
     initThree();
     if (captureBackground) {
-      captureBackgroundImage();
-      // Update background periodically
-      setInterval(captureBackgroundImage, 1000);
+      // Capture once on mount instead of every second to prevent forced reflows and high CPU usage
+      // setTimeout to ensure DOM is ready
+      setTimeout(captureBackgroundImage, 1000);
     }
     window.addEventListener('resize', onResize);
   });

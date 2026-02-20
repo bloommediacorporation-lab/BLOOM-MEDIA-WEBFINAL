@@ -6,7 +6,7 @@
   import { enhance } from '$app/forms';
 
   // --- Constants & Data ---
-  const BASE_STRATEGY_FEE = 249.99;
+  const BASE_STRATEGY_FEE = 199.99;
   
   const SERVICES = [
     // CAPTURARE

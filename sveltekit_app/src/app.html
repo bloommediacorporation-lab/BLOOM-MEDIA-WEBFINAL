@@ -71,8 +71,14 @@
       t.src=v;s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '991068654089906');
-      fbq('track', 'PageView');
+      
+      // Defer Pixel init to improve TBT/LCP
+      window.addEventListener('load', function() {
+          setTimeout(function() {
+            fbq('init', '991068654089906');
+            fbq('track', 'PageView');
+          }, 1500);
+      });
     </script>
     <noscript><img height="1" width="1" style="display:none"
       src="https://www.facebook.com/tr?id=991068654089906&ev=PageView&noscript=1"

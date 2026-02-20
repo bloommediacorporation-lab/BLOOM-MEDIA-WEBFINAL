@@ -5,25 +5,25 @@
   const steps = [
     {
       id: '01',
-      title: 'Descoperi<span class="relative inline-block">re<img src="/monstru_descoperire.png" alt="" class="absolute w-[150px] -top-14 -right-14 md:w-[200px] md:top-[-4.2rem] md:right-[-5rem] max-w-none pointer-events-none z-20" /></span>',
+      title: 'Descoperi<span class="relative inline-block">re<picture><source srcset="/monstru_descoperire_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_descoperire_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_descoperire_desktop.webp" alt="" class="absolute w-[150px] -top-14 -right-14 md:w-[200px] md:top-[-4.2rem] md:right-[-5rem] max-w-none pointer-events-none z-20" /></picture></span>',
       description: 'Analizăm în profunzime ADN-ul brandului tău, poziția în piață, competitorii și comportamentul audienței pentru a descoperi oportunități ascunse.',
       label: 'ETAPA'
     },
     {
       id: '02',
       title: 'Strategie',
-      description: 'Construim o foaie de parcurs personalizată. Fără șabloane. Doar un plan de atac calculat, conceput <span class="relative inline-block">pentru<img src="/monstru_strategie.png" alt="" class="absolute -top-1 top-10 w-[150px] -left-16 md:w-[250px] md:top-[-8px] md:left-[-4.2rem] max-w-none pointer-events-none z-20" /></span> a maximiza ROI-ul și a domina nișa.',
+      description: 'Construim o foaie de parcurs personalizată. Fără șabloane. Doar un plan de atac calculat, conceput <span class="relative inline-block">pentru<picture><source srcset="/monstru_strategie_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_strategie_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_strategie_desktop.webp" alt="" class="absolute -top-1 top-10 w-[150px] -left-16 md:w-[250px] md:top-[-8px] md:left-[-4.2rem] max-w-none pointer-events-none z-20" /></picture></span> a maximiza ROI-ul și a domina nișa.',
       label: 'ETAPA'
     },
     {
       id: '03',
-      title: 'Execuți<span class="relative inline-block">e<img src="/monstru_executie.png" alt="" class="absolute w-[150px] right-[-4.6rem] -top-4 md:w-[250px] md:right-[-7.9rem] md:top-[-1rem] max-w-none pointer-events-none z-20" /></span>',
+      title: 'Execuți<span class="relative inline-block">e<picture><source srcset="/monstru_executie_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_executie_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_executie_desktop.webp" alt="" class="absolute w-[150px] right-[-4.6rem] -top-4 md:w-[250px] md:right-[-7.9rem] md:top-[-1rem] max-w-none pointer-events-none z-20" /></picture></span>',
       description: 'Echipa noastră de elită implementează planul. Targetare precisă, creație high-end și fluxuri automatizate care intră în acțiune.',
       label: 'ETAPA'
     },
     {
       id: '04',
-      title: '<span class="relative inline-block">Optimizare<img src="/monstru_optimizare.png" alt="" class="absolute w-[150px] top-[-3.8rem] right-[-2.6rem] md:w-[250px] md:top-[-6.2rem] md:right-[-4rem] max-w-none pointer-events-none z-20" /></span>',
+      title: '<span class="relative inline-block">Optimizare<picture><source srcset="/monstru_optimizare_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_optimizare_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_optimizare_desktop.webp" alt="" class="absolute w-[150px] top-[-3.8rem] right-[-2.6rem] md:w-[250px] md:top-[-6.2rem] md:right-[-4rem] max-w-none pointer-events-none z-20" /></picture></span>',
       description: 'Datele nu dorm niciodată. Monitorizăm, analizăm și rafinăm în timp real, scalând ce funcționează și eliminând ce nu aduce rezultate.',
       label: 'ETAPA'
     }

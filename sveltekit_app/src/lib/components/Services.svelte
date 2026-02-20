@@ -36,7 +36,7 @@
             <div class="flex flex-col items-start w-full mb-6">
                <span class="text-[#FFA500] text-sm font-medium mb-1">De la</span>
                <div class="flex items-start">
-                 <span class="text-[#FFA500] text-5xl font-black font-['Montserrat'] tracking-tight leading-none">249,99</span>
+                 <span class="text-[#FFA500] text-5xl font-black font-['Montserrat'] tracking-tight leading-none">199,99</span>
                  <div class="flex flex-col items-start ml-1 mt-2">
                    <span class="text-[#FFA500] text-2xl font-bold leading-none">€</span>
                    <span class="text-white/40 text-xs font-medium mt-1">/lună</span>
@@ -62,7 +62,7 @@
           <!-- DESKTOP LAYOUT -->
           <div class="price-block hidden md:block">
             <div class="prefix">De la</div>
-            <span class="price-amount value">249,99</span>
+            <span class="price-amount value">199,99</span>
             <span class="currency">€</span>
             <span class="period">/lună</span>
           </div>
