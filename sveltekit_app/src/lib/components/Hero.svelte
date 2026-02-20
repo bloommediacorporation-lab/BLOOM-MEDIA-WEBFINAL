@@ -119,6 +119,19 @@
       startWatchdog();
     }
 
+    if (isMobile) {
+      // Avoid any video logic on mobile
+    } else {
+      // Desktop logic
+      const handleVisibilityChange = () => {
+        if (!document.hidden && videoEl?.paused) {
+          setTimeout(forcePlay, isIOS ? 300 : 150);
+        }
+      };
+      
+      // ... (other listeners)
+    }
+
     // ══════════════════════════════════════════════════════════════════════════
     // GSAP ANIMATIONS
     // ══════════════════════════════════════════════════════════════════════════
@@ -217,6 +230,16 @@
 <section class="hero-section" style:height={heroHeight}>
   
   <div class="video-wrapper">
+    <!-- LCP Image for Mobile -->
+    <img 
+      src="/images/hero-poster.webp" 
+      alt="Bloom Media Hero" 
+      class="poster-image" 
+      fetchpriority="high"
+      width="1920"
+      height="1080"
+    />
+
     <video
       bind:this={videoEl}
       class="video-element"
@@ -225,7 +248,7 @@
       loop
       playsinline
       webkit-playsinline
-      preload="metadata"
+      preload="none"
       poster="/images/hero-poster.webp"
       disablePictureInPicture
     >
@@ -268,9 +291,18 @@
     bottom: 0;
     overflow: hidden;
     pointer-events: none;
-    background-image: url("/images/hero-poster.webp");
-    background-size: cover;
-    background-position: center;
+    /* Removed background-image to rely on img tag for LCP */
+  }
+
+  .poster-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
   }
 
   .video-element {
@@ -288,6 +320,7 @@
     will-change: transform, opacity;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    z-index: 1; /* Above image */
   }
 
   .overlay {

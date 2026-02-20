@@ -19,10 +19,11 @@
 
     if (sectionRef) observer.observe(sectionRef);
 
-    // Fallback safety to ensure title appears
-    setTimeout(() => {
-      isVisible = true;
-    }, 500);
+    // Removed the aggressive fallback timeout to prevent early video loading
+    // The intersection observer is sufficient and more performant
+    // setTimeout(() => {
+    //   isVisible = true;
+    // }, 500);
 
     return () => observer.disconnect();
   });
@@ -50,6 +51,7 @@
               playsinline 
               webkit-playsinline
               class="mascot-video"
+              preload="none"
             >
               <!-- HEVC for Safari (Alpha Channel) - Check if .mp4 or .mov exists -->
               <source src="/monstru_2.mp4" type='video/mp4; codecs="hvc1"'>

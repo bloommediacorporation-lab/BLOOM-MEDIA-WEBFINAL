@@ -5,11 +5,11 @@
   let isMobile = $state(false);
   
   onMount(() => {
-    // Only show orbs on desktop - ACTIVAT SI PE MOBIL LA CERERE
-    // isMobile = window.matchMedia('(max-width: 768px)').matches;
-    // if (!isMobile) {
+    // Only show orbs on desktop to save GPU/CPU on mobile
+    isMobile = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches;
+    if (!isMobile) {
       visible = true;
-    // }
+    }
   });
 </script>
 

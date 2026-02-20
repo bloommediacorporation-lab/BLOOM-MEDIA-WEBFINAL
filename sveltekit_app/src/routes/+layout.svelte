@@ -45,7 +45,7 @@
     // ═══════════════════════════════════════════════════════════════════════════
     // DERIVED
     // ═══════════════════════════════════════════════════════════════════════════
-    let enableHeavyEffects = $derived(browser && !isPerfBot);
+    let enableHeavyEffects = $derived(browser && !isPerfBot && !isMobile);
     let showEffects = $derived(
         enableHeavyEffects && 
         CursorComp && 
@@ -121,7 +121,7 @@
     // LENIS INITIALIZATION
     // ═══════════════════════════════════════════════════════════════════════════
     async function initScrolling() {
-        if (destroyed || !browser || forceNativeScroll || lenis) return;
+        if (destroyed || !browser || forceNativeScroll || lenis || isMobile) return;
 
         // ✅ Respectă prefers-reduced-motion
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
