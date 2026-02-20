@@ -229,8 +229,8 @@
       poster="/images/hero-poster.webp"
       disablePictureInPicture
     >
-      <source src="/0119.webm" type="video/webm" />
-      <source src="/0119.mp4" type="video/mp4" />
+      <source src="/0119.webm" type="video/webm" media="(min-width: 769px)" />
+      <source src="/0119.mp4" type="video/mp4" media="(min-width: 769px)" />
     </video>
   </div>
 

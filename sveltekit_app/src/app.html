@@ -43,6 +43,8 @@
     <!-- GTM - ASYNC (nu blocking, dar după Cookiebot) -->
     <script>
       window.addEventListener('load', function() {
+        var isMobile = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches;
+        if (isMobile) return;
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
         var gtmScript = document.createElement('script');
@@ -79,6 +81,8 @@
     <!-- Meta Pixel Code -->
     <script>
       window.addEventListener('load', function() {
+        var isMobile = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches;
+        if (isMobile) return;
         if (!window.fbq) {
           var fbq = function() {
             fbq.callMethod ? fbq.callMethod.apply(fbq, arguments) : fbq.queue.push(arguments);
