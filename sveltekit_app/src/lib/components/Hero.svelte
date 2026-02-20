@@ -217,7 +217,7 @@
       playsinline
       webkit-playsinline
       preload="metadata"
-      poster="/images/hero-mobile-fallback.webp"
+      poster="/images/hero-poster.webp"
       disablePictureInPicture
     >
       <source src="/0119.webm" type="video/webm" />
@@ -259,7 +259,7 @@
     bottom: 0;
     overflow: hidden;
     pointer-events: none;
-    background-image: url('/images/hero-mobile-fallback.webp');
+    background-image: url('/images/hero-poster.webp');
     background-size: cover;
     background-position: center;
   }
