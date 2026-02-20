@@ -317,6 +317,23 @@
     top: 14px;
   }
 
+  @media (max-width: 768px) {
+    .liquid-glass-navbar {
+      top: 0;
+      width: 100%;
+      max-width: 100%;
+      border-radius: 0;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transform: none;
+      left: 0;
+    }
+    
+    .liquid-glass-navbar.scrolled {
+      top: 0;
+    }
+  }
+
   nav a {
     color: white;
     mix-blend-mode: difference;

@@ -4,25 +4,12 @@
   let videoEl: HTMLVideoElement | null = null;
   let heroText: HTMLHeadingElement | null = null;
   let subtext: HTMLParagraphElement | null = null;
-  let heroHeight = "100svh";
+  let heroHeight = "100vh"; // Default fallback
 
   onMount(() => {
-    const setHeight = () => {
-      heroHeight = `${window.innerHeight}px`;
-    };
-    
-    setHeight();
-
-    let lastWidth = window.innerWidth;
-    const handleResize = () => {
-      if (window.innerWidth !== lastWidth) {
-        lastWidth = window.innerWidth;
-        setHeight();
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
+    // ══════════════════════════════════════════════════════════════════════════
+    // MOBILE OPTIMIZATION
+    // ══════════════════════════════════════════════════════════════════════════
     const isMobile =
       window.matchMedia("(max-width: 768px)").matches ||
       window.matchMedia("(pointer: coarse)").matches;
@@ -227,7 +214,7 @@
   });
 </script>
 
-<section class="hero-section" style:height={heroHeight}>
+<section class="hero-section">
   
   <div class="video-wrapper">
     <video
