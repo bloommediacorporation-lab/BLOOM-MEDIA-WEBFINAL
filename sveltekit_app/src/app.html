@@ -41,10 +41,15 @@
     ></script>
 
     <!-- GTM - ASYNC (nu blocking, dar după Cookiebot) -->
-    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-THRM454W"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+      window.addEventListener('load', function() {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+        var gtmScript = document.createElement('script');
+        gtmScript.async = true;
+        gtmScript.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-THRM454W';
+        document.head.appendChild(gtmScript);
+      });
     </script>
 
     <!-- FONTS - NON-BLOCKING -->
@@ -73,21 +78,27 @@
     
     <!-- Meta Pixel Code -->
     <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      
-      // Defer Pixel init to improve TBT/LCP
       window.addEventListener('load', function() {
-          setTimeout(function() {
+        if (!window.fbq) {
+          var fbq = function() {
+            fbq.callMethod ? fbq.callMethod.apply(fbq, arguments) : fbq.queue.push(arguments);
+          };
+          window.fbq = fbq;
+          fbq.push = fbq;
+          fbq.loaded = true;
+          fbq.version = '2.0';
+          fbq.queue = [];
+          var fbScript = document.createElement('script');
+          fbScript.async = true;
+          fbScript.src = 'https://connect.facebook.net/en_US/fbevents.js';
+          document.head.appendChild(fbScript);
+        }
+        setTimeout(function() {
+          if (window.fbq) {
             fbq('init', '991068654089906');
             fbq('track', 'PageView');
-          }, 1500);
+          }
+        }, 1500);
       });
     </script>
     <noscript><img height="1" width="1" style="display:none"

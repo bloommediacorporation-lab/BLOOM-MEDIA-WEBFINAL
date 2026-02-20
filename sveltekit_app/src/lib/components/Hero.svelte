@@ -23,9 +23,11 @@
 
     window.addEventListener("resize", handleResize);
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // FIX VIDEO FREEZE: iOS WEBKIT SPECIFIC SOLUTION
-    // ══════════════════════════════════════════════════════════════════════════
+    const isMobile =
+      window.matchMedia("(max-width: 768px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
     let watchdogInterval: ReturnType<typeof setInterval>;
     let isResuming = false;
 
@@ -65,12 +67,8 @@
       }
     };
 
-    // Detectează iOS pentru handling special
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
     const handleVisibilityChange = () => {
       if (!document.hidden && videoEl?.paused) {
-        // iOS are nevoie de delay mai mare
         setTimeout(forcePlay, isIOS ? 300 : 150);
       }
     };
@@ -101,25 +99,25 @@
     };
 
     const startWatchdog = () => {
+      if (!isIOS) return;
       watchdogInterval = setInterval(() => {
         if (!videoEl || document.hidden) return;
-        
         if (videoEl.paused || videoEl.ended) {
           forcePlay();
         }
       }, 1500);
     };
 
-    // Event listeners
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("pageshow", handlePageShow);
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("touchstart", handleInteraction, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
-    window.addEventListener("click", handleInteraction, { passive: true });
-    window.addEventListener("scroll", handleInteraction, { passive: true });
-
-    startWatchdog();
+    if (isIOS) {
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      window.addEventListener("pageshow", handlePageShow);
+      window.addEventListener("focus", handleFocus);
+      window.addEventListener("touchstart", handleInteraction, { passive: true });
+      window.addEventListener("touchend", handleTouchEnd, { passive: true });
+      window.addEventListener("click", handleInteraction, { passive: true });
+      window.addEventListener("scroll", handleInteraction, { passive: true });
+      startWatchdog();
+    }
 
     // ══════════════════════════════════════════════════════════════════════════
     // GSAP ANIMATIONS
@@ -127,63 +125,78 @@
     let destroyed = false;
     let timeline: gsap.core.Timeline | undefined;
 
-    (async () => {
-      const { default: gsap } = await import("gsap");
-      if (destroyed) return;
-
+    if (isMobile) {
       if (videoEl) {
-        gsap.set(videoEl, { scale: 1.15, opacity: 0 });
+        videoEl.style.opacity = "1";
+        videoEl.addEventListener(
+          "loadeddata",
+          () => {
+            if (videoEl) videoEl.style.opacity = "1";
+          },
+          { once: true }
+        );
       }
-      if (heroText) {
-        gsap.set(heroText, { 
-          yPercent: 100, 
-          opacity: 0, 
-          scaleX: 1.4, 
-          transformOrigin: "50% 50%" 
-        });
-      }
-      if (subtext) {
-        gsap.set(subtext, { opacity: 0, y: 16 });
-      }
+      if (heroText) heroText.style.opacity = "1";
+      if (subtext) subtext.style.opacity = "1";
+    } else {
+      (async () => {
+        const { default: gsap } = await import("gsap");
+        if (destroyed) return;
 
-      timeline = gsap.timeline();
-
-      if (videoEl) {
-        timeline.to(videoEl, {
-          scale: 1.05,
-          opacity: 1,
-          duration: 2,
-          ease: "power2.out"
-        });
-      }
-
-      if (heroText) {
-        timeline.to(
-          heroText,
-          {
-            yPercent: 0,
-            opacity: 1,
+        if (videoEl) {
+          gsap.set(videoEl, { scale: 1.15, opacity: 0 });
+        }
+        if (heroText) {
+          gsap.set(heroText, {
+            yPercent: 100,
+            opacity: 0,
             scaleX: 1.4,
-            duration: 1.2,
-            ease: "power4.out"
-          },
-          0.5
-        );
-      }
+            transformOrigin: "50% 50%"
+          });
+        }
+        if (subtext) {
+          gsap.set(subtext, { opacity: 0, y: 16 });
+        }
 
-      if (subtext) {
-        timeline.to(
-          subtext,
-          {
+        timeline = gsap.timeline();
+
+        if (videoEl) {
+          timeline.to(videoEl, {
+            scale: 1.05,
             opacity: 1,
-            y: 0,
-            duration: 1,
+            duration: 2,
             ease: "power2.out"
-          },
-          "-=0.8"
-        );
-      }
-    })();
+          });
+        }
+
+        if (heroText) {
+          timeline.to(
+            heroText,
+            {
+              yPercent: 0,
+              opacity: 1,
+              scaleX: 1.4,
+              duration: 1.2,
+              ease: "power4.out"
+            },
+            0.5
+          );
+        }
+
+        if (subtext) {
+          timeline.to(
+            subtext,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              ease: "power2.out"
+            },
+            "-=0.8"
+          );
+        }
+      })();
+    }
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -200,10 +213,6 @@
     };
   });
 </script>
-
-<svelte:head>
-  <!-- Font loading moved to app.html for performance -->
-</svelte:head>
 
 <section class="hero-section" style:height={heroHeight}>
   
@@ -259,7 +268,7 @@
     bottom: 0;
     overflow: hidden;
     pointer-events: none;
-    background-image: url('/images/hero-poster.webp');
+    background-image: url("/images/hero-poster.webp");
     background-size: cover;
     background-position: center;
   }

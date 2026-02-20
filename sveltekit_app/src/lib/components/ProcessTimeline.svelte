@@ -5,25 +5,25 @@
   const steps = [
     {
       id: '01',
-      title: 'Descoperi<span class="relative inline-block">re<picture><source srcset="/monstru_descoperire_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_descoperire_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_descoperire_desktop.webp" alt="" class="absolute w-[150px] -top-14 -right-14 md:w-[200px] md:top-[-4.2rem] md:right-[-5rem] max-w-none pointer-events-none z-20" /></picture></span>',
+      title: 'Descoperi<span class="relative inline-block">re<img src="/monstru_descoperire_mobile.webp" srcset="/monstru_descoperire_mobile.webp 150w, /monstru_descoperire_desktop.webp 250w" sizes="(max-width: 768px) 150px, 250px" width="250" height="250" loading="lazy" decoding="async" alt="" class="absolute w-[150px] -top-14 -right-14 md:w-[200px] md:top-[-4.2rem] md:right-[-5rem] max-w-none pointer-events-none z-20" /></span>',
       description: 'Analizăm în profunzime ADN-ul brandului tău, poziția în piață, competitorii și comportamentul audienței pentru a descoperi oportunități ascunse.',
       label: 'ETAPA'
     },
     {
       id: '02',
       title: 'Strategie',
-      description: 'Construim o foaie de parcurs personalizată. Fără șabloane. Doar un plan de atac calculat, conceput <span class="relative inline-block">pentru<picture><source srcset="/monstru_strategie_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_strategie_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_strategie_desktop.webp" alt="" class="absolute -top-1 top-10 w-[150px] -left-16 md:w-[250px] md:top-[-8px] md:left-[-4.2rem] max-w-none pointer-events-none z-20" /></picture></span> a maximiza ROI-ul și a domina nișa.',
+      description: 'Construim o foaie de parcurs personalizată. Fără șabloane. Doar un plan de atac calculat, conceput <span class="relative inline-block">pentru<img src="/monstru_strategie_mobile.webp" srcset="/monstru_strategie_mobile.webp 150w, /monstru_strategie_desktop.webp 250w" sizes="(max-width: 768px) 150px, 250px" width="250" height="250" loading="lazy" decoding="async" alt="" class="absolute -top-1 top-10 w-[150px] -left-16 md:w-[250px] md:top-[-8px] md:left-[-4.2rem] max-w-none pointer-events-none z-20" /></span> a maximiza ROI-ul și a domina nișa.',
       label: 'ETAPA'
     },
     {
       id: '03',
-      title: 'Execuți<span class="relative inline-block">e<picture><source srcset="/monstru_executie_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_executie_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_executie_desktop.webp" alt="" class="absolute w-[150px] right-[-4.6rem] -top-4 md:w-[250px] md:right-[-7.9rem] md:top-[-1rem] max-w-none pointer-events-none z-20" /></picture></span>',
+      title: 'Execuți<span class="relative inline-block">e<img src="/monstru_executie_mobile.webp" srcset="/monstru_executie_mobile.webp 150w, /monstru_executie_desktop.webp 250w" sizes="(max-width: 768px) 150px, 250px" width="250" height="250" loading="lazy" decoding="async" alt="" class="absolute w-[150px] right-[-4.6rem] -top-4 md:w-[250px] md:right-[-7.9rem] md:top-[-1rem] max-w-none pointer-events-none z-20" /></span>',
       description: 'Echipa noastră de elită implementează planul. Targetare precisă, creație high-end și fluxuri automatizate care intră în acțiune.',
       label: 'ETAPA'
     },
     {
       id: '04',
-      title: '<span class="relative inline-block">Optimizare<picture><source srcset="/monstru_optimizare_mobile.webp" media="(max-width: 768px)" /><source srcset="/monstru_optimizare_desktop.webp" media="(min-width: 769px)" /><img src="/monstru_optimizare_desktop.webp" alt="" class="absolute w-[150px] top-[-3.8rem] right-[-2.6rem] md:w-[250px] md:top-[-6.2rem] md:right-[-4rem] max-w-none pointer-events-none z-20" /></picture></span>',
+      title: '<span class="relative inline-block">Optimizare<img src="/monstru_optimizare_mobile.webp" srcset="/monstru_optimizare_mobile.webp 150w, /monstru_optimizare_desktop.webp 250w" sizes="(max-width: 768px) 150px, 250px" width="250" height="250" loading="lazy" decoding="async" alt="" class="absolute w-[150px] top-[-3.8rem] right-[-2.6rem] md:w-[250px] md:top-[-6.2rem] md:right-[-4rem] max-w-none pointer-events-none z-20" /></span>',
       description: 'Datele nu dorm niciodată. Monitorizăm, analizăm și rafinăm în timp real, scalând ce funcționează și eliminând ce nu aduce rezultate.',
       label: 'ETAPA'
     }
@@ -37,62 +37,63 @@
   onMount(() => {
     let destroyed = false;
     let ctx;
-    
-    (async () => {
-      const [{ gsap }, scrollTriggerModule] = await Promise.all([
-        import('gsap'),
-        import('gsap/ScrollTrigger')
-      ]);
+    const isDesktop =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(min-width: 768px)').matches;
 
-      const { ScrollTrigger } = scrollTriggerModule;
-      if (destroyed) return;
-      if (typeof window === 'undefined') return;
+    isMobile = !isDesktop;
 
-      gsap.registerPlugin(ScrollTrigger);
+    if (isDesktop) {
+      (async () => {
+        const [{ gsap }, scrollTriggerModule] = await Promise.all([
+          import('gsap'),
+          import('gsap/ScrollTrigger')
+        ]);
 
-      // Robust Cleanup: Kill any existing trigger with the same ID
-      ScrollTrigger.getById('process-timeline-pin')?.kill(true);
+        const { ScrollTrigger } = scrollTriggerModule;
+        if (destroyed) return;
+        if (typeof window === 'undefined') return;
 
-      ctx = gsap.context(() => {
-        const mm = gsap.matchMedia();
+        gsap.registerPlugin(ScrollTrigger);
 
-        mm.add("(min-width: 768px)", () => {
-            isMobile = false;
-            
-            const getScrollDistance = () => {
-              if (!trackRef) return 0;
-              const panels = trackRef.querySelectorAll('.process-panel');
-              const panelCount = panels.length;
-              const viewportWidth = window.innerWidth;
-              const totalWidth = panelCount * viewportWidth;
-              const distance = totalWidth - viewportWidth;
-              return distance;
-            };
+        ScrollTrigger.getById('process-timeline-pin')?.kill(true);
 
-            // Use pinContainerRef for pinning instead of sectionRef
-            if (trackRef && pinContainerRef) {
-                gsap.to(trackRef, {
-                  x: () => -getScrollDistance(),
-                  ease: "none",
-                  scrollTrigger: {
-                    id: 'process-timeline-pin',
-                    trigger: pinContainerRef, // Pin the inner wrapper
-                    pin: true,
-                    scrub: 1,
-                    start: "top top",
-                    end: () => "+=" + (getScrollDistance() * 2.2),
-                    invalidateOnRefresh: true,
-                    pinSpacing: true
-                  }
-                });
-            }
-        });
+        ctx = gsap.context(() => {
+          const mm = gsap.matchMedia();
 
-        mm.add("(max-width: 767px)", () => {
-            isMobile = true;
-        });
-      }, sectionRef); // Scope to sectionRef
-    })();
+          mm.add("(min-width: 768px)", () => {
+              isMobile = false;
+              
+              const getScrollDistance = () => {
+                if (!trackRef) return 0;
+                const panels = trackRef.querySelectorAll('.process-panel');
+                const panelCount = panels.length;
+                const viewportWidth = window.innerWidth;
+                const totalWidth = panelCount * viewportWidth;
+                const distance = totalWidth - viewportWidth;
+                return distance;
+              };
+
+              if (trackRef && pinContainerRef) {
+                  gsap.to(trackRef, {
+                    x: () => -getScrollDistance(),
+                    ease: "none",
+                    scrollTrigger: {
+                      id: 'process-timeline-pin',
+                      trigger: pinContainerRef,
+                      pin: true,
+                      scrub: 1,
+                      start: "top top",
+                      end: () => "+=" + (getScrollDistance() * 2.2),
+                      invalidateOnRefresh: true,
+                      pinSpacing: true
+                    }
+                  });
+              }
+          });
+        }, sectionRef);
+      })();
+    }
 
     return () => {
       destroyed = true;
