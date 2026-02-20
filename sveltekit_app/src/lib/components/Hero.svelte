@@ -288,6 +288,12 @@
     z-index: 1; /* Above image */
   }
 
+  @media (max-width: 768px) {
+    .video-element {
+      opacity: 1 !important; /* Ensure video is visible on mobile */
+    }
+  }
+
   .overlay {
     position: absolute;
     top: 0;

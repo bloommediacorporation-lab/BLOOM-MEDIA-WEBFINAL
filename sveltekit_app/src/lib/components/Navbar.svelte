@@ -319,18 +319,19 @@
 
   @media (max-width: 768px) {
     .liquid-glass-navbar {
-      top: 0;
-      width: 100%;
-      max-width: 100%;
-      border-radius: 0;
-      border: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      transform: none;
-      left: 0;
+      top: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 0 !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      transform: none !important;
+      left: 0 !important;
+      padding-top: max(1.2rem, env(safe-area-inset-top)); /* Handle notch */
     }
     
     .liquid-glass-navbar.scrolled {
-      top: 0;
+      top: 0 !important;
     }
   }
 
