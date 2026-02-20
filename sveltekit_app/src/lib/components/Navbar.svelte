@@ -327,11 +327,20 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
       transform: none !important;
       left: 0 !important;
-      padding-top: max(1.2rem, env(safe-area-inset-top)); /* Handle notch */
+      padding-top: max(1rem, env(safe-area-inset-top)); /* Handle notch */
+      padding-bottom: 1rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
     
     .liquid-glass-navbar.scrolled {
       top: 0 !important;
+      padding-top: max(0.8rem, env(safe-area-inset-top));
+      padding-bottom: 0.8rem;
+    }
+
+    .logo {
+      font-size: 1.2rem;
     }
   }
 
