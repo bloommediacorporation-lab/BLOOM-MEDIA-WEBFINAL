@@ -8,12 +8,31 @@
 
   onMount(() => {
     // ══════════════════════════════════════════════════════════════════════════
-    // MOBILE OPTIMIZATION
+    // RESPONSIVE HEIGHT LOGIC
     // ══════════════════════════════════════════════════════════════════════════
-    const isMobile =
-      window.matchMedia("(max-width: 768px)").matches ||
-      window.matchMedia("(pointer: coarse)").matches;
+    // Use width-based check for layout decisions to avoid issues on touch-enabled laptops
+    const isMobileLayout = window.matchMedia("(max-width: 768px)").matches;
+    const isMobile = isMobileLayout || window.matchMedia("(pointer: coarse)").matches;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    let handleResize = () => {};
+
+    if (!isMobileLayout) {
+      // Desktop: Use exact window height for pixel-perfect fit
+      const setHeight = () => {
+        heroHeight = `${window.innerHeight}px`;
+      };
+      setHeight();
+      
+      let lastWidth = window.innerWidth;
+      handleResize = () => {
+        if (window.innerWidth !== lastWidth) {
+          lastWidth = window.innerWidth;
+          setHeight();
+        }
+      };
+      window.addEventListener("resize", handleResize);
+    }
 
     let watchdogInterval: ReturnType<typeof setInterval>;
     let isResuming = false;
@@ -255,6 +274,8 @@
   .hero-section {
     position: relative;
     width: 100%;
+    height: 100vh;
+    min-height: 100vh;
     overflow: hidden;
     background: #000;
   }
