@@ -281,7 +281,7 @@
     transform: translate(-50%, -50%);
     object-fit: cover;
     object-position: center center;
-    opacity: 0;
+    /* opacity: 0; REMOVED to avoid invisible video on desktop if JS fails. GSAP will handle init. */
     will-change: transform, opacity;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;

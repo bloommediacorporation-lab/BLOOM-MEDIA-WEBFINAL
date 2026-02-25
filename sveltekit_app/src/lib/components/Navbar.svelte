@@ -607,14 +607,28 @@
 
   @media (max-width: 768px) {
     .liquid-glass-navbar {
-      top: 14px;
-      width: calc(100% - 24px);
-      padding: 10px 18px;
+      top: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 0 !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      transform: none !important;
+      left: 0 !important;
+      padding-top: max(1rem, env(safe-area-inset-top)); /* Handle notch */
+      padding-bottom: 1rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    
+    .liquid-glass-navbar.scrolled {
+      top: 0 !important;
+      padding-top: max(0.8rem, env(safe-area-inset-top));
+      padding-bottom: 0.8rem;
     }
 
-    .liquid-glass-navbar.scrolled {
-      top: 10px;
-      padding: 9px 16px;
+    .logo {
+      font-size: 1.2rem;
     }
   }
 </style>
