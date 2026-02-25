@@ -36,7 +36,7 @@
             <div class="flex flex-col items-start w-full mb-6">
                <span class="text-[#FFA500] text-sm font-medium mb-1">De la</span>
                <div class="flex items-start">
-                 <span class="text-[#FFA500] text-5xl font-black font-['Montserrat'] tracking-tight leading-none">199,99</span>
+                 <span class="text-[#FFA500] text-5xl font-black font-montserrat tracking-tight leading-none">199,99</span>
                  <div class="flex flex-col items-start ml-1 mt-2">
                    <span class="text-[#FFA500] text-2xl font-bold leading-none">€</span>
                    <span class="text-white/40 text-xs font-medium mt-1">/lună</span>

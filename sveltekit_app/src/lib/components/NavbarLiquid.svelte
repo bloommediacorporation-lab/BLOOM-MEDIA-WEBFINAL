@@ -243,7 +243,7 @@
     cursor: pointer;
     transition: all 0.3s;
     letter-spacing: 0.05em;
-    font-family: "Inter", sans-serif;
+    font-family: "Montserrat", sans-serif;
     border-radius: 4px;
   }
 
@@ -339,7 +339,7 @@
     font-weight: 800;
     text-transform: uppercase;
     cursor: pointer;
-    font-family: "Inter", sans-serif;
+    font-family: "Montserrat", sans-serif;
   }
 
   .desktop-only {

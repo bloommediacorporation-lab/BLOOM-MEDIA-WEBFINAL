@@ -127,18 +127,18 @@
             <!-- Number & Title Wrapper -->
             <div class="relative mb-8">
               <!-- Giant Number Behind Title -->
-              <span class="absolute -top-12 -left-8 text-[8rem] font-['Montserrat'] font-black text-[#fca311]/10 select-none leading-none z-0">
+              <span class="absolute -top-12 -left-8 text-[8rem] font-montserrat font-black text-[#fca311]/10 select-none leading-none z-0">
                 {step.id}
               </span>
               
               <!-- Title -->
-              <h2 class="relative z-10 text-4xl md:text-[4rem] font-['Montserrat'] font-extrabold text-white uppercase leading-none">
+              <h2 class="relative z-10 text-4xl md:text-[4rem] font-montserrat font-extrabold text-white uppercase leading-none">
                 {@html step.title}
               </h2>
             </div>
 
             <!-- Description -->
-            <p class="font-['Inter'] text-lg leading-[1.8] text-white/75 font-light max-w-[500px]">
+            <p class="font-montserrat text-lg leading-[1.8] text-white/75 font-light max-w-[500px]">
               {@html step.description}
             </p>
 
@@ -158,7 +158,7 @@
   }
 
   .fixed-title {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 4vw;
     transform: translateY(-50%);

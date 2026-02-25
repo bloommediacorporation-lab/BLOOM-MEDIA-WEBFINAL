@@ -56,7 +56,7 @@
     
     <!-- TOP LEFT LABEL -->
     <div class="absolute top-8 left-6 md:top-12 md:left-12 lg:left-20 z-20">
-        <span class="text-gray-500 font-mono text-sm tracking-[0.2em] font-bold uppercase">
+        <span class="text-gray-500 font-montserrat text-sm tracking-[0.2em] font-bold uppercase">
             03 / SERVICII
         </span>
     </div>
