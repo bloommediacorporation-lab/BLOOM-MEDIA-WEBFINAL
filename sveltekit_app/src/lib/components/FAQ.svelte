@@ -178,7 +178,7 @@
   }
   
   .answer p {
-    font-family: Inter;
+    font-family: 'Montserrat', sans-serif;
     color: rgba(255, 255, 255, 0.7);
     line-height: 1.6;
     margin: 0;

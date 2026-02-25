@@ -12,7 +12,7 @@
     {
       id: '02',
       title: 'Strategie',
-      description: 'Construim o foaie de parcurs personalizată. Fără șabloane. Doar un plan de atac calculat, conceput <span class="relative inline-block">pentru<img src="/monstru_strategie_mobile.webp" srcset="/monstru_strategie_mobile.webp 150w, /monstru_strategie_desktop.webp 250w" sizes="(max-width: 768px) 150px, 250px" width="250" height="250" loading="lazy" decoding="async" alt="" class="absolute -top-1 top-10 w-[150px] -left-16 md:w-[250px] md:top-[-8px] md:left-[-4.2rem] max-w-none pointer-events-none z-20" /></span> a maximiza ROI-ul și a domina nișa.',
+      description: 'Construim o foaie de parcurs personalizată. Fără șabloane. Doar un plan de atac calculat, concepu<span class="relative inline-block">t<img src="/monstru_strategie_mobile.webp" srcset="/monstru_strategie_mobile.webp 150w, /monstru_strategie_desktop.webp 250w" sizes="(max-width: 768px) 150px, 250px" width="250" height="250" loading="lazy" decoding="async" alt="" class="absolute top-4 left-[-4rem] w-[150px] md:w-[250px] md:top-1 md:left-[-7rem] max-w-none pointer-events-none z-20" /></span> pentru a maximiza ROI-ul și a domina nișa.',
       label: 'ETAPA'
     },
     {
