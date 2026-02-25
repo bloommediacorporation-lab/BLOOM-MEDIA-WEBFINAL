@@ -6,7 +6,7 @@
   const faqs = [
     {
       question: 'CARE SUNT COSTURILE?',
-      answer: 'Taxa de management și strategie: €249/lună. Serviciile suplimentare (ads, design, development) se configurează separat în funcție de nevoi. Prețuri clare de la început, fără costuri ascunse sau surprize la factură.'
+      answer: 'Taxa de management și strategie: €199.99/lună. Serviciile suplimentare (ads, design, development) se configurează separat în funcție de nevoi. Prețuri clare de la început, fără costuri ascunse sau surprize la factură.'
     },
     {
       question: 'ÎN CÂT TIMP VOI VEDEA REZULTATE?',

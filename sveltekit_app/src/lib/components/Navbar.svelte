@@ -373,7 +373,7 @@
     font-weight: 900;
     font-size: 1.5rem;
     color: white;
-    mix-blend-mode: difference;
+    mix-blend-mode: normal;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -405,12 +405,12 @@
     mix-blend-mode: difference;
     text-decoration: none;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: all 0.3s;
     position: relative;
-    font-family: "Inter", sans-serif;
+    font-family: "Montserrat", sans-serif;
     pointer-events: auto; /* Restore interactivity */
     cursor: pointer;
   }
@@ -592,7 +592,7 @@
     font-weight: 800;
     text-transform: uppercase;
     cursor: pointer;
-    font-family: "Inter", sans-serif;
+    font-family: "Montserrat", sans-serif;
   }
 
   @media (max-width: 1024px) {

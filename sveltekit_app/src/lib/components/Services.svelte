@@ -162,7 +162,7 @@
   }
 
   .title {
-    font-family: Montserrat, sans-serif; 
+    font-family: "Montserrat", sans-serif; 
     font-weight: 900; 
     font-size: 3rem;
     color: white; 
@@ -235,7 +235,7 @@
   }
   
   .period {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
     font-weight: 400;
     color: rgba(255,255,255,0.5);
@@ -243,9 +243,7 @@
     margin-left: 0.5rem;
   }
   
-  .meta {
-    /* Layout handled by utility classes */
-  }
+
 
   .package-name {
     font-family: 'Montserrat', sans-serif;
@@ -302,15 +300,15 @@
   }
   
   .number {
-    font-family: 'Inter', monospace; /* Monospaced look */
+    font-family: 'Montserrat', sans-serif; /* Unified to Montserrat */
     font-size: 0.9rem;
     color: #444; /* Dark gray */
-    font-weight: 500;
+    font-weight: 600;
   }
   
   .text { 
-    font-family: 'Inter', sans-serif; 
-    font-weight: 400; 
+    font-family: 'Montserrat', sans-serif; 
+    font-weight: 500; 
     font-size: 1.1rem; 
     color: #e5e5e5; 
     line-height: 1.4;

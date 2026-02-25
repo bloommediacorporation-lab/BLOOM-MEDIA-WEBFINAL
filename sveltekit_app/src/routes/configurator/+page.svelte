@@ -491,7 +491,7 @@
 
     .section-label {
         display: block;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Montserrat', sans-serif;
         font-weight: 600;
         font-size: 0.75rem;
         color: rgba(255,255,255,0.4);
@@ -512,7 +512,7 @@
     }
 
     .section-description {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Montserrat', sans-serif;
         font-size: 1rem;
         color: rgba(255,255,255,0.5);
         line-height: 1.7;

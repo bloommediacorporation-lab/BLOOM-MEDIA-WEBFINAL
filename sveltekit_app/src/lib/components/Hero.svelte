@@ -32,6 +32,10 @@
         }
       };
       window.addEventListener("resize", handleResize);
+    } else {
+      // Mobile: Force fixed pixel height once on mount to prevent address bar jumps
+      // This is more robust than 100svh in some environments
+      heroHeight = `${window.innerHeight}px`;
     }
 
     let watchdogInterval: ReturnType<typeof setInterval>;
@@ -233,7 +237,7 @@
   });
 </script>
 
-<section class="hero-section">
+<section class="hero-section" style:height={heroHeight}>
   
   <div class="video-wrapper">
     <video
@@ -274,10 +278,16 @@
   .hero-section {
     position: relative;
     width: 100%;
-    height: 100vh;
-    min-height: 100vh;
+    /* height set via inline style for control */
     overflow: hidden;
     background: #000;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      /* Remove min-height svh to allow fixed pixel height to dominate */
+      /* min-height: 100svh; */
+    }
   }
 
   .video-wrapper {
@@ -367,9 +377,9 @@
   }
 
   .hero-text {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: "Montserrat", "Inter", sans-serif;
     font-size: clamp(42px, 15vw, 180px);
-    font-weight: 800;
+    font-weight: 900;
     line-height: 1.2;
     letter-spacing: -0.04em;
     text-transform: lowercase;

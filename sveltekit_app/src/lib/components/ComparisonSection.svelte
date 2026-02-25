@@ -59,7 +59,7 @@
       <!-- ALTE AGENȚII – appears second on mobile -->
       <div class="order-last md:order-none flex flex-col gap-8 text-right md:pr-20">
         <div class="flex min-h-[2rem] items-end justify-end">
-          <span class="font-mono text-xs uppercase tracking-[0.2em] text-white/40 md:text-sm">
+          <span class="font-['Montserrat'] text-xs uppercase tracking-[0.2em] text-white/40 md:text-sm">
             Alte Agenții
           </span>
         </div>

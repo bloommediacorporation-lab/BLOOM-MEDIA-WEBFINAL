@@ -113,7 +113,7 @@
         </div>
 
         <!-- DESCRIPTION (Under the line) -->
-        <div class="mt-4 flex justify-between items-start text-gray-400 font-mono text-xs h-20">
+        <div class="mt-4 flex justify-between items-start text-gray-400 font-['Montserrat'] text-xs h-20">
             {#key currentIndex}
                 <div 
                     in:fly={{ y: 20, duration: 600, delay: 200, easing: cubicOut }}

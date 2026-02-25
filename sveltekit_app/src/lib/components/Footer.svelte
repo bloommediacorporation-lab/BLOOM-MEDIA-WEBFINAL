@@ -195,7 +195,7 @@
   }
   
   .tagline {
-    font-family: Inter;
+    font-family: "Montserrat", sans-serif;
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.875rem;
   }
@@ -216,7 +216,7 @@
   
   .links a, 
   .contact a {
-    font-family: Inter;
+    font-family: "Inter", sans-serif;
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     font-size: 0.875rem;
@@ -237,7 +237,7 @@
   }
   
   .bottom p {
-    font-family: Inter;
+    font-family: "Montserrat", sans-serif;
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.875rem;
   }

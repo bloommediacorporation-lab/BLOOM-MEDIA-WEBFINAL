@@ -190,7 +190,7 @@
   }
 
   .pill-subtitle {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 300;
     font-size: 1.5rem;
     margin: 0.5rem 0 0 0;
