@@ -10,7 +10,6 @@
     // ══════════════════════════════════════════════════════════════════════════
     // RESPONSIVE HEIGHT LOGIC
     // ══════════════════════════════════════════════════════════════════════════
-    // Use width-based check for layout decisions to avoid issues on touch-enabled laptops
     const isMobileLayout = window.matchMedia("(max-width: 768px)").matches;
     const isMobile = isMobileLayout || window.matchMedia("(pointer: coarse)").matches;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -23,7 +22,7 @@
         heroHeight = `${window.innerHeight}px`;
       };
       setHeight();
-      
+
       let lastWidth = window.innerWidth;
       handleResize = () => {
         if (window.innerWidth !== lastWidth) {
@@ -34,7 +33,6 @@
       window.addEventListener("resize", handleResize);
     } else {
       // Mobile: Force fixed pixel height once on mount to prevent address bar jumps
-      // This is more robust than 100svh in some environments
       heroHeight = `${window.innerHeight}px`;
     }
 
@@ -43,26 +41,20 @@
 
     const forcePlay = async () => {
       if (!videoEl || isResuming) return;
-      
+
       isResuming = true;
-      
+
       try {
-        // iOS WebKit fix: trebuie să "lovim" currentTime pentru a trezi video-ul
         const currentTime = videoEl.currentTime;
-        
-        // Trick 1: Seek minim pentru a forța iOS să reactiveze video-ul
+
         videoEl.currentTime = currentTime + 0.001;
-        
-        // Trick 2: Asigură proprietățile
         videoEl.muted = true;
         videoEl.playsInline = true;
-        
-        // Trick 3: Așteaptă puțin înainte de play
+
         await new Promise(resolve => setTimeout(resolve, 50));
-        
+
         await videoEl.play();
       } catch (e) {
-        // Fallback: reload complet dacă seek nu a funcționat
         try {
           const time = videoEl.currentTime;
           videoEl.load();
@@ -70,7 +62,7 @@
           videoEl.muted = true;
           await videoEl.play();
         } catch (e2) {
-          // Silent fail - userul va trebui să atingă ecranul
+          // Silent fail
         }
       } finally {
         isResuming = false;
@@ -101,7 +93,6 @@
       }
     };
 
-    // iOS specific: resume pe orice gest
     const handleTouchEnd = () => {
       if (videoEl?.paused) {
         forcePlay();
@@ -127,19 +118,8 @@
       window.addEventListener("click", handleInteraction, { passive: true });
       window.addEventListener("scroll", handleInteraction, { passive: true });
       startWatchdog();
-    }
-
-    if (isMobile) {
-      // Avoid any video logic on mobile
     } else {
-      // Desktop logic
-      const handleVisibilityChange = () => {
-        if (!document.hidden && videoEl?.paused) {
-          setTimeout(forcePlay, isIOS ? 300 : 150);
-        }
-      };
-      
-      // ... (other listeners)
+      document.addEventListener("visibilitychange", handleVisibilityChange);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -238,7 +218,7 @@
 </script>
 
 <section class="hero-section" style:height={heroHeight}>
-  
+
   <div class="video-wrapper">
     <video
       bind:this={videoEl}
@@ -278,16 +258,9 @@
   .hero-section {
     position: relative;
     width: 100%;
-    /* height set via inline style for control */
+    /* height set via inline style from JS for precise control */
     overflow: hidden;
     background: #000;
-  }
-
-  @media (max-width: 768px) {
-    .hero-section {
-      /* Remove min-height svh to allow fixed pixel height to dominate */
-      /* min-height: 100svh; */
-    }
   }
 
   .video-wrapper {
@@ -298,7 +271,6 @@
     bottom: 0;
     overflow: hidden;
     pointer-events: none;
-    /* Removed background-image to rely on img tag for LCP */
   }
 
   .video-element {
@@ -312,30 +284,30 @@
     transform: translate(-50%, -50%);
     object-fit: cover;
     object-position: center center;
-    /* opacity: 0; REMOVED to avoid invisible video on desktop if JS fails. GSAP will handle init. */
     will-change: transform, opacity;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    z-index: 1; /* Above image */
+    z-index: 1;
   }
 
   @media (max-width: 768px) {
     .video-element {
-      opacity: 1 !important; /* Ensure video is visible on mobile */
-      min-width: 100vw;
-      min-height: 100vh;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
+      /* FIX: Use 100% to fill the parent (which has fixed px height from JS)
+         instead of 100vh which causes jumps when browser chrome appears/disappears */
+      opacity: 1 !important;
       top: 0;
       left: 0;
       transform: none;
+      width: 100%;
+      height: 100%;
+      min-width: 100%;
+      min-height: 100%;
     }
-    
-    .hero-section {
-      height: 100vh !important;
-      height: 100dvh !important;
-    }
+
+    /* FIX: Removed height: 100vh !important and height: 100dvh !important
+       These were overriding the JS-set pixel height and causing the hero
+       to resize when the mobile browser's address bar appeared/disappeared.
+       The JS in onMount already sets the correct fixed pixel height. */
   }
 
   .overlay {
@@ -419,7 +391,7 @@
       gap: 0;
       transform: translateY(4vh);
     }
-    
+
     .subtext {
       margin-top: -1rem;
     }
