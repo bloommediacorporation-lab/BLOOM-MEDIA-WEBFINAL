@@ -86,19 +86,13 @@
       type="text/javascript"
     ></script>
 
-    <!-- GTM - ASYNC (nu blocking, dar după Cookiebot) -->
-    <script>
-      window.addEventListener('load', function() {
-        var isMobile = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches;
-        if (isMobile) return;
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
-        var gtmScript = document.createElement('script');
-        gtmScript.async = true;
-        gtmScript.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-THRM454W';
-        document.head.appendChild(gtmScript);
-      });
-    </script>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PBD847ZG');</script>
+    <!-- End Google Tag Manager -->
 
     <!-- FONTS - NON-BLOCKING -->
     
@@ -161,9 +155,10 @@
   </head>
   
   <body class="antialiased" data-sveltekit-preload-data="hover">
-    <noscript>
-      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-THRM454W" height="0" width="0" style="display:none;visibility:hidden" title="GTM"></iframe>
-    </noscript>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PBD847ZG"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>
