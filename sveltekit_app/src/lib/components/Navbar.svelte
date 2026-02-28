@@ -108,23 +108,32 @@
     isMenuOpen = !isMenuOpen;
   }
 
-  function handleScrollTo(e, id) {
-    e.preventDefault();
-    isMenuOpen = false;
+function handleScrollTo(e, id) {
+  e.preventDefault();
+  isMenuOpen = false;
+  if (typeof window === "undefined" || typeof document === "undefined") return;
 
-    if (typeof window === "undefined" || typeof document === "undefined")
-      return;
-    if (window.location.pathname !== "/") {
-      navigate("/");
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }, 500);
+  const scrollToEl = (elementId) => {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    const lenisInstance = window["lenis"];
+    if (lenisInstance?.scrollTo) {
+      lenisInstance.scrollTo(el, { offset: -100, duration: 1 });
     } else {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      // Fallback dacă Lenis nu e încărcat încă
+      const top = el.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top, behavior: "smooth" });
     }
+  };
+
+  if (window.location.pathname !== "/") {
+    navigate("/");
+    setTimeout(() => scrollToEl(id), 600);
+  } else {
+    scrollToEl(id);
   }
+}
 
   function handleNavigate(path) {
     try {

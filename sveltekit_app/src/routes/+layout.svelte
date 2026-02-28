@@ -279,12 +279,15 @@
     });
 
     // Effect 3: Reset scroll on navigation
-    $effect(() => {
-        if (lenis && $page.url.pathname) {
-            // ✅ Folosește untrack pentru a evita re-rularea inutilă
-            lenis.scrollTo(0, { immediate: true });
-        }
-    });
+ let prevPath = $state('');
+$effect(() => {
+  if (!browser || !lenis) return;
+  const path = $page.url.pathname;
+  if (path !== prevPath && !$page.url.hash) {
+    lenis.scrollTo(0, { immediate: true });
+  }
+  prevPath = path;
+});
 
     // ═══════════════════════════════════════════════════════════════════════════
     // CLEANUP
