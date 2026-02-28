@@ -95,7 +95,6 @@
     <!-- End Google Tag Manager -->
 
     <!-- FONTS - NON-BLOCKING -->
-    
     <link 
       rel="preload"
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" 
@@ -108,38 +107,6 @@
 
     <!-- HERO PRELOAD -->
     <link rel="preload" as="image" href="/images/hero-poster.webp" media="(max-width: 768px)" type="image/webp" />
-    
-    <!-- Meta Pixel Code -->
-    <script>
-      window.addEventListener('load', function() {
-        var isMobile = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches;
-        if (isMobile) return;
-        if (!window.fbq) {
-          var fbq = function() {
-            fbq.callMethod ? fbq.callMethod.apply(fbq, arguments) : fbq.queue.push(arguments);
-          };
-          window.fbq = fbq;
-          fbq.push = fbq;
-          fbq.loaded = true;
-          fbq.version = '2.0';
-          fbq.queue = [];
-          var fbScript = document.createElement('script');
-          fbScript.async = true;
-          fbScript.src = 'https://connect.facebook.net/en_US/fbevents.js';
-          document.head.appendChild(fbScript);
-        }
-        setTimeout(function() {
-          if (window.fbq) {
-            fbq('init', '991068654089906');
-            fbq('track', 'PageView');
-          }
-        }, 1500);
-      });
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=991068654089906&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
 
     <style>
       #CybotCookiebotDialog, #CybotCookiebotDialog * { cursor: auto !important; }
