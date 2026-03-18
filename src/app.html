@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ro" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    
+    <!-- PRECONNECTS FIRST -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://consent.cookiebot.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    
+    <!-- META TAGS -->
+    <meta name="description" content="Bloom Media - agenție de marketing digital și automatizare. Strategii personalizate, web design și campanii performante pentru creșterea afacerii tale." />
+    <meta name="theme-color" content="#080808" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+    <link rel="canonical" href="https://bloommedia.ro" />
+
+    <!-- OPEN GRAPH -->
+    <meta property="og:site_name" content="Bloom Media" />
+    <meta property="og:locale" content="ro_RO" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Bloom Media — Marketing Digital & Automatizare" />
+    <meta property="og:description" content="Bloom Media - agenție de marketing digital și automatizare. Strategii personalizate, web design și campanii performante pentru creșterea afacerii tale." />
+    <meta property="og:url" content="https://bloommedia.ro" />
+    <meta property="og:image" content="https://bloommedia.ro/images/hero-poster.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- TWITTER CARDS -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bloom Media — Marketing Digital & Automatizare" />
+    <meta name="twitter:description" content="Bloom Media - agenție de marketing digital și automatizare. Strategii personalizate, web design și campanii performante." />
+    <meta name="twitter:image" content="https://bloommedia.ro/images/hero-poster.webp" />
+
+    <!-- SCHEMA.ORG JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Bloom Media",
+        "url": "https://bloommedia.ro",
+        "logo": "https://bloommedia.ro/favicon.svg",
+        "description": "Bloom Media - agenție de marketing digital și automatizare.",
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "telephone": "+40-750-269-259",
+            "contactType": "customer service",
+            "areaServed": "RO",
+            "availableLanguage": "Romanian"
+          },
+          {
+            "@type": "ContactPoint",
+            "telephone": "+40-734-270-188",
+            "contactType": "customer service",
+            "areaServed": "RO",
+            "availableLanguage": "Romanian"
+          }
+        ]
+      }
+    </script>
+    
+    <!-- CONSENT DEFAULTS - PRIMUL SCRIPT -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'functionality_storage': 'granted',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+      gtag('set', 'ads_data_redaction', true);
+    </script>
+
+    <script 
+      id="Cookiebot" 
+      src="https://consent.cookiebot.com/uc.js" 
+      data-cbid="c4162480-9dd0-4d9a-9d64-3527d2289375"
+      data-blockingmode="auto"
+      defer
+      type="text/javascript"
+    ></script>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PBD847ZG');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- FONTS - NON-BLOCKING -->
+    <link 
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" 
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet" />
+    </noscript>
+
+    <!-- HERO PRELOAD -->
+    <link rel="preload" as="image" href="/images/hero-poster.webp" media="(max-width: 768px)" type="image/webp" />
+
+    <style>
+      #CybotCookiebotDialog, #CybotCookiebotDialog * { cursor: auto !important; }
+      #CookiebotWidget, #CookiebotWidget * { cursor: auto !important; }
+      #CybotCookiebotDialogBodyLevelButtonAccept:hover,
+      #CybotCookiebotDialogBodyButtonSettings:hover,
+      #CybotCookiebotDialogBodyLevelButtonDecline:hover,
+      #CookiebotWidget .CookiebotWidget-btn:hover { cursor: none !important; }
+      html { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    </style>
+
+    %sveltekit.head%
+  </head>
+  
+  <body class="antialiased" data-sveltekit-preload-data="hover">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PBD847ZG"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
