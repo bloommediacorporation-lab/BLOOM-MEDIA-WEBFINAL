@@ -3,9 +3,10 @@ import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../convex/_generated/api';
+import { sendCapiEvent } from '$lib/server/meta-capi';
 
 export const actions = {
-  default: async ({ request }) => {
+  default: async ({ request, getClientAddress }) => {
     // 1. Setup Convex Client
     const convexUrl = privateEnv.CONVEX_URL || publicEnv.PUBLIC_CONVEX_URL;
     if (!convexUrl) {
@@ -76,7 +77,22 @@ TikTok: ${resolvedTiktok || '-'}`;
 
       console.log('Convex submission result:', { auditId });
 
-      // 5. Return Success
+      // 5. Send CAPI Lead event (fire-and-forget)
+      sendCapiEvent({
+        eventName: 'Lead',
+        eventSourceUrl: 'https://bloommedia.ro/audit',
+        userData: {
+          email: resolvedEmail,
+          phone: resolvedPhone,
+          name: resolvedName,
+          ipAddress: getClientAddress(),
+          userAgent: request.headers.get('user-agent'),
+          fbp: request.cookies.get('_fbp')?.value,
+          fbc: request.cookies.get('_fbc')?.value,
+        },
+      }).catch((err) => console.error('[Meta CAPI] Lead event error:', err));
+
+      // 6. Return Success
       return { success: true, auditId };
 
     } catch (e) {
