@@ -54,23 +54,13 @@
     z-index: 1;
     padding: 4rem 0;
     background: #000100;
-    min-height: 200px;
     display: flex;
     align-items: center;
-  }
-
-  .image-marquee-container::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: #000100;
-    z-index: -1;
-    pointer-events: none;
   }
 
   .image-marquee-track {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -79,9 +69,9 @@
 
   .marquee-bloc {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     flex-shrink: 0;
-    min-width: max-content;
+    width: 100vw;
   }
 
   .logo-item {
@@ -89,6 +79,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    height: 200px;
     min-width: 240px;
     padding: 0 1.5rem;
   }
@@ -110,7 +101,7 @@
   }
 
   .logo-item img.logo-gads {
-    height: 220px;
+    height: 300px;
     max-width: 320px;
     width: auto;
   }
