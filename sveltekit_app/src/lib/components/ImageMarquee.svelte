@@ -9,24 +9,39 @@
     'photoshop-transparent.png',
     'figma-transparent.png',
     'canva-transparent.png',
-    'claude-transparent.png',
+    'claude-alt-transparent.jpg',
     'gemini-transparent.png',
   ];
   
   const logos = logoFiles.map(f => basePath + encodeURIComponent(f));
-  const repeatedLogos = [...logos, ...logos, ...logos];
 </script>
 
 <div class="image-marquee-container">
   <div class="image-marquee-track">
-    {#each repeatedLogos as logo, index}
-      <div class="logo-item" aria-hidden={index >= logos.length}>
-        <img
-          src={logo}
-          alt={index < logos.length ? 'logo partener' : ''}
-        />
-      </div>
-    {/each}
+    <div class="marquee-bloc">
+      {#each logos as logo, index}
+        <div class="logo-item">
+          <img
+            src={logo}
+            alt={index === 0 ? 'logo partener' : ''}
+            class:logo-photoshop={index === 5}
+            class:logo-gads={index === 0}
+          />
+        </div>
+      {/each}
+    </div>
+    <div class="marquee-bloc" aria-hidden="true">
+      {#each logos as logo, index}
+        <div class="logo-item">
+          <img
+            src={logo}
+            alt=""
+            class:logo-photoshop={index === 5}
+            class:logo-gads={index === 0}
+          />
+        </div>
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -55,21 +70,27 @@
 
   .image-marquee-track {
     display: flex;
-    will-change: transform;
     align-items: center;
-    gap: 0;
-    width: max-content;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
     animation: marquee 40s linear infinite;
+  }
+
+  .marquee-bloc {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: max-content;
   }
 
   .logo-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 280px;
-    width: 280px;
-    padding: 0 2rem;
     flex-shrink: 0;
+    min-width: 240px;
+    padding: 0 1.5rem;
   }
 
   .logo-item img {
@@ -82,6 +103,18 @@
     transition: filter 0.3s ease;
   }
 
+  .logo-item img.logo-photoshop {
+    height: 150px;
+    max-width: 220px;
+    width: auto;
+  }
+
+  .logo-item img.logo-gads {
+    height: 220px;
+    max-width: 320px;
+    width: auto;
+  }
+
   .logo-item:hover img {
     filter: grayscale(0%) brightness(1);
   }
@@ -91,7 +124,7 @@
       transform: translateX(0);
     }
     100% {
-      transform: translateX(-33.3333%);
+      transform: translateX(-100%);
     }
   }
 
