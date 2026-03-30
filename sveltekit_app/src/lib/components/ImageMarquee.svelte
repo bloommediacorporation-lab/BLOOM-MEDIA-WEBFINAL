@@ -47,6 +47,7 @@
     inset: 0;
     background: #000100;
     z-index: -1;
+    pointer-events: none;
   }
 
   .image-marquee-track {
@@ -66,8 +67,6 @@
     width: 280px;
     padding: 0 2rem;
     flex-shrink: 0;
-    background: #000100;
-    border-radius: 4px;
   }
 
   .logo-item img {
@@ -78,7 +77,6 @@
     max-width: 100%;
     filter: brightness(0.92);
     transition: filter 0.3s ease;
-    mix-blend-mode: multiply;
   }
 
   .logo-item:hover img {
@@ -108,8 +106,6 @@
       flex-basis: 180px;
       width: 180px;
       padding: 0 1rem;
-      background: #000100;
-      border-radius: 4px;
     }
   }
 </style>
