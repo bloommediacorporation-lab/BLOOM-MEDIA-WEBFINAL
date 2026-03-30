@@ -6,7 +6,7 @@ import { api } from '../../../convex/_generated/api';
 import { sendCapiEvent } from '$lib/server/meta-capi';
 
 export const actions = {
-  default: async ({ request, getClientAddress }) => {
+  default: async ({ request, cookies, getClientAddress }) => {
     // 1. Setup Convex Client
     const convexUrl = privateEnv.CONVEX_URL || publicEnv.PUBLIC_CONVEX_URL;
     if (!convexUrl) {
@@ -87,8 +87,8 @@ TikTok: ${resolvedTiktok || '-'}`;
           name: resolvedName,
           ipAddress: getClientAddress(),
           userAgent: request.headers.get('user-agent'),
-          fbp: request.cookies.get('_fbp')?.value,
-          fbc: request.cookies.get('_fbc')?.value,
+          fbp: cookies.get('_fbp'),
+          fbc: cookies.get('_fbc'),
         },
       }).catch((err) => console.error('[Meta CAPI] Lead event error:', err));
 
