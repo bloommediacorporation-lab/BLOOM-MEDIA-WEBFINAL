@@ -24,7 +24,6 @@
         <img
           src={logo}
           alt={index < logos.length ? 'logo partener' : ''}
-          class:gads-fix={index % logos.length === 0}
         />
       </div>
     {/each}
@@ -75,17 +74,12 @@
 
   .logo-item img {
     display: block;
-    height: 140px;
+    height: 200px;
     width: auto;
     object-fit: contain;
     max-width: 100%;
     filter: brightness(0.92);
     transition: filter 0.3s ease;
-  }
-
-  .logo-item img.gads-fix {
-    height: 180px;
-    width: auto;
   }
 
   .logo-item:hover img {
@@ -108,7 +102,7 @@
     }
 
     .logo-item img {
-      height: 58px;
+      height: 85px;
     }
 
     .logo-item {
