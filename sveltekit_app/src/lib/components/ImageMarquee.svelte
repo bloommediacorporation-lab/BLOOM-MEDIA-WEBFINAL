@@ -1,16 +1,16 @@
 <script>
   const basePath = '/Marquee/';
   const logoFiles = [
-    'google ads logo.png',
-    'tiktok logo.png',
-    'meta logo.png',
-    'openclaw logo.png',
-    'flow logo.png',
-    'photoshop logo.png',
-    'figma logo.png',
-    'canva logo.png',
-    'claude logo.png',
-    'gemini logo.png',
+    'google-ads-transparent.png',
+    'tiktok-transparent.png',
+    'meta-transparent.png',
+    'openclaw-transparent.png',
+    'flow-transparent.png',
+    'photoshop-transparent.png',
+    'figma-transparent.png',
+    'canva-transparent.png',
+    'claude-transparent.png',
+    'gemini-transparent.png',
   ];
   
   const logos = logoFiles.map(f => basePath + encodeURIComponent(f));
