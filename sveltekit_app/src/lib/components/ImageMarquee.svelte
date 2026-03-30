@@ -28,6 +28,7 @@
           class:logo-gads={index % logos.length === 0}
           class:logo-claude={index % logos.length === 8}
           class:logo-figma={index % logos.length === 6}
+          class:logo-tiktok={index % logos.length === 1}
         />
       </div>
     {/each}
@@ -90,6 +91,10 @@
   .logo-item img.logo-figma {
     height: 300px;
     width: 260px;
+  }
+
+  .logo-item img.logo-tiktok {
+    object-position: center;
   }
 
   .logo-item:hover img {
