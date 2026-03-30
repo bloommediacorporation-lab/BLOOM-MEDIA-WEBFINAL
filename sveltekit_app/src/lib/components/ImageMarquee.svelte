@@ -14,34 +14,21 @@
   ];
   
   const logos = logoFiles.map(f => basePath + encodeURIComponent(f));
+  const repeatedLogos = [...logos, ...logos, ...logos];
 </script>
 
 <div class="image-marquee-container">
   <div class="image-marquee-track">
-    <div class="marquee-bloc">
-      {#each logos as logo, index}
-        <div class="logo-item">
-          <img
-            src={logo}
-            alt={index === 0 ? 'logo partener' : ''}
-            class:logo-photoshop={index === 5}
-            class:logo-gads={index === 0}
-          />
-        </div>
-      {/each}
-    </div>
-    <div class="marquee-bloc" aria-hidden="true">
-      {#each logos as logo, index}
-        <div class="logo-item">
-          <img
-            src={logo}
-            alt=""
-            class:logo-photoshop={index === 5}
-            class:logo-gads={index === 0}
-          />
-        </div>
-      {/each}
-    </div>
+    {#each repeatedLogos as logo, index}
+      <div class="logo-item">
+        <img
+          src={logo}
+          alt={index < logos.length ? 'logo partener' : ''}
+          class:logo-photoshop={index % logos.length === 5}
+          class:logo-gads={index % logos.length === 0}
+        />
+      </div>
+    {/each}
   </div>
 </div>
 
@@ -60,18 +47,11 @@
 
   .image-marquee-track {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
     animation: marquee 40s linear infinite;
-  }
-
-  .marquee-bloc {
-    display: flex;
-    align-items: stretch;
-    flex-shrink: 0;
-    width: 100vw;
   }
 
   .logo-item {
@@ -79,7 +59,6 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    height: 200px;
     min-width: 240px;
     padding: 0 1.5rem;
   }
@@ -111,18 +90,13 @@
   }
 
   @keyframes marquee {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-100%);
-    }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% / 3)); }
   }
 
   @media (max-width: 768px) {
     .image-marquee-container {
       padding: 2.75rem 0;
-      min-height: 132px;
     }
 
     .logo-item img {
@@ -130,8 +104,7 @@
     }
 
     .logo-item {
-      flex-basis: 180px;
-      width: 180px;
+      min-width: 180px;
       padding: 0 1rem;
     }
   }
