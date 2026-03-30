@@ -17,6 +17,7 @@
     ServicesShowcase: null,
     ProcessTimeline: null,
     Services: null,
+    ImageMarquee: null,
     FAQ: null,
     Contact: null,
     Footer: null
@@ -35,6 +36,7 @@
         import('$lib/components/ServicesShowcase.svelte'),
         import('$lib/components/ProcessTimeline.svelte'),
         import('$lib/components/Services.svelte'),
+        import('$lib/components/ImageMarquee.svelte'),
         import('$lib/components/FAQ.svelte'),
         import('$lib/components/Contact.svelte'),
         import('$lib/components/Footer.svelte')
@@ -46,6 +48,7 @@
         components.ServicesShowcase,
         components.ProcessTimeline,
         components.Services,
+        components.ImageMarquee,
         components.FAQ,
         components.Contact,
         components.Footer
@@ -108,6 +111,7 @@
     <C.ServicesShowcase />
     <C.ProcessTimeline />
     <C.Services {navigate} />
+    <C.ImageMarquee />
     <C.FAQ />
     <C.Contact />
   {:else if isLoading}
