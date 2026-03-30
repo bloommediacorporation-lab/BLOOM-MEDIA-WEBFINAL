@@ -26,6 +26,8 @@
           alt={index < logos.length ? 'logo partener' : ''}
           class:logo-photoshop={index % logos.length === 5}
           class:logo-gads={index % logos.length === 0}
+          class:logo-claude={index % logos.length === 8}
+          class:logo-figma={index % logos.length === 6}
         />
       </div>
     {/each}
@@ -47,11 +49,10 @@
 
   .image-marquee-track {
     display: flex;
-    align-items: center;
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
-    animation: marquee 40s linear infinite;
+    animation: marquee 30s linear infinite;
   }
 
   .logo-item {
@@ -59,30 +60,36 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    min-width: 240px;
-    padding: 0 1.5rem;
+    width: 270px;
   }
 
   .logo-item img {
     display: block;
-    height: 200px;
-    width: auto;
+    height: 240px;
+    width: 260px;
     object-fit: contain;
-    max-width: 100%;
     filter: brightness(0.92);
     transition: filter 0.3s ease;
   }
 
   .logo-item img.logo-photoshop {
-    height: 150px;
-    max-width: 220px;
-    width: auto;
+    height: 180px;
+    width: 260px;
   }
 
   .logo-item img.logo-gads {
+    height: 480px;
+    width: 340px;
+  }
+
+  .logo-item img.logo-claude {
+    height: 170px;
+    width: 260px;
+  }
+
+  .logo-item img.logo-figma {
     height: 300px;
-    max-width: 320px;
-    width: auto;
+    width: 260px;
   }
 
   .logo-item:hover img {
@@ -91,7 +98,7 @@
 
   @keyframes marquee {
     0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% / 3)); }
+    100% { transform: translateX(-2700px); }
   }
 
   @media (max-width: 768px) {
@@ -99,13 +106,33 @@
       padding: 2.75rem 0;
     }
 
-    .logo-item img {
-      height: 85px;
+    .logo-item {
+      width: 195px;
     }
 
-    .logo-item {
-      min-width: 180px;
-      padding: 0 1rem;
+    .logo-item img {
+      height: 100px;
+      width: 185px;
+    }
+
+    .logo-item img.logo-photoshop {
+      height: 75px;
+      width: 185px;
+    }
+
+    .logo-item img.logo-gads {
+      height: 180px;
+      width: 128px;
+    }
+
+    .logo-item img.logo-claude {
+      height: 100px;
+      width: 185px;
+    }
+
+    .logo-item img.logo-figma {
+      height: 125px;
+      width: 185px;
     }
   }
 </style>
