@@ -9,7 +9,7 @@
     'photoshop-transparent.png',
     'figma-transparent.png',
     'canva-transparent.png',
-    'claude-alt-transparent.jpg',
+    'claude-alt-transparent.png',
     'gemini-transparent.png',
   ];
   
