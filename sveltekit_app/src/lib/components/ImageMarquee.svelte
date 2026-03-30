@@ -60,7 +60,7 @@
     align-items: center;
     gap: 0;
     width: max-content;
-    animation: marquee 65s linear infinite;
+    animation: marquee 40s linear infinite;
   }
 
   .logo-item {
@@ -84,7 +84,7 @@
   }
 
   .logo-item img.gads-fix {
-    height: 160px;
+    height: 180px;
     width: auto;
   }
 
