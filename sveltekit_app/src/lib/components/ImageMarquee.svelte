@@ -21,7 +21,11 @@
   <div class="image-marquee-track">
     {#each repeatedLogos as logo, index}
       <div class="logo-item" aria-hidden={index >= logos.length}>
-        <img src={logo} alt={index < logos.length ? 'logo partener' : ''} />
+        <img
+          src={logo}
+          alt={index < logos.length ? 'logo partener' : ''}
+          class:gads-fix={index % logos.length === 0}
+        />
       </div>
     {/each}
   </div>
@@ -77,6 +81,11 @@
     max-width: 100%;
     filter: brightness(0.92);
     transition: filter 0.3s ease;
+  }
+
+  .logo-item img.gads-fix {
+    height: 160px;
+    width: auto;
   }
 
   .logo-item:hover img {
